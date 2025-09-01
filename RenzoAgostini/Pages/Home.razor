@@ -1,0 +1,18 @@
+﻿@page "/"
+@using RenzoAgostini.Components
+
+<h2 class="sr-only">Quadri</h2>
+
+<div class="grid">
+  @foreach (var p in paintings)
+  {
+      <PaintingCard
+          Title="@p.Title"
+          Description="@p.Description"
+          Year="@p.Year"
+          Medium="@p.Medium"
+          Price="@p.Price"
+          IsForSale="@p.IsForSale"
+          ImageUrls="@p.ImageUrls" />
+  }
+</div>
