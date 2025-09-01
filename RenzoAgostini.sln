@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.35906.104 d17.14
+VisualStudioVersion = 17.14.35906.104
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenzoAgostini", "RenzoAgostini\RenzoAgostini.csproj", "{537A507F-7F30-4C64-A7FD-3D0EA77B89E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenzoAgostini.Client", "RenzoAgostini.Client\RenzoAgostini.Client.csproj", "{537A507F-7F30-4C64-A7FD-3D0EA77B89E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenzoAgostini.Server", "RenzoAgostini.Server\RenzoAgostini.Server.csproj", "{57666B18-BA69-4344-BA3F-A05E91522F4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenzoAgostini.Shared", "RenzoAgostini.Shared\RenzoAgostini.Shared.csproj", "{964F5686-7661-4623-B495-A70CBA16FF00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{537A507F-7F30-4C64-A7FD-3D0EA77B89E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{537A507F-7F30-4C64-A7FD-3D0EA77B89E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{537A507F-7F30-4C64-A7FD-3D0EA77B89E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57666B18-BA69-4344-BA3F-A05E91522F4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57666B18-BA69-4344-BA3F-A05E91522F4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57666B18-BA69-4344-BA3F-A05E91522F4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57666B18-BA69-4344-BA3F-A05E91522F4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{964F5686-7661-4623-B495-A70CBA16FF00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{964F5686-7661-4623-B495-A70CBA16FF00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{964F5686-7661-4623-B495-A70CBA16FF00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{964F5686-7661-4623-B495-A70CBA16FF00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
