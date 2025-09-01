@@ -1,4 +1,4 @@
-﻿namespace RenzoAgostini.Models
+﻿namespace RenzoAgostini.Entities
 {
     public record Painting(
     int Id,

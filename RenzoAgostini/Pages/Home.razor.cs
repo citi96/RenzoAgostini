@@ -1,14 +1,29 @@
-﻿namespace RenzoAgostini.Pages
+﻿using global::RenzoAgostini.Models.DTOs;
+using global::RenzoAgostini.Services.Interfaces;
+using Microsoft.AspNetCore.Components;
+
+namespace RenzoAgostini.Pages
 {
     public partial class Home
     {
-        protected record PaintingVm(string Title, string? Description, int? Year, string? Medium, decimal? Price, bool IsForSale, IReadOnlyList<string> ImageUrls);
+        [Inject] private IPaintingService PaintingService { get; set; } = default!;
+        [Inject] private ILogger<Home> Logger { get; set; } = default!;
 
-        protected List<PaintingVm> paintings = new()
+        protected IEnumerable<PaintingDto>? paintings;
+        protected string? errorMessage;
+
+        protected override async Task OnInitializedAsync()
         {
-            new("Alba sul mare", "Serie marina. Colori caldi.", 2023, "Olio su tela", 1200m, true, new[]{"/img/q1a.jpg","/img/q1b.jpg"}),
-            new("Notturno", "Acrilico, toni blu.", 2021, "Acrilico su tavola", null, false, new[]{"/img/q2a.jpg","/img/q2b.jpg"}),
-            new("Colline", "Paesaggio primaverile.", 2024, "Olio su tela", 900m, true, new[]{"/img/q3a.jpg"})
-        };
+            try
+            {
+                paintings = await PaintingService.GetAllPaintingsAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error loading paintings on home page");
+                errorMessage = "Errore nel caricamento dei quadri. Riprova più tardi.";
+                // In produzione, potresti voler mostrare un messaggio più user-friendly
+            }
+        }
     }
 }
