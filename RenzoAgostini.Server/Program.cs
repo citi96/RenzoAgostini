@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -69,7 +70,7 @@ builder.Services.AddSwaggerGen(o =>
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(o =>
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
     {
         o.Authority = "http://localhost:8080/realms/RenzoAgostiniRealm";
         o.TokenValidationParameters = new TokenValidationParameters
@@ -88,6 +89,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
         o.MetadataAddress = "http://localhost:8080/realms/RenzoAgostiniRealm/.well-known/openid-configuration";
         o.RequireHttpsMetadata = true;
+
+        o.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = ctx =>
+            {
+                var id = (ClaimsIdentity)ctx.Principal!.Identity!;
+
+                var res = ctx.Principal.FindFirst("resource_access")?.Value;
+                if (!string.IsNullOrEmpty(res))
+                {
+                    var obj = System.Text.Json.JsonDocument.Parse(res);
+                    if (obj.RootElement.TryGetProperty("web-a1e0f0a5-ed40-4a9f-bd85-87a2273e38f7", out var client)
+                        && client.TryGetProperty("roles", out var arr2))
+                        foreach (var r in arr2.EnumerateArray())
+                            id.AddClaim(new Claim(ClaimTypes.Role, r.GetString()!));
+                }
+                
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddAuthorization(options =>
