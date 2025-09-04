@@ -1,17 +1,13 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.JSInterop;
-using RenzoAgostini.Client.Authentication.Responses;
 using RenzoAgostini.Client.Services.Interfaces;
-using RenzoAgostini.Shared.Contracts;
-using RenzoAgostini.Shared.Data;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Authentication
 {
     public class CustomAuthenticationStateProvider(IUserService userService, ICookieService cookieService) : AuthenticationStateProvider, IDisposable
     {
-        public UserDto? CurrentUser { get; private set; }
+        public UserDto? CurrentUser { get; set; }
 
         public void Dispose()
         {
@@ -22,11 +18,11 @@ namespace RenzoAgostini.Client.Authentication
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var principal = new ClaimsPrincipal();
-            var user = await userService.FetchUserFromBrowserAsync();
 
+            var user = await userService.FetchUserFromBrowserAsync();
             if (user != null)
             {
-                var authenticatedUser = await userService.SendAuthenticateRequestAsync(user.UserName, user.PasswordHash ?? string.Empty);
+                var authenticatedUser = await userService.SendAuthenticateRequestAsync(await cookieService.GetAsync<string>("access_token"));
 
                 if (authenticatedUser != null)
                 {
@@ -35,50 +31,44 @@ namespace RenzoAgostini.Client.Authentication
                 }
             }
 
-            return new(principal);
-        }
-
-        public async Task LoginAsync(string username, string password)
-        {
-            var principal = new ClaimsPrincipal();
-            var user = await userService.SendAuthenticateRequestAsync(username, password);
-
-            if (user != null)
-            {
-                CurrentUser = user;
-                principal = user.ToClaimsPrincipal();
-            }
-
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(principal)));
+            return new AuthenticationState(principal);
         }
 
         public async Task LogoutAsync()
         {
-            await cookieService.ClearAsync("token");
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new())));
+            CurrentUser = null;
+            await cookieService.ClearAsync("access_token");
+            await cookieService.ClearAsync("auth_state");
+            await cookieService.ClearAsync("auth_nonce");
+
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal())));
         }
 
-        [JSInvokable]
-        public async void GoogleLogin(GoogleResponse googleResponse)
+        public void UpdateCurrentUser(UserDto user)
         {
-            var principal = new ClaimsPrincipal();
-            var user = await userService.SendAuthenticateRequestAsync(EProvider.Google, googleResponse.Credential);
-
-            if (user != null)
-            {
-                CurrentUser = user;
-                principal = user.ToClaimsPrincipal();
-            }
-
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(principal)));
+            CurrentUser = user;
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user.ToClaimsPrincipal())));
         }
 
         private async void OnAuthenticationStateChangedAsync(Task<AuthenticationState> task)
         {
-            var authenticationState = await task;
-
-            if (authenticationState != null)
-                CurrentUser = UserDto.FromClaimsPrincipal(authenticationState.User);
+            try
+            {
+                var authenticationState = await task;
+                if (authenticationState?.User?.Identity?.IsAuthenticated == true)
+                {
+                    CurrentUser = UserDto.FromClaimsPrincipal(authenticationState.User);
+                }
+                else
+                {
+                    CurrentUser = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore nel cambio stato di autenticazione: {ex.Message}");
+                CurrentUser = null;
+            }
         }
     }
 }

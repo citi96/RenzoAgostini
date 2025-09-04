@@ -1,11 +1,28 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using RenzoAgostini.Client.Components
+@inherits LayoutComponentBase
 
 <div class="container">
     <div class="nav">
         <a class="brand" href="/">Galleria</a>
         <div class="spacer"></div>
         <button class="btn" title="Carrello">🛒 <strong>@cartCount</strong></button>
-        <button class="btn primary" title="Login">Accedi</button>
+        
+        <AuthorizeView>
+            <Authorized>
+                <div class="user-info">
+                    <span class="welcome-text">Ciao, @context.User.Identity?.Name</span>
+                    <button class="btn secondary" @onclick="LogoutAsync" title="Logout">
+                        Esci
+                    </button>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <button class="btn primary" @onclick="ShowLoginModal" title="Login">
+                    Accedi
+                </button>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
     <main>
         @Body

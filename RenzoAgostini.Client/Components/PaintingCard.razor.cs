@@ -2,7 +2,7 @@
 
 namespace RenzoAgostini.Client.Components
 {
-    public partial class PaintingCard
+    public partial class PaintingCard : ComponentBase
     {
         [Parameter] public required string Title { get; set; }
         [Parameter] public string? Description { get; set; }

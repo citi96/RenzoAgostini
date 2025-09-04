@@ -15,7 +15,7 @@ namespace RenzoAgostini.Server.Services
         {
             const string cacheKey = "all_paintings";
 
-            9if (cache.TryGetValue(cacheKey, out IEnumerable<PaintingDto>? cachedPaintings))
+            if (cache.TryGetValue(cacheKey, out IEnumerable<PaintingDto>? cachedPaintings))
             {
                 logger.LogInformation("Retrieved paintings from cache");
                 return cachedPaintings!;

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using RenzoAgostini.Server.Entities;
 
 namespace RenzoAgostini.Server.Data
 {
-    public class RenzoAgostiniDbContext(DbContextOptions<RenzoAgostiniDbContext> opt) : DbContext(opt)
+    public class RenzoAgostiniDbContext(DbContextOptions<RenzoAgostiniDbContext> opt) : IdentityDbContext<ApplicationUser>(opt)
     {
         public DbSet<Painting> Paintings => Set<Painting>();
 
