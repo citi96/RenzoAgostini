@@ -9,6 +9,7 @@
         string? Medium,
         decimal? Price,
         bool IsForSale,
+        string? Dimensions,
         IReadOnlyList<string> ImageUrls
     );
 
@@ -20,6 +21,7 @@
         string? Medium,
         decimal? Price,
         bool IsForSale,
+        string? Dimensions,
         IReadOnlyList<PaintingImageDto> Images
     );
 }

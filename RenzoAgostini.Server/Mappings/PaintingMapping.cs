@@ -16,6 +16,7 @@ namespace RenzoAgostini.Server.Mappings
                 painting.Medium,
                 painting.Price,
                 painting.IsForSale,
+                painting.Dimensions,
                 [.. painting.Images.Select(img => img.Url)]
             );
         }
@@ -31,6 +32,7 @@ namespace RenzoAgostini.Server.Mappings
                 Medium = dto.Medium,
                 Price =dto.Price,
                 IsForSale = dto.IsForSale,
+                Dimensions = dto.Dimensions,
                 Images = [.. dto.Images.Select(img => new PaintingImage {
                     Url = img.Url,
                     Width = img.Width,
@@ -49,6 +51,7 @@ namespace RenzoAgostini.Server.Mappings
             target.Medium = dto.Medium;
             target.Price = dto.Price;
             target.IsForSale = dto.IsForSale;
+            target.Dimensions = dto.Dimensions;
 
             target.Images.Clear();
             target.Images.AddRange(dto.Images.Select(i => new PaintingImage {

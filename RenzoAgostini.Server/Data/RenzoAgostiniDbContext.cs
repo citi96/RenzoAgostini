@@ -37,6 +37,9 @@ namespace RenzoAgostini.Server.Data
                 entity.Property(p => p.Price)
                     .HasColumnType("decimal(10,2)");
 
+                entity.Property(p => p.Dimensions)
+                    .HasMaxLength(50);
+
                 // Configurazione Images come owned entities
                 entity.OwnsMany(p => p.Images, img =>
                 {

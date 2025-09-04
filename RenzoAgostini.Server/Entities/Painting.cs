@@ -10,6 +10,7 @@
         public string? Medium { get; set; }
         public decimal? Price { get; set; }
         public bool IsForSale { get; set; }
+        public string? Dimensions { get; set; }
 
         public List<PaintingImage> Images { get; set; } = new();
 
