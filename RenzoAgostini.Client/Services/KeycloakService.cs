@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
 using Microsoft.JSInterop;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.DTOs;
@@ -75,10 +76,15 @@ namespace RenzoAgostini.Client.Services
                 if (!tokenData.TryGetProperty("access_token", out var accessTokenElement))
                     return null;
 
+                if (!tokenData.TryGetProperty("refresh_token", out var refreshTokenElement))
+                    return null;
+
                 var accessToken = accessTokenElement.GetString();
+                var refreshToken = refreshTokenElement.GetString();
 
                 // Salva il token
                 await _cookieService.PutAsync("access_token", accessToken);
+                await _cookieService.PutAsync("refresh_token", refreshToken);
 
                 return accessToken;
             }

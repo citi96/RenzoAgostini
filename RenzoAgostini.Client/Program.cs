@@ -25,6 +25,7 @@ try
 catch { /* ok se non esiste */ }
 
 builder.Services.AddScoped<AuthorizationMessageHandler>();
+builder.Services.AddScoped<RefreshTokenHandler>();
 builder.Services.AddScoped<ErrorMessageHandler>();
 builder.Services.AddScoped<HttpClient, CustomHttpClient>();
 
