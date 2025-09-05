@@ -29,18 +29,22 @@
                     @foreach (var p in paintings)
                     {
                         <div class="painting-item">
-                            <PaintingCard Title="@(p.Title)"
-                                          Description="@(p.Description)"
-                                          Year="@(p.Year)"
-                                          Medium="@(p.Medium)"
-                                          IsForSale="@(p.IsForSale)"
-                                          Price="@(p.Price)"
-                                          ImageUrls="@(p.ImageUrls)" />
+                            <PaintingCard Title="@p.Title"
+                                          Description="@p.Description"
+                                          Year="@p.Year"
+                                          Medium="@p.Medium"
+                                          IsForSale="@p.IsForSale"
+                                          Price="@p.Price"
+                                          ImageUrls="@p.ImageUrls"
+                                          IsAdminMode="true"
+                                          PaintingData="p"
+                                          OnEdit="ShowEditor"
+                                          OnDelete="ConfirmDelete" />
 
-                            <div class="actions mt-2">
+                            @* <div class="actions mt-2">
                                 <button class="btn secondary small" @onclick="() => ShowEditor(p)">✏️ Modifica</button>
                                 <button class="btn danger small" @onclick="() => ConfirmDelete(p)">🗑️ Elimina</button>
-                            </div>
+                            </div> *@
                         </div>
                     }
                 </div>

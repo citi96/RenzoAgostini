@@ -1,31 +1,38 @@
 ﻿@using System.Globalization
 
 <div class="card">
-    <img src="@($"{Configuration["BaseUrl"]}/{@PrimaryImageUrl}")"
-         alt="@Title"
-         @onclick="() => ShowLightbox(0)"
-         class="clickable-image" />
-    <div class="body">
-        <div class="title">@Title</div>
-        @if (!string.IsNullOrWhiteSpace(Description))
-        {
-            <div class="meta">@Description</div>
-        }
-        <div class="meta">@Year @Medium</div>
-        @if (IsForSale && Price is not null)
-        {
-            <div class="price">@Price?.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</div>
-            <button class="btn primary w-100">Aggiungi al carrello</button>
-        }
-        else
-        {
-            <span class="btn w-100" disabled>Non disponibile</span>
-        }
-    </div>
+	<img src="@($"{Configuration["BaseUrl"]}/{@PrimaryImageUrl}")"
+		 alt="@Title"
+		 @onclick="() => ShowLightbox(0)"
+		 class="clickable-image" />
+	<div class="body">
+		<div class="title">@Title</div>
+		@if (!string.IsNullOrWhiteSpace(Description))
+		{
+			<div class="meta">@Description</div>
+		}
+		<div class="meta">@Year @Medium</div>
+		@if (IsAdminMode && PaintingData != null)
+		{
+			<div class="actions">
+				<button class="btn secondary small" @onclick="() => OnEdit.InvokeAsync(PaintingData)">✏️ Modifica</button>
+				<button class="btn danger small" @onclick="() => OnDelete.InvokeAsync(PaintingData)">🗑️ Elimina</button>
+			</div>
+		}
+		else if (IsForSale && Price is not null)
+		{
+			<div class="price">@Price?.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</div>
+			<button class="btn primary w-100">Aggiungi al carrello</button>
+		}
+		else
+		{
+			<span class="btn w-100" disabled>Non disponibile</span>
+		}
+	</div>
 </div>
 
 <ImageLightbox IsVisible="showLightbox"
-               Images="ImageUrls"
-               InitialIndex="lightboxIndex"
-               Title="@Title"
-               OnClose="HideLightbox" />
+			   Images="ImageUrls"
+			   InitialIndex="lightboxIndex"
+			   Title="@Title"
+			   OnClose="HideLightbox" />

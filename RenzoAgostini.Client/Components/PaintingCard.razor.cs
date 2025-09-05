@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Components
 {
@@ -13,6 +14,10 @@ namespace RenzoAgostini.Client.Components
         [Parameter] public decimal? Price { get; set; }
         [Parameter] public bool IsForSale { get; set; }
         [Parameter] public IReadOnlyList<string> ImageUrls { get; set; } = [];
+        [Parameter] public bool IsAdminMode { get; set; } = false;
+        [Parameter] public EventCallback<PaintingDto> OnEdit { get; set; }
+        [Parameter] public EventCallback<PaintingDto> OnDelete { get; set; }
+        [Parameter] public PaintingDto? PaintingData { get; set; }
 
         protected string PrimaryImageUrl => ImageUrls.Count > 0 ? ImageUrls[0] : string.Empty;
 
