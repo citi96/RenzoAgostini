@@ -6,3 +6,16 @@
 .w-100 {
     width: 100%
 }
+
+.clickable-image {
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+    .clickable-image:hover {
+        transform: scale(1.05);
+        filter: brightness(1.1);
+    }

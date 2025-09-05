@@ -1,0 +1,35 @@
+﻿@if (IsVisible)
+{
+    <div class="lightbox-overlay" @onclick="Close" @onkeydown="HandleKeyDown" tabindex="0">
+        <div class="lightbox-container" @onclick:stopPropagation="true">
+            <button class="lightbox-close" @onclick="Close" title="Chiudi">✕</button>
+
+            @if (Images.Count > 1)
+            {
+                <button class="lightbox-nav lightbox-prev" @onclick="PreviousImage" title="Immagine precedente">‹</button>
+                <button class="lightbox-nav lightbox-next" @onclick="NextImage" title="Immagine successiva">›</button>
+            }
+
+            <div class="lightbox-image-container">
+                <img src="@($"{Configuration["BaseUrl"]}/{CurrentImage}")"
+                     alt="@Title"
+                     class="lightbox-image"
+                     @onload="OnImageLoad" />
+
+                @if (IsLoading)
+                {
+                    <div class="lightbox-loading">
+                        <div class="spinner"></div>
+                    </div>
+                }
+            </div>
+
+            @if (Images.Count > 1)
+            {
+                <div class="lightbox-counter">
+                    @(CurrentIndex + 1) di @Images.Count
+                </div>
+            }
+        </div>
+    </div>
+}

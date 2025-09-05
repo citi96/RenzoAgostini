@@ -15,5 +15,19 @@ namespace RenzoAgostini.Client.Components
         [Parameter] public IReadOnlyList<string> ImageUrls { get; set; } = [];
 
         protected string PrimaryImageUrl => ImageUrls.Count > 0 ? ImageUrls[0] : string.Empty;
+
+        private bool showLightbox = false;
+        private int lightboxIndex = 0;
+
+        private void ShowLightbox(int index)
+        {
+            lightboxIndex = index;
+            showLightbox = true;
+        }
+
+        private void HideLightbox()
+        {
+            showLightbox = false;
+        }
     }
 }
