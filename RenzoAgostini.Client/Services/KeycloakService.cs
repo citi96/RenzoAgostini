@@ -49,7 +49,7 @@ namespace RenzoAgostini.Client.Services
             return loginUrl;
         }
 
-        public async Task<UserDto?> HandleCallbackAsync(string code)
+        public async Task<string?> HandleCallbackAsync(string code)
         {
             try
             {
@@ -80,8 +80,7 @@ namespace RenzoAgostini.Client.Services
                 // Salva il token
                 await _cookieService.PutAsync("access_token", accessToken);
 
-                // Ottieni le informazioni dell'utente
-                return await GetUserInfoAsync(accessToken);
+                return accessToken;
             }
             catch (Exception)
             {

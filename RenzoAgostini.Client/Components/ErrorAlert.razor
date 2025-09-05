@@ -1,0 +1,8 @@
+﻿@if (!string.IsNullOrEmpty(Message))
+{
+    <div class="alert alert-@Type" role="alert">
+        <span class="alert-icon">@GetIcon()</span>
+        <span class="alert-message">@Message</span>
+        <button class="alert-close" @onclick="Close">✕</button>
+    </div>
+}

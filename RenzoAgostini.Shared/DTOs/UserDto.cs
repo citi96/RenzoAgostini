@@ -11,7 +11,7 @@ namespace RenzoAgostini.Shared.DTOs
         public string? Surname { get; set; }
         public IEnumerable<string> Roles { get; set; } = [];
 
-        public ClaimsPrincipal ToClaimsPrincipal()
+        public ClaimsPrincipal ToClaimsPrincipal(string accessToken)
         {
             var claims = new List<Claim>
             {

@@ -1,0 +1,74 @@
+﻿@page "/admin/paintings"
+@using System.Globalization
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize(Roles = "admin")]
+
+<PageTitle>Gestione Quadri - Admin</PageTitle>
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+        <div class="admin-container">
+            <div class="header">
+                <h1>Gestione Quadri</h1>
+                <button class="btn primary" @onclick="() => ShowEditor(null)">
+                    <span class="icon">➕</span> Nuovo Quadro
+                </button>
+            </div>
+
+            <ErrorAlert Message="@errorMessage" Type="error" OnClose="() => errorMessage = null" />
+            <ErrorAlert Message="@successMessage" Type="success" OnClose="() => successMessage = null" />
+
+            @if (paintings is null)
+            {
+                <div class="loading">Caricamento...</div>
+            }
+            else
+            {
+                <div class="grid paintings-grid">
+                    @foreach (var p in paintings)
+                    {
+                        <div class="painting-item">
+                            <PaintingCard Title="@(p.Title)"
+                                          Description="@(p.Description)"
+                                          Year="@(p.Year)"
+                                          Medium="@(p.Medium)"
+                                          IsForSale="@(p.IsForSale)"
+                                          Price="@(p.Price)"
+                                          ImageUrls="@(p.ImageUrls)" />
+
+                            <div class="actions mt-2">
+                                <button class="btn secondary small" @onclick="() => ShowEditor(p)">✏️ Modifica</button>
+                                <button class="btn danger small" @onclick="() => ConfirmDelete(p)">🗑️ Elimina</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (showEditor)
+            {
+                <PaintingEditor Painting="editingPainting"
+                                OnSave="HandleSave"
+                                OnCancel="HideEditor" />
+            }
+
+            @if (showDeleteConfirm && paintingToDelete is not null)
+            {
+                <div class="modal-overlay" @onclick="CancelDelete">
+                    <div class="modal" @onclick:stopPropagation="true">
+                        <h3>Conferma eliminazione</h3>
+                        <p>Eliminare "<strong>@paintingToDelete.Title</strong>"?</p>
+                        <div class="modal-actions">
+                            <button class="btn secondary" @onclick="CancelDelete">Annulla</button>
+                            <button class="btn danger" @onclick="ExecuteDelete">Elimina</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <p>Non hai i requisiti per vedere questa pagina.</p>
+    </NotAuthorized>
+</AuthorizeView>

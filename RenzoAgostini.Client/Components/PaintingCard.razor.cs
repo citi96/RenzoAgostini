@@ -4,6 +4,8 @@ namespace RenzoAgostini.Client.Components
 {
     public partial class PaintingCard : ComponentBase
     {
+        [Inject] IConfiguration Configuration { get; set; } = default!;
+
         [Parameter] public required string Title { get; set; }
         [Parameter] public string? Description { get; set; }
         [Parameter] public int? Year { get; set; }

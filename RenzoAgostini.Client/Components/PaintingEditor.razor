@@ -1,0 +1,112 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using RenzoAgostini.Shared.DTOs
+
+<div class="modal-overlay" @onclick="OnCancel">
+    <div class="modal editor" @onclick:stopPropagation="true">
+        <div class="modal-header">
+            <h2>@(IsEditing ? "Modifica Quadro" : "Nuovo Quadro")</h2>
+            <button class="btn-close" @onclick="OnCancel">✕</button>
+        </div>
+
+        <EditForm Model="form" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Titolo *</label>
+                    <InputText @bind-Value="form.Title" class="form-control" />
+                    <ValidationMessage For="() => form.Title" />
+                </div>
+
+                <div class="form-group">
+                    <label>Slug *</label>
+                    <InputText @bind-Value="form.Slug" class="form-control" placeholder="titolo-del-quadro" />
+                    <ValidationMessage For="() => form.Slug" />
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Descrizione</label>
+                    <InputTextArea @bind-Value="form.Description" class="form-control" rows="3" />
+                </div>
+
+                <div class="form-group">
+                    <label>Anno</label>
+                    <InputNumber @bind-Value="form.Year" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Tecnica</label>
+                    <InputText @bind-Value="form.Medium" class="form-control" placeholder="Olio su tela" />
+                </div>
+
+                <div class="form-group">
+                    <label>Dimensioni</label>
+                    <InputText @bind-Value="form.Dimensions" class="form-control" placeholder="50x70 cm" />
+                </div>
+
+                <div class="form-group">
+                    <label>Prezzo</label>
+                    <InputNumber @bind-Value="form.Price" class="form-control" step="0.01" />
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <InputCheckbox @bind-Value="form.IsForSale" />
+                        <span>In vendita</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="images-section">
+                <h3>Immagini</h3>
+
+                <div class="image-upload">
+                    <label class="upload-button">
+                        <InputFile OnChange="HandleFileSelection" multiple accept="image/*" />
+                        📁 Seleziona immagini
+                    </label>
+                    @if (!IsEditing)
+                    {
+                        <small>*Almeno un'immagine è obbligatoria</small>
+                    }
+                </div>
+
+                @if (form.Images.Any())
+                {
+                    <div class="images-preview">
+                        @for (int i = 0; i < form.Images.Count; i++)
+                        {
+                            var index = i;
+                            var image = form.Images[i];
+                            <div class="image-item @(image.IsPrimary ? "primary" : "")">
+                                <img src="@image.Url" alt="Preview" />
+                                <div class="image-actions">
+                                    @if (!image.IsPrimary)
+                                    {
+                                        <button type="button" class="btn-mini primary" @onclick="() => SetPrimary(index)">
+                                            ⭐ Principale
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <span class="primary-badge">⭐ Principale</span>
+                                    }
+                                    <button type="button" class="btn-mini danger" @onclick="() => RemoveImage(index)">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn secondary" @onclick="OnCancel">Annulla</button>
+                <button type="submit" class="btn primary" disabled="@(!CanSave)">
+                    @(IsEditing ? "Salva modifiche" : "Crea quadro")
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RenzoAgostini.Server.Data;
@@ -69,7 +70,12 @@ builder.Services.AddSwaggerGen(o =>
         });
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(o =>
+{
+    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
     {
         o.Authority = "http://localhost:8080/realms/RenzoAgostiniRealm";
@@ -88,7 +94,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
 
         o.MetadataAddress = "http://localhost:8080/realms/RenzoAgostiniRealm/.well-known/openid-configuration";
-        o.RequireHttpsMetadata = true;
+        o.RequireHttpsMetadata = false; // Solo per sviluppo con Keycloak in HTTP
 
         o.Events = new JwtBearerEvents
         {
@@ -105,7 +111,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         foreach (var r in arr2.EnumerateArray())
                             id.AddClaim(new Claim(ClaimTypes.Role, r.GetString()!));
                 }
-                
+
                 return Task.CompletedTask;
             }
         };
@@ -132,9 +138,16 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Se servi immagini statiche dal server:
-// app.UseStaticFiles(); // e metti le immagini in wwwroot/img
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
+
+app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.WebRootPath, "uploads")),
+    RequestPath = "/uploads",
+});
 
 app.Run();

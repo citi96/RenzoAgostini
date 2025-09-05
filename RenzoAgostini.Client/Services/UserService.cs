@@ -24,30 +24,6 @@ namespace RenzoAgostini.Client.Services
             }
 
             return null;
-        }
-
-        private ClaimsPrincipal CreateClaimsPrincipalFromToken(string token)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var identity = new ClaimsIdentity();
-
-            if (tokenHandler.CanReadToken(token))
-            {
-                var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
-                identity = new(jwtSecurityToken.Claims, "Bearer");
-            }
-
-            return new(identity);
-        }
-
-        public async Task<UserDto?> FetchUserFromBrowserAsync()
-        {
-            // TODO: Please note that this code sample does not encrypt the user's password. In a real project, you should consider adding encryption.
-            var token = await cookieService.GetAsync<string>("access_token");
-            var claimsPrincipal = CreateClaimsPrincipalFromToken(token);
-            var userDto = UserDto.FromClaimsPrincipal(claimsPrincipal);
-
-            return userDto;
-        }
+        }       
     }
 }

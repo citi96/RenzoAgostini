@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using RenzoAgostini.Client.Authentication;
 using RenzoAgostini.Client.Services.Interfaces;
@@ -41,19 +40,13 @@ namespace RenzoAgostini.Client.Pages
                     return;
                 }
 
-                // Gestisci il callback di Keycloak
-                var user = await KeycloakService.HandleCallbackAsync(code);
-
-                if (user != null)
+                var token = await KeycloakService.HandleCallbackAsync(code);
+                if (token != null)
                 {
                     // Aggiorna il provider di autenticazione
                     if (AuthProvider is CustomAuthenticationStateProvider customProvider)
-                        customProvider.UpdateCurrentUser(user);
+                        customProvider.UpdateCurrentUser(token);
 
-                    // Attendi un momento per mostrare il successo
-                    await Task.Delay(1500);
-
-                    // Reindirizza alla home
                     ReturnHome();
                 }
                 else

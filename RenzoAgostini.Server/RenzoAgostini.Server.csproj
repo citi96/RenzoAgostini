@@ -24,4 +24,8 @@
     <ProjectReference Include="..\RenzoAgostini.Shared\RenzoAgostini.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
 </Project>

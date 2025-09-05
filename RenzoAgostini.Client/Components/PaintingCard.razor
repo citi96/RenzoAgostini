@@ -1,7 +1,7 @@
 ﻿@using System.Globalization
 
 <div class="card">
-    <img src="@PrimaryImageUrl" alt="@Title" />
+    <img src="@($"{Configuration["BaseUrl"]}/{@PrimaryImageUrl}")" alt="@Title" />
     <div class="body">
         <div class="title">@Title</div>
         @if (!string.IsNullOrWhiteSpace(Description))
