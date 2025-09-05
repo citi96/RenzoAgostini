@@ -19,7 +19,6 @@ namespace RenzoAgostini.Server.Repositories
         {
             return await context.Paintings
                 .Include(p => p.Images)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
