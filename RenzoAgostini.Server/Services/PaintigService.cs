@@ -1,4 +1,6 @@
-﻿using RenzoAgostini.Server.Mappings;
+﻿using System.Net;
+using RenzoAgostini.Server.Exceptions;
+using RenzoAgostini.Server.Mappings;
 using RenzoAgostini.Server.Repositories.Interfaces;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
@@ -54,7 +56,7 @@ namespace RenzoAgostini.Server.Services
             try
             {
                 var painting = paintingDto.ToEntity();
-                var createdPainting = await repository.CreateAsync(painting);
+                var createdPainting = await repository.AddAsync(painting);
                 return createdPainting.ToDto();
             }
             catch (Exception ex)
@@ -69,7 +71,7 @@ namespace RenzoAgostini.Server.Services
             try
             {
                 var existingPainting = await repository.GetByIdAsync(id) ?? 
-                    throw new ArgumentException($"Painting with ID {id} not found");
+                    throw new ApiException(HttpStatusCode.NotFound, $"Painting with ID {id} not found");
 
                 var updatedPainting = paintingDto.ApplyTo(existingPainting);
                 var result = await repository.UpdateAsync(updatedPainting);
@@ -86,7 +88,10 @@ namespace RenzoAgostini.Server.Services
         {
             try
             {
-                await repository.DeleteAsync(id);
+                var existingPainting = await repository.GetByIdAsync(id) ??
+                    throw new ApiException(HttpStatusCode.NotFound, $"Painting with ID {id} not found");
+
+                await repository.DeleteAsync(existingPainting);
             }
             catch (Exception ex)
             {

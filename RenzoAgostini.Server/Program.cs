@@ -7,6 +7,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RenzoAgostini.Server.Config;
 using RenzoAgostini.Server.Data;
 using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Server.Repositories;
@@ -14,6 +15,7 @@ using RenzoAgostini.Server.Repositories.Interfaces;
 using RenzoAgostini.Server.Services;
 using RenzoAgostini.Server.Services.Interfaces;
 using RenzoAgostini.Shared.Contracts;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +50,9 @@ builder.Services.AddScoped<IPaintingService>(sp =>
     ));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.Configure<StripeOptions>(builder.Configuration.GetSection("Stripe"));
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 // CORS per sviluppo: client e server su origini diverse
 builder.Services.AddCors(options =>

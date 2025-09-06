@@ -7,6 +7,8 @@ namespace RenzoAgostini.Server.Data
     public class RenzoAgostiniDbContext(DbContextOptions<RenzoAgostiniDbContext> opt) : IdentityDbContext<ApplicationUser>(opt)
     {
         public DbSet<Painting> Paintings => Set<Painting>();
+        public DbSet<Order> Orders => Set<Order>();
+        public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -55,6 +57,32 @@ namespace RenzoAgostini.Server.Data
                     img.Property(i => i.Height);
                     img.Property(i => i.IsPrimary);
                 });
+            });
+
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasKey(o => o.Id);
+                entity.Property(o => o.CustomerFirstName).IsRequired().HasMaxLength(100);
+                entity.Property(o => o.CustomerLastName).IsRequired().HasMaxLength(100);
+                entity.Property(o => o.CustomerEmail).IsRequired().HasMaxLength(150);
+                entity.Property(o => o.AddressLine).IsRequired().HasMaxLength(200);
+                entity.Property(o => o.City).IsRequired().HasMaxLength(100);
+                entity.Property(o => o.PostalCode).IsRequired().HasMaxLength(20);
+                entity.Property(o => o.Country).IsRequired().HasMaxLength(50);
+                entity.Property(o => o.TermsAccepted).IsRequired();
+                entity.Property(o => o.TotalAmount).HasColumnType("decimal(10,2)");
+                entity.Property(o => o.Status).HasConversion<int>(); // memorizza enum come int
+                entity.Property(o => o.StripeSessionId).HasMaxLength(200);
+                entity.HasMany(o => o.Items)
+                      .WithOne(i => i.Order)
+                      .HasForeignKey(i => i.OrderId);
+            });
+
+            modelBuilder.Entity<OrderItem>(entity =>
+            {
+                entity.HasKey(i => i.Id);
+                entity.Property(i => i.Price).HasColumnType("decimal(10,2)");
+                entity.HasIndex(i => new { i.OrderId, i.PaintingId }).IsUnique();
             });
 
             // Seed data per development
