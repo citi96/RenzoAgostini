@@ -16,6 +16,7 @@ using RenzoAgostini.Server.Services;
 using RenzoAgostini.Server.Services.Interfaces;
 using RenzoAgostini.Shared.Contracts;
 using Stripe;
+using IOrderService = RenzoAgostini.Server.Services.Interfaces.IOrderService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +49,9 @@ builder.Services.AddScoped<IPaintingService>(sp =>
         sp.GetRequiredService<IMemoryCache>(),
         sp.GetRequiredService<ILogger<CachedPaintingService>>()
     ));
+
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 

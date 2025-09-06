@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using RenzoAgostini.Server.Config;
 using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Server.Exceptions;
+using RenzoAgostini.Server.Mappings;
 using RenzoAgostini.Server.Repositories.Interfaces;
 using RenzoAgostini.Server.Services.Interfaces;
 using RenzoAgostini.Shared.Common;
@@ -13,7 +14,7 @@ using Stripe.Checkout;
 
 namespace RenzoAgostini.Server.Services
 {
-    public class OrderService(IOrderRepository orderRepo, IPaintingRepository paintingRepo,
+    public class OrderService(IOrderRepository orderRepository, IPaintingRepository paintingRepository,
                          IOptions<StripeOptions> stripeOptions, ILogger<OrderService> logger) : IOrderService
     {
         private readonly StripeOptions _stripeOptions = stripeOptions.Value;
@@ -22,20 +23,16 @@ namespace RenzoAgostini.Server.Services
         {
             // 1. Validazione input
             if (!checkout.TermsAccepted)
-            {
-                return Result<string>.Failure("Devi accettare le condizioni di vendita prima di procedere all'acquisto.");
-            }
+                throw new ApiException(HttpStatusCode.BadRequest, "Devi accettare le condizioni di vendita prima di procedere all'acquisto.");
             if (checkout.PaintingIds == null || checkout.PaintingIds.Count == 0)
-            {
-                return Result<string>.Failure("Nessun articolo presente nel carrello.");
-            }
+                throw new ApiException(HttpStatusCode.BadRequest, "Nessun articolo presente nel carrello.");
 
             // 2. Recupera i quadri dal DB e verifica disponibilità
             var paintings = new List<Painting>();
             decimal totalAmount = 0m;
             foreach (int paintingId in checkout.PaintingIds)
             {
-                var painting = await paintingRepo.GetByIdAsync(paintingId) ??
+                var painting = await paintingRepository.GetByIdAsync(paintingId) ??
                     throw new ApiException(HttpStatusCode.NotFound, $"Il quadro con ID {paintingId} non esiste.");
 
                 if (!painting.IsForSale)
@@ -111,7 +108,7 @@ namespace RenzoAgostini.Server.Services
 
                 // 5. Salva l'ordine nel DB con la StripeSessionId
                 order.StripeSessionId = session.Id;
-                await orderRepo.AddAsync(order);
+                await orderRepository.AddAsync(order);
 
                 logger.LogInformation("Creato ordine {OrderId} con sessione Stripe {SessionId}", order.Id, session.Id);
                 return Result<string>.Success(session.Id);
@@ -131,7 +128,7 @@ namespace RenzoAgostini.Server.Services
         public async Task<Result<Order>> ConfirmOrderPaymentAsync(string stripeSessionId)
         {
             // 1. Trova l'ordine corrispondente alla sessione
-            var order = await orderRepo.GetByStripeSessionAsync(stripeSessionId) ??
+            var order = await orderRepository.GetByStripeSessionAsync(stripeSessionId) ??
                 throw new ApiException(HttpStatusCode.NotFound, "Ordine non trovato per la sessione specificata.");
 
             if (order.Status == OrderStatus.Paid)
@@ -146,7 +143,7 @@ namespace RenzoAgostini.Server.Services
                 {
                     // Pagamento non completato (l'utente potrebbe aver annullato)
                     order.Status = OrderStatus.Cancelled;
-                    await orderRepo.UpdateAsync(order);
+                    await orderRepository.UpdateAsync(order);
 
                     logger.LogWarning("Pagamento non completato per ordine {OrderId}", order.Id);
                     throw new ApiException(HttpStatusCode.InternalServerError, "Pagamento non completato o annullato.");
@@ -154,16 +151,16 @@ namespace RenzoAgostini.Server.Services
 
                 // 3. Pagamento riuscito - aggiorna stato ordine
                 order.Status = OrderStatus.Paid;
-                await orderRepo.UpdateAsync(order);
+                await orderRepository.UpdateAsync(order);
 
                 // 4. Aggiorna lo stato di ogni quadro come venduto (IsForSale = false)
                 foreach (var item in order.Items)
                 {
-                    var painting = await paintingRepo.GetByIdAsync(item.PaintingId);
+                    var painting = await paintingRepository.GetByIdAsync(item.PaintingId);
                     if (painting != null)
                     {
                         painting.IsForSale = false;
-                        await paintingRepo.UpdateAsync(painting);
+                        await paintingRepository.UpdateAsync(painting);
                     }
                 }
                 logger.LogInformation("Ordine {OrderId} confermato come PAGATO.", order.Id);
@@ -176,19 +173,57 @@ namespace RenzoAgostini.Server.Services
             }
         }
 
-        public Task<IEnumerable<OrderDto>> GetAllOrdersAsync()
+        public async Task<IEnumerable<OrderDto>> GetAllOrdersAsync()
         {
-            throw new NotImplementedException();
+            var orders = await orderRepository.GetAllAsync();
+            return orders.Select(o => o.ToOrderAdminDto());
         }
 
-        public Task<OrderDto> UpdateOrderTrackingAsync(int orderId, string trackingNumber)
+        public async Task<OrderDto> UpdateOrderTrackingAsync(int orderId, string trackingNumber)
         {
-            throw new NotImplementedException();
+            var order = await orderRepository.GetByIdAsync(orderId)
+                ?? throw new ApiException(HttpStatusCode.NotFound, $"Ordine ID {orderId} non trovato.");
+
+            order.TrackingNumber = trackingNumber;
+            await orderRepository.UpdateAsync(order);
+            return order.ToOrderAdminDto();
         }
 
-        public Task<OrderDto> UpdateOrderStatusAsync(int orderId, OrderStatus newStatus)
+        public async Task<OrderDto> UpdateOrderStatusAsync(int orderId, OrderStatus newStatus)
         {
-            throw new NotImplementedException();
+            var order = await orderRepository.GetByIdAsync(orderId)
+                ?? throw new ApiException(HttpStatusCode.NotFound, $"Ordine ID {orderId} non trovato.");
+
+            var prevStatus = order.Status;
+            order.Status = newStatus;
+            await orderRepository.UpdateAsync(order);
+
+            if (newStatus == OrderStatus.Paid && prevStatus != OrderStatus.Paid)
+            {
+                foreach (var item in order.Items)
+                {
+                    var painting = await paintingRepository.GetByIdAsync(item.PaintingId);
+                    if (painting != null)
+                    {
+                        painting.IsForSale = false;
+                        await paintingRepository.UpdateAsync(painting);
+                    }
+                }
+            }
+            else if (newStatus == OrderStatus.Cancelled && prevStatus == OrderStatus.Paid)
+            {
+                foreach (var item in order.Items)
+                {
+                    var painting = await paintingRepository.GetByIdAsync(item.PaintingId);
+                    if (painting != null)
+                    {
+                        painting.IsForSale = true;
+                        await paintingRepository.UpdateAsync(painting);
+                    }
+                }
+            }
+
+            return order.ToOrderAdminDto();
         }
     }
 }
