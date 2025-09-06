@@ -4,7 +4,7 @@ using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Server.Services.Interfaces
 {
-    public interface IOrderService
+    public interface IOrderService : Shared.Contracts.IOrderService
     {
         /// <summary>Crea un nuovo ordine e avvia una sessione di pagamento Stripe.</summary>
         Task<Result<string>> CreateOrderAndStartPaymentAsync(CheckoutDto checkout);

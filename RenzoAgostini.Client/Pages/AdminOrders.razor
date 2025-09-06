@@ -1,0 +1,133 @@
+﻿@page "/admin/orders"
+@using System.Globalization
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using RenzoAgostini.Shared.DTOs
+@using RenzoAgostini.Shared.Data
+@attribute [Authorize(Roles = "admin")]
+
+<PageTitle>Gestione Ordini - Admin</PageTitle>
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+        <div class="admin-container">
+            <div class="header">
+                <h1>Gestione Ordini</h1>
+            </div>
+
+            <!-- Messaggi di errore/successo -->
+            <ErrorAlert Message="@errorMessage" Type="error" OnClose="() => errorMessage = null" />
+            <ErrorAlert Message="@successMessage" Type="success" OnClose="() => successMessage = null" />
+
+            @if (orders is null)
+            {
+                <div class="loading">Caricamento...</div>
+            }
+            else
+            {
+                <!-- Tabella degli ordini -->
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Email</th>
+                            <th>Stato</th>
+                            <th>Data</th>
+                            <th>Totale</th>
+                            <th>Articoli</th>
+                            <th>Pagamento</th>
+                            <th>Indirizzo</th>
+                            <th>Tracking</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in orders)
+                        {
+                            <tr @onclick="() => ShowDetails(order)">
+                                <td>@order.CustomerFirstName @order.CustomerLastName</td>
+                                <td><a href="mailto:@order.Email">@order.Email</a></td>
+                                <td>@GetStatusLabel(order.Status)</td>
+                                <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm", CultureInfo.GetCultureInfo("it-IT"))</td>
+                                <td>@order.Total.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</td>
+                                <td>@order.ItemCount</td>
+                                <td>@(string.IsNullOrEmpty(order.PaymentMethod) ? "-" : order.PaymentMethod)</td>
+                                <td>@order.Address.Street, @order.Address.City, @order.Address.PostalCode, @order.Address.Country</td>
+                                <td>@(string.IsNullOrEmpty(order.TrackingNumber) ? "-" : order.TrackingNumber)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+
+            @if (showDetail && selectedOrder is not null)
+            {
+                <!-- Modale di dettaglio ordine -->
+                <div class="modal-overlay" @onclick="CloseDetail">
+                    <div class="modal" @onclick:stopPropagation="true">
+                        <div class="modal-header">
+                            <h2>Dettaglio Ordine @selectedOrder.Id</h2>
+                            <button class="btn-close" @onclick="CloseDetail">✕</button>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                <strong>Cliente:</strong> @selectedOrder.CustomerFirstName @selectedOrder.CustomerLastName
+                                (<a href="mailto:@selectedOrder.Email">@selectedOrder.Email</a>)
+                            </p>
+                            <p><strong>Indirizzo:</strong> @selectedOrder.Address.Street, @selectedOrder.Address.City, @selectedOrder.Address.PostalCode, @selectedOrder.Address.Country</p>
+                            <p><strong>Data ordine:</strong> @selectedOrder.OrderDate.ToString("dd/MM/yyyy HH:mm", CultureInfo.GetCultureInfo("it-IT"))</p>
+                            <p><strong>Metodo pagamento:</strong> @selectedOrder.PaymentMethod</p>
+                            <p><strong>Stato ordine:</strong> @GetStatusLabel(selectedOrder.Status)</p>
+
+                            <h3>Articoli</h3>
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Articolo</th>
+                                        <th>Quantità</th>
+                                        <th>Prezzo Unitario</th>
+                                        <th>Totale</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in selectedOrder.Items)
+                                    {
+                                        <tr>
+                                            <td>@item.PaintingTitle</td>
+                                            <td>@item.Quantity</td>
+                                            <td>@item.Price.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</td>
+                                            <td>@(item.Price* item.Quantity).ToString("C", CultureInfo.GetCultureInfo("it-IT"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                            @if (selectedOrder.Status == OrderStatus.Paid || selectedOrder.Status == OrderStatus.Shipped)
+                            {
+                                <!-- Aggiornamento tracking (visibile per ordini Pagati o Spediti) -->
+                                <div class="form-group">
+                                    <label>Tracking</label>
+                                    <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem;">
+                                        <input class="form-control" @bind="newTrackingNumber" placeholder="Inserisci tracking" />
+                                        <button class="btn secondary" @onclick="UpdateTracking" disabled="@string.IsNullOrWhiteSpace(newTrackingNumber)">
+                                            Aggiorna Tracking
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn secondary" @onclick="CloseDetail">Chiudi</button>
+                            @if (selectedOrder.Status == OrderStatus.Paid)
+                            {
+                                <button class="btn primary" @onclick="MarkAsShipped">Segna come Spedito</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <p>Non hai i permessi per visualizzare questa pagina.</p>
+    </NotAuthorized>
+</AuthorizeView>

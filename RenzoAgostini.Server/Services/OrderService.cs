@@ -175,5 +175,20 @@ namespace RenzoAgostini.Server.Services
                 throw new ApiException(HttpStatusCode.InternalServerError, "Impossibile verificare il pagamento con Stripe. Riprova più tardi.");
             }
         }
+
+        public Task<IEnumerable<OrderDto>> GetAllOrdersAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<OrderDto> UpdateOrderTrackingAsync(int orderId, string trackingNumber)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<OrderDto> UpdateOrderStatusAsync(int orderId, OrderStatus newStatus)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
