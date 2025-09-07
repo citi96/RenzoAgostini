@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using Microsoft.Extensions.Options;
 using RenzoAgostini.Server.Config;
+using RenzoAgostini.Server.Emailing.Interfaces;
+using RenzoAgostini.Server.Emailing.Models;
 using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Server.Exceptions;
 using RenzoAgostini.Server.Mappings;
@@ -15,7 +17,7 @@ using Stripe.Checkout;
 namespace RenzoAgostini.Server.Services
 {
     public class OrderService(IOrderRepository orderRepository, IPaintingRepository paintingRepository,
-                         IOptions<StripeOptions> stripeOptions, ILogger<OrderService> logger) : IOrderService
+                         IOptions<StripeOptions> stripeOptions, ICustomEmailSender emailSender, IWebHostEnvironment env, ILogger<OrderService> logger) : IOrderService
     {
         private readonly StripeOptions _stripeOptions = stripeOptions.Value;
 
@@ -125,14 +127,14 @@ namespace RenzoAgostini.Server.Services
             }
         }
 
-        public async Task<Result<Order>> ConfirmOrderPaymentAsync(string stripeSessionId)
+        public async Task<Result<OrderDto>> ConfirmOrderPaymentAsync(string stripeSessionId)
         {
             // 1. Trova l'ordine corrispondente alla sessione
             var order = await orderRepository.GetByStripeSessionAsync(stripeSessionId) ??
                 throw new ApiException(HttpStatusCode.NotFound, "Ordine non trovato per la sessione specificata.");
 
             if (order.Status == OrderStatus.Paid)
-                return Result<Order>.Success(order);
+                return Result<OrderDto>.Success(order.ToOrderAdminDto());
 
             try
             {
@@ -153,6 +155,12 @@ namespace RenzoAgostini.Server.Services
                 order.Status = OrderStatus.Paid;
                 await orderRepository.UpdateAsync(order);
 
+                await emailSender.SendAsync(new(null, null, null, GetHtmlMessage($"{env.WebRootPath}/mailTemplates/order_paid.html"))
+                {
+                    To = [new EmailAddress(order.CustomerEmail, $"{order.CustomerLastName}, {order.CustomerFirstName}")],
+                    Subject = "Conferma di pagamento - Ordine #" + order.Id
+                });
+
                 // 4. Aggiorna lo stato di ogni quadro come venduto (IsForSale = false)
                 foreach (var item in order.Items)
                 {
@@ -164,7 +172,7 @@ namespace RenzoAgostini.Server.Services
                     }
                 }
                 logger.LogInformation("Ordine {OrderId} confermato come PAGATO.", order.Id);
-                return Result<Order>.Success(order);
+                return Result<OrderDto>.Success(order.ToOrderAdminDto());
             }
             catch (StripeException ex)
             {
@@ -224,6 +232,11 @@ namespace RenzoAgostini.Server.Services
             }
 
             return order.ToOrderAdminDto();
+        }
+
+        private static string GetHtmlMessage(string templatePath)
+        {
+            return System.IO.File.ReadAllText(templatePath);
         }
     }
 }

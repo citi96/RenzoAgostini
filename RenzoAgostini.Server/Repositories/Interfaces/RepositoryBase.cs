@@ -36,6 +36,7 @@ namespace RenzoAgostini.Server.Repositories.Interfaces
         public virtual async Task<T> AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
+            await SaveChangesAsync();
             return entity;
         }
 

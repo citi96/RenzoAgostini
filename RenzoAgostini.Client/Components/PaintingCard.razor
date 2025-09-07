@@ -12,17 +12,17 @@
 			<div class="meta">@Description</div>
 		}
 		<div class="meta">@Year @Medium</div>
-		@if (IsAdminMode && PaintingData != null)
+		@if (IsAdminMode && PaintingDto != null)
 		{
 			<div class="actions">
-				<button class="btn secondary small" @onclick="() => OnEdit.InvokeAsync(PaintingData)">✏️ Modifica</button>
-				<button class="btn danger small" @onclick="() => OnDelete.InvokeAsync(PaintingData)">🗑️ Elimina</button>
+				<button class="btn secondary small" @onclick="() => OnEdit.InvokeAsync(PaintingDto)">✏️ Modifica</button>
+				<button class="btn danger small" @onclick="() => OnDelete.InvokeAsync(PaintingDto)">🗑️ Elimina</button>
 			</div>
 		}
 		else if (IsForSale && Price is not null)
 		{
 			<div class="price">@Price?.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</div>
-			<button class="btn primary w-100">Aggiungi al carrello</button>
+			<button class="btn primary w-100" @onclick="AddToCart">Aggiungi al carrello</button>
 		}
 		else
 		{

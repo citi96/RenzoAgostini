@@ -1,0 +1,92 @@
+﻿@page "/cart"
+@using System.ComponentModel.DataAnnotations
+
+<h3>Carrello</h3>
+
+@if (CartService.ItemsCount == 0)
+{
+    <p>Il carrello è vuoto.</p>
+}
+else
+{
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Quadro</th>
+                <th>Prezzo</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in CartService.Items)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@(item.Price.HasValue? item.Price.Value.ToString("C") : "-")</td>
+                    <td>
+                        <button class="btn secondary" @onclick="() => RemoveFromCart(item.Id)" title="Rimuovi">✕</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p><strong>Totale parziale:</strong> @CartService.TotalAmount.ToString("C")</p>
+
+    <EditForm Model="@_checkoutModel" OnValidSubmit="ProceedToCheckout">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Nome *</label>
+            <InputText @bind-Value="_checkoutModel.FirstName" class="form-control" />
+            <ValidationMessage For="@(() => _checkoutModel.FirstName)" />
+        </div>
+        <div class="form-group">
+            <label>Cognome *</label>
+            <InputText @bind-Value="_checkoutModel.LastName" class="form-control" />
+            <ValidationMessage For="@(() => _checkoutModel.LastName)" />
+        </div>
+        <div class="form-group">
+            <label>Email *</label>
+            <InputText @bind-Value="_checkoutModel.Email" class="form-control" />
+            <ValidationMessage For="@(() => _checkoutModel.Email)" />
+        </div>
+        <div class="form-group">
+            <label>Indirizzo *</label>
+            <InputText @bind-Value="_checkoutModel.AddressLine" class="form-control" />
+            <ValidationMessage For="@(() => _checkoutModel.AddressLine)" />
+        </div>
+        <div class="form-group">
+            <label>Città *</label>
+            <InputText @bind-Value="_checkoutModel.City" class="form-control" />
+            <ValidationMessage For="@(() => _checkoutModel.City)" />
+        </div>
+        <div class="form-group">
+            <label>CAP *</label>
+            <InputText @bind-Value="_checkoutModel.PostalCode" class="form-control" />
+            <ValidationMessage For="@(() => _checkoutModel.PostalCode)" />
+        </div>
+        <div class="form-group">
+            <label>Nazione *</label>
+            <InputText @bind-Value="_checkoutModel.Country" class="form-control" />
+            <ValidationMessage For="@(() => _checkoutModel.Country)" />
+        </div>
+        <div class="form-group">
+            <label>Metodo di spedizione *</label>
+            <InputSelect @bind-Value="_checkoutModel.ShippingMethod" class="form-control">
+                <option value="">-- Seleziona --</option>
+                <option>Standard</option>
+                <option>Express</option>
+            </InputSelect>
+            <ValidationMessage For="@(() => _checkoutModel.ShippingMethod)" />
+        </div>
+        <div class="form-group form-check">
+            <InputCheckbox @bind-Value="_checkoutModel.TermsAccepted" id="termsCheck" />
+            <label for="termsCheck">Accetto i termini e le condizioni *</label>
+            <ValidationMessage For="@(() => _checkoutModel.TermsAccepted)" />
+        </div>
+
+        <button type="submit" class="btn primary" disabled="@(!CartService.Items.Any())">Procedi al pagamento</button>
+    </EditForm>
+}

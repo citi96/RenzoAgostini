@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Components
@@ -6,6 +7,7 @@ namespace RenzoAgostini.Client.Components
     public partial class PaintingCard : ComponentBase
     {
         [Inject] IConfiguration Configuration { get; set; } = default!;
+        [Inject] ICartService CartService { get; set; } = default!;
 
         [Parameter] public required string Title { get; set; }
         [Parameter] public string? Description { get; set; }
@@ -17,7 +19,7 @@ namespace RenzoAgostini.Client.Components
         [Parameter] public bool IsAdminMode { get; set; } = false;
         [Parameter] public EventCallback<PaintingDto> OnEdit { get; set; }
         [Parameter] public EventCallback<PaintingDto> OnDelete { get; set; }
-        [Parameter] public PaintingDto? PaintingData { get; set; }
+        [Parameter] public PaintingDto? PaintingDto { get; set; }
 
         protected string PrimaryImageUrl => ImageUrls.Count > 0 ? ImageUrls[0] : string.Empty;
 
@@ -33,6 +35,14 @@ namespace RenzoAgostini.Client.Components
         private void HideLightbox()
         {
             showLightbox = false;
+        }
+
+        private void AddToCart()
+        {
+            if (PaintingDto is not null)
+            {
+                CartService.AddItem(PaintingDto);
+            }
         }
     }
 }

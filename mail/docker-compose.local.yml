@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: mailserver
+    hostname: mail
+    domainname: local.test
+    env_file: .env.local
+    ports:
+      - "2525:587"            # SMTP submission locale
+    volumes:
+      - ./config/:/tmp/docker-mailserver/
+      - dms_mail:/var/mail/
+      - dms_state:/var/mail-state/
+    cap_add: [ "NET_ADMIN" ]
+    restart: unless-stopped
+volumes:
+  dms_mail:
+  dms_state:

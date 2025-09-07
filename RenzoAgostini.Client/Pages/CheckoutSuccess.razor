@@ -1,0 +1,19 @@
+﻿@page "/checkout-success"
+
+<h3>Pagamento Completato</h3>
+
+@if (isProcessing)
+{
+    <p>Elaborazione in corso, attendere...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p class="text-danger">@errorMessage</p>
+    <p>Se il problema persiste, contattaci.</p>
+}
+else
+{
+    <p>Grazie! Il tuo ordine è stato confermato con successo.</p>
+    <p>Riceverai una conferma via email con i dettagli dell'ordine.</p>
+    <button class="btn" @onclick="GoToHome">Torna alla Home</button>
+}

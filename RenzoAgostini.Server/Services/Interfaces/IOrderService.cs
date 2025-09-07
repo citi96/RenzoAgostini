@@ -9,6 +9,6 @@ namespace RenzoAgostini.Server.Services.Interfaces
         /// <summary>Crea un nuovo ordine e avvia una sessione di pagamento Stripe.</summary>
         Task<Result<string>> CreateOrderAndStartPaymentAsync(CheckoutDto checkout);
         /// <summary>Conferma il pagamento completato aggiornando l'ordine e i quadri.</summary>
-        Task<Result<Order>> ConfirmOrderPaymentAsync(string stripeSessionId);
+        Task<Result<OrderDto>> ConfirmOrderPaymentAsync(string stripeSessionId);
     }
 }

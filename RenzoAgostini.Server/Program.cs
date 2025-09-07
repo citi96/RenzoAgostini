@@ -4,11 +4,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RenzoAgostini.Server.Config;
 using RenzoAgostini.Server.Data;
+using RenzoAgostini.Server.Emailing;
+using RenzoAgostini.Server.Emailing.Extensions;
+using RenzoAgostini.Server.Emailing.Interfaces;
 using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Server.Repositories;
 using RenzoAgostini.Server.Repositories.Interfaces;
@@ -16,6 +20,7 @@ using RenzoAgostini.Server.Services;
 using RenzoAgostini.Server.Services.Interfaces;
 using RenzoAgostini.Shared.Contracts;
 using Stripe;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 using IOrderService = RenzoAgostini.Server.Services.Interfaces.IOrderService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +45,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 })
     .AddEntityFrameworkStores<RenzoAgostiniDbContext>()
     .AddDefaultTokenProviders();
+
+//builder.Services.AddEmailing(builder.Configuration);
+
+builder.Services.AddOptions<SmtpOptions>()
+                .Bind(builder.Configuration.GetSection("Email:Smtp"))
+                .ValidateDataAnnotations()
+                .Validate(o => !string.IsNullOrWhiteSpace(o.Host), "Host richiesto");
+
+builder.Services.AddSingleton<ICustomEmailSender, SmtpEmailSender>();
+builder.Services.AddHealthChecks().AddCheck<SmtpHealthCheck>("smtp", HealthStatus.Degraded);
 
 builder.Services.AddScoped<IPaintingRepository, PaintingRepository>();
 builder.Services.AddScoped<PaintingService>();

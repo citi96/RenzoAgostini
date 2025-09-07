@@ -6,13 +6,31 @@ using RenzoAgostini.Client.Services.Interfaces;
 
 namespace RenzoAgostini.Client.Layout
 {
-    public partial class MainLayout
+    public partial class MainLayout : IDisposable
     {
         [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
         [Inject] private IKeycloakService KeycloakService { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+        [Inject] ICartService CartService { get; set; } = default!;
 
         private int cartCount = 0;
+
+        protected override void OnInitialized()
+        {
+            cartCount = CartService.ItemsCount;
+            CartService.OnChange += HandleCartChanged;
+        }
+
+        private void HandleCartChanged()
+        {
+            cartCount = CartService.ItemsCount;
+            InvokeAsync(StateHasChanged);
+        }
+
+        public void Dispose()
+        {
+            CartService.OnChange -= HandleCartChanged;
+        }
 
         private async void ShowLoginModal()
         {

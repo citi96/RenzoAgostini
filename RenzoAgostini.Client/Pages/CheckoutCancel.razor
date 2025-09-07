@@ -1,0 +1,18 @@
+﻿@page "/checkout-cancel"
+
+<h3>Pagamento annullato</h3>
+
+@if (isProcessing)
+{
+    <p>Sto aggiornando lo stato dell’ordine…</p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <p class="text-danger">@error</p>
+    <button class="btn" @onclick="GoToHome">Torna al catalogo</button>
+}
+else
+{
+    <p>L’ordine è stato annullato. Nessun addebito è stato effettuato.</p>
+    <button class="btn" @onclick="GoToHome">Torna al catalogo</button>
+}

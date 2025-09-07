@@ -4,16 +4,23 @@
 
 <div class="container">
     <div class="nav">
-        
         <a class="brand" href="/">Galleria</a>
         <AuthorizeView Roles="admin">
             <Authorized>
                 <a class="brand" href="/admin/paintings">🎨 Gestisci Quadri</a>
             </Authorized>
         </AuthorizeView>
+        <AuthorizeView Roles="admin">
+            <Authorized>
+                <a class="brand" href="/admin/orders">Ordini</a>
+            </Authorized>
+        </AuthorizeView>
 
         <div class="spacer"></div>
-        <button class="btn" title="Carrello">🛒 <strong>@cartCount</strong></button>
+
+        <a class="btn" href="/cart" title="Carrello">
+            🛒 <strong>@cartCount</strong>
+        </a>
         
         <AuthorizeView>
             <Authorized>

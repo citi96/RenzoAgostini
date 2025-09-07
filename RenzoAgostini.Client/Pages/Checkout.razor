@@ -1,0 +1,39 @@
+﻿@page "/checkout"
+
+<h3>Conferma Ordine</h3>
+
+@if (CartService.ItemsCount == 0 || CartService.CheckoutData == null)
+{
+    <p>Il carrello è vuoto o i dati di checkout non sono disponibili.</p>
+    <button class="btn" @onclick="NavigateToGallery">Torna alla galleria</button>
+}
+else
+{
+    <!-- Riepilogo ordine -->
+    <h4>Articoli (@CartService.ItemsCount)</h4>
+    <ul>
+        @foreach (var item in CartService.Items)
+        {
+            <li>@item.Title - @item.Price?.ToString("C")</li>
+        }
+    </ul>
+    <p>Totale articoli: @CartService.TotalAmount.ToString("C")</p>
+
+    @* Calcolo costo spedizione *@
+
+    <p>Spedizione (<em>@CartService.CheckoutData.ShippingMethod</em>): @GetShippingCost().ToString("C")</p>
+
+    <p><strong>Totale ordine (articoli + spedizione):</strong> @((CartService.TotalAmount + GetShippingCost()).ToString("C"))</p>
+
+    <p>Dati spedizione: <br />
+       <em>@CartService.CheckoutData.CustomerFirstName @CartService.CheckoutData.CustomerLastName, 
+       @CartService.CheckoutData.AddressLine, @CartService.CheckoutData.PostalCode @CartService.CheckoutData.City (@CartService.CheckoutData.Country)</em>
+    </p>
+
+    <button class="btn primary" @onclick="StartPayment">Conferma e paga ora</button>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="text-danger">@errorMessage</p>
+    }
+}

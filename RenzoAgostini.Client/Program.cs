@@ -32,12 +32,16 @@ builder.Services.AddScoped<HttpClient, CustomHttpClient>();
 // Cache opzionale sul client
 builder.Services.AddMemoryCache();
 
+builder.Services.AddSingleton<ICartService, CartService>();
+
 builder.Services.AddScoped<IPaintingService, PaintingService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICookieService, CookieService>();
 builder.Services.AddScoped<IKeycloakService, KeycloakService>();
 builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICheckoutClient, CheckoutClient>();
+builder.Services.AddScoped<IShippingClient, ShippingClient>();
 
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
