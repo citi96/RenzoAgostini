@@ -1,19 +1,147 @@
 ﻿@page "/checkout-success"
 
-<h3>Pagamento Completato</h3>
+<PageTitle>Ordine Completato</PageTitle>
 
-@if (isProcessing)
-{
-    <p>Elaborazione in corso, attendere...</p>
-}
-else if (!string.IsNullOrEmpty(errorMessage))
-{
-    <p class="text-danger">@errorMessage</p>
-    <p>Se il problema persiste, contattaci.</p>
-}
-else
-{
-    <p>Grazie! Il tuo ordine è stato confermato con successo.</p>
-    <p>Riceverai una conferma via email con i dettagli dell'ordine.</p>
-    <button class="btn" @onclick="GoToHome">Torna alla Home</button>
-}
+<div class="success-container">
+    @if (isProcessing)
+    {
+        <div class="processing-state">
+            <div class="success-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <h2>Elaborazione in corso...</h2>
+            <p>Stiamo confermando il tuo ordine, attendere prego.</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="error-state">
+            <div class="error-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+            </div>
+            <h2>Problema con l'ordine</h2>
+            <p class="error-message">@errorMessage</p>
+            <p class="error-suggestion">Se il problema persiste, ti preghiamo di contattarci via email.</p>
+            <div class="action-buttons">
+                <button class="btn primary" @onclick="GoToHome">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Torna alla Home
+                </button>
+                <a href="mailto:info@renzoagostini.com" class="btn secondary">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Contattaci
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="success-state">
+            <div class="success-animation">
+                <div class="success-circle">
+                    <svg class="checkmark" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 12l2 2 4-4" />
+                    </svg>
+                </div>
+                <div class="success-particles">
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                </div>
+            </div>
+
+            <h1>Ordine completato con successo! 🎉</h1>
+            <div class="success-content">
+                <p class="main-message">
+                    <strong>Grazie per il tuo acquisto!</strong><br>
+                    Il tuo ordine è stato confermato e sarà elaborato a breve.
+                </p>
+
+                <div class="info-cards">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <h3>Conferma via email</h3>
+                            <p>Riceverai una conferma dell'ordine con tutti i dettagli nella tua casella di posta.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <h3>Tracciamento ordine</h3>
+                            <p>Ti invieremo le informazioni di tracciamento non appena il tuo ordine verrà spedito.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <h3>Tempi di consegna</h3>
+                            <p>Il tuo ordine verrà elaborato e spedito entro 2-3 giorni lavorativi.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="next-steps">
+                    <h3>Cosa succede adesso?</h3>
+                    <ol class="steps-list">
+                        <li>
+                            <span class="step-number">1</span>
+                            <span class="step-text">Confermeremo il tuo ordine e inizieremo la preparazione</span>
+                        </li>
+                        <li>
+                            <span class="step-number">2</span>
+                            <span class="step-text">Imballeremo con cura i tuoi quadri per la spedizione</span>
+                        </li>
+                        <li>
+                            <span class="step-number">3</span>
+                            <span class="step-text">Ti invieremo il codice di tracciamento per seguire la spedizione</span>
+                        </li>
+                        <li>
+                            <span class="step-number">4</span>
+                            <span class="step-text">Riceverai i tuoi quadri direttamente a casa</span>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn primary large" @onclick="GoToHome">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Continua a esplorare
+                    </button>
+                    <a href="mailto:info@renzoagostini.com" class="btn secondary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Hai domande?
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

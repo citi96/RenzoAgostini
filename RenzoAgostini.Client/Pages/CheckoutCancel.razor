@@ -1,18 +1,153 @@
 ﻿@page "/checkout-cancel"
 
-<h3>Pagamento annullato</h3>
+<PageTitle>Pagamento Annullato</PageTitle>
 
-@if (isProcessing)
-{
-    <p>Sto aggiornando lo stato dell’ordine…</p>
-}
-else if (!string.IsNullOrEmpty(error))
-{
-    <p class="text-danger">@error</p>
-    <button class="btn" @onclick="GoToHome">Torna al catalogo</button>
-}
-else
-{
-    <p>L’ordine è stato annullato. Nessun addebito è stato effettuato.</p>
-    <button class="btn" @onclick="GoToHome">Torna al catalogo</button>
-}
+<div class="cancel-container">
+    @if (isProcessing)
+    {
+        <div class="processing-state">
+            <div class="cancel-spinner">
+                <div class="spinner-circle"></div>
+            </div>
+            <h2>Aggiornamento in corso...</h2>
+            <p>Stiamo aggiornando lo stato dell'ordine, attendere prego.</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(error))
+    {
+        <div class="error-state">
+            <div class="error-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+            </div>
+            <h2>Si è verificato un errore</h2>
+            <p class="error-message">@error</p>
+            <p class="error-suggestion">Non preoccuparti, non è stato effettuato alcun addebito.</p>
+            <div class="action-buttons">
+                <button class="btn primary" @onclick="GoToHome">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Torna al catalogo
+                </button>
+                <button class="btn secondary" @onclick="GoToCart">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m-2.4 0L6 4M7 13L5.4 4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6.28" />
+                    </svg>
+                    Torna al carrello
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="cancel-state">
+            <div class="cancel-animation">
+                <div class="cancel-circle">
+                    <svg class="cancel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="15" y1="9" x2="9" y2="15" />
+                        <line x1="9" y1="9" x2="15" y2="15" />
+                    </svg>
+                </div>
+                <div class="cancel-waves">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+            </div>
+
+            <h1>Pagamento annullato</h1>
+
+            <div class="cancel-content">
+                <p class="main-message">
+                    Il processo di pagamento è stato annullato.<br>
+                    <strong>Nessun addebito è stato effettuato</strong> sul tuo metodo di pagamento.
+                </p>
+
+                <div class="info-section">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <h3>Nessun addebito</h3>
+                            <p>Il tuo metodo di pagamento non è stato addebitato</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m-2.4 0L6 4M7 13L5.4 4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6.28" />
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <h3>Carrello salvato</h3>
+                            <p>I tuoi articoli sono ancora nel carrello</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="suggestions">
+                    <h3>Cosa puoi fare ora?</h3>
+                    <div class="suggestion-cards">
+                        <div class="suggestion-card">
+                            <div class="suggestion-icon">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m-2.4 0L6 4M7 13L5.4 4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6.28" />
+                                </svg>
+                            </div>
+                            <h4>Riprova il pagamento</h4>
+                            <p>Torna al carrello e completa l'acquisto con un altro metodo di pagamento</p>
+                        </div>
+
+                        <div class="suggestion-card">
+                            <div class="suggestion-icon">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <h4>Continua a esplorare</h4>
+                            <p>Scopri altri quadri nella nostra galleria e aggiungi nuovi pezzi alla tua collezione</p>
+                        </div>
+
+                        <div class="suggestion-card">
+                            <div class="suggestion-icon">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h4>Hai bisogno di aiuto?</h4>
+                            <p>Se hai riscontrato problemi durante il pagamento, non esitare a contattarci</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn primary large" @onclick="GoToCart">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m-2.4 0L6 4M7 13L5.4 4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6.28" />
+                        </svg>
+                        Torna al carrello
+                    </button>
+                    <button class="btn secondary" @onclick="GoToHome">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Esplora la galleria
+                    </button>
+                    <a href="mailto:info@renzoagostini.com" class="btn outline">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Contattaci
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

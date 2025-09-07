@@ -18,13 +18,17 @@ namespace RenzoAgostini.Client.Pages
             {
                 var sessionId = GetQuery("session_id");
                 if (!string.IsNullOrWhiteSpace(sessionId))
+                {
+                    // Conferma il pagamento anche se cancellato per aggiornare lo stato
                     await CheckoutClient.ConfirmPaymentAsync(sessionId);
+                }
 
-                CartService.Clear(); // svuota carrello locale
+                // Non svuotiamo il carrello in caso di cancellazione
+                // così l'utente può riprovare facilmente
             }
             catch (Exception ex)
             {
-                error = ex.Message;
+                error = "Si è verificato un errore durante l'elaborazione della cancellazione: " + ex.Message;
             }
             finally
             {
@@ -41,5 +45,8 @@ namespace RenzoAgostini.Client.Pages
 
         private void GoToHome() =>
             Navigation.NavigateTo("/");
+
+        private void GoToCart() =>
+            Navigation.NavigateTo("/cart");
     }
 }
