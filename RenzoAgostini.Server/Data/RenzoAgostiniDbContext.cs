@@ -9,6 +9,7 @@ namespace RenzoAgostini.Server.Data
         public DbSet<Painting> Paintings => Set<Painting>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+        public DbSet<CustomOrder> CustomOrders => Set<CustomOrder>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -83,6 +84,48 @@ namespace RenzoAgostini.Server.Data
                 entity.HasKey(i => i.Id);
                 entity.Property(i => i.Price).HasColumnType("decimal(10,2)");
                 entity.HasIndex(i => new { i.OrderId, i.PaintingId }).IsUnique();
+            });
+
+
+            modelBuilder.Entity<CustomOrder>(entity =>
+            {
+                entity.HasKey(co => co.Id);
+
+                entity.Property(co => co.CustomerEmail)
+                    .IsRequired()
+                    .HasMaxLength(150);
+
+                entity.Property(co => co.Description)
+                    .IsRequired()
+                    .HasMaxLength(2000);
+
+                entity.Property(co => co.AttachmentPath)
+                    .HasMaxLength(500);
+
+                entity.Property(co => co.AttachmentOriginalName)
+                    .HasMaxLength(255);
+
+                entity.Property(co => co.AccessCode)
+                    .IsRequired()
+                    .HasMaxLength(20);
+
+                entity.HasIndex(co => co.AccessCode)
+                    .IsUnique();
+
+                entity.Property(co => co.Status)
+                    .HasConversion<int>();
+
+                entity.Property(co => co.QuotedPrice)
+                    .HasColumnType("decimal(10,2)");
+
+                entity.Property(co => co.ArtistNotes)
+                    .HasMaxLength(1000);
+
+                // Relazione opzionale con Painting
+                entity.HasOne(co => co.Painting)
+                    .WithMany()
+                    .HasForeignKey(co => co.PaintingId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             // Seed data per development
