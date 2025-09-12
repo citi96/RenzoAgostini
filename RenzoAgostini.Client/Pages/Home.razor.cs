@@ -4,7 +4,7 @@ using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Pages
 {
-    public partial class Home
+    public partial class Home : ComponentBase
     {
         [Inject] private IPaintingService PaintingService { get; set; } = default!;
         [Inject] private ILogger<Home> Logger { get; set; } = default!;
@@ -17,12 +17,13 @@ namespace RenzoAgostini.Client.Pages
             try
             {
                 paintings = await PaintingService.GetAllPaintingsAsync();
+                StateHasChanged();
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error loading paintings on home page");
                 errorMessage = "Errore nel caricamento dei quadri. Riprova più tardi.";
-                // In produzione, potresti voler mostrare un messaggio più user-friendly
+                StateHasChanged();
             }
         }
     }

@@ -14,7 +14,7 @@ namespace RenzoAgostini.Server.Controllers
         public async Task<ActionResult<CustomOrderDto>> CreateCustomOrder([FromForm] CreateCustomOrderDto dto)
         {
             var result = await customOrderService.CreateCustomOrderAsync(dto);
-            Ok(result.Value);
+            return Ok(result.Value);
         }
 
         [HttpPost("access")]

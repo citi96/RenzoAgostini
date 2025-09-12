@@ -15,6 +15,11 @@
                 <a class="brand" href="/admin/orders">Ordini</a>
             </Authorized>
         </AuthorizeView>
+        <AuthorizeView Roles="admin">
+            <Authorized>
+                <a class="brand" href="/admin/custom-orders">Richieste Quadri</a>
+            </Authorized>
+        </AuthorizeView>
 
         <div class="spacer"></div>
 

@@ -42,6 +42,7 @@ builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICheckoutClient, CheckoutClient>();
 builder.Services.AddScoped<IShippingClient, ShippingClient>();
+builder.Services.AddScoped<ICustomOrderService, CustomOrderService>();
 
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider =>

@@ -1,0 +1,111 @@
+﻿@page "/richiedi-quadro"
+
+<PageTitle>Richiedi un Quadro Personalizzato</PageTitle>
+
+<div class="custom-order-container">
+    <div class="header">
+        <h1>Richiedi un Quadro Personalizzato</h1>
+        <p class="subtitle">Descrivi la tua idea e l'artista ti contatterà per discutere i dettagli</p>
+    </div>
+
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert success">
+            <h3>✅ Richiesta Inviata!</h3>
+            <p>@successMessage</p>
+            <p><strong>Il tuo codice di riferimento è: @accessCode</strong></p>
+            <p class="small">Conserva questo codice, ti servirà per accedere al tuo quadro una volta accettata la richiesta.</p>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert error">
+            <p>❌ @errorMessage</p>
+        </div>
+    }
+
+    @if (string.IsNullOrEmpty(successMessage))
+    {
+        <EditForm Model="@customOrderRequest" OnValidSubmit="@SubmitRequest" FormName="CustomOrderForm">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <InputText @bind-Value="customOrderRequest.CustomerEmail" class="form-control" id="email" placeholder="La tua email per essere contattato" />
+                <ValidationMessage For="@(() => customOrderRequest.CustomerEmail)" />
+            </div>
+
+            <div class="form-group">
+                <label for="description">Descrizione del quadro desiderato *</label>
+                <InputTextArea @bind-Value="customOrderRequest.Description" class="form-control" id="description"
+                               placeholder="Descrivi il quadro che vorresti: soggetto, stile, dimensioni preferite, colori, etc..."
+                               rows="6" />
+                <ValidationMessage For="@(() => customOrderRequest.Description)" />
+            </div>
+
+            <div class="form-group">
+                <label for="attachment">Allegato (opzionale)</label>
+                <InputFile OnChange="@HandleFileChange" class="form-control" id="attachment" accept="image/*" />
+                <small class="help-text">Se hai una foto di riferimento o un'immagine da copiare, caricala qui (max 5MB)</small>
+                @if (selectedFileName != null)
+                {
+                    <p class="selected-file">📎 @selectedFileName</p>
+                }
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn primary" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span>Invio in corso...</span>
+                    }
+                    else
+                    {
+                        <span>Invia Richiesta</span>
+                    }
+                </button>
+            </div>
+        </EditForm>
+    }
+
+    <!-- Sezione per clienti che hanno già un codice -->
+    <div class="existing-order-section">
+        <h2>Hai già richiesto un quadro personalizzato?</h2>
+        <p>Se hai ricevuto una email di accettazione, inserisci il tuo codice di accesso qui:</p>
+
+        @if (!string.IsNullOrEmpty(accessErrorMessage))
+        {
+            <div class="alert error">
+                <p>❌ @accessErrorMessage</p>
+            </div>
+        }
+
+        <EditForm Model="@accessRequest" OnValidSubmit="@AccessCustomOrder" FormName="AccessForm">
+            <DataAnnotationsValidator />
+
+            <div class="access-form">
+                <div class="form-group inline">
+                    <InputText @bind-Value="accessRequest.AccessCode" class="form-control" placeholder="Codice accesso (es: CO20241215001)" />
+                    <ValidationMessage For="@(() => accessRequest.AccessCode)" />
+                </div>
+
+                <div class="form-group inline">
+                    <InputText @bind-Value="accessRequest.CustomerEmail" class="form-control" placeholder="La tua email" />
+                    <ValidationMessage For="@(() => accessRequest.CustomerEmail)" />
+                </div>
+
+                <button type="submit" class="btn secondary" disabled="@isAccessingOrder">
+                    @if (isAccessingOrder)
+                    {
+                        <span>Verifica...</span>
+                    }
+                    else
+                    {
+                        <span>Accedi al tuo quadro</span>
+                    }
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>

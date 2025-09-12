@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RenzoAgostini.Server.Data;
 
@@ -10,9 +11,11 @@ using RenzoAgostini.Server.Data;
 namespace RenzoAgostini.Server.Migrations
 {
     [DbContext(typeof(RenzoAgostiniDbContext))]
-    partial class RenzoAgostiniDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250909165702_AddCustomOrders")]
+    partial class AddCustomOrders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");

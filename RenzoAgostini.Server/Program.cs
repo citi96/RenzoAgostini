@@ -46,15 +46,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<RenzoAgostiniDbContext>()
     .AddDefaultTokenProviders();
 
-//builder.Services.AddEmailing(builder.Configuration);
-
-builder.Services.AddOptions<SmtpOptions>()
-                .Bind(builder.Configuration.GetSection("Email:Smtp"))
-                .ValidateDataAnnotations()
-                .Validate(o => !string.IsNullOrWhiteSpace(o.Host), "Host richiesto");
-
-builder.Services.AddSingleton<ICustomEmailSender, SmtpEmailSender>();
-builder.Services.AddHealthChecks().AddCheck<SmtpHealthCheck>("smtp", HealthStatus.Degraded);
+builder.Services.AddEmailing(builder.Configuration);
 
 builder.Services.AddScoped<IPaintingRepository, PaintingRepository>();
 builder.Services.AddScoped<PaintingService>();
@@ -67,6 +59,8 @@ builder.Services.AddScoped<IPaintingService>(sp =>
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICustomOrderRepository, CustomOrderRepository>();
+builder.Services.AddScoped<ICustomOrderService, CustomOrderService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 

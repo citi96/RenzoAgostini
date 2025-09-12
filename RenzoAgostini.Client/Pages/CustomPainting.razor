@@ -1,0 +1,138 @@
+﻿@page "/quadro-personalizzato/{paintingId:int}"
+@using RenzoAgostini.Shared.DTOs
+
+<PageTitle>Il tuo quadro personalizzato</PageTitle>
+
+@if (painting == null)
+{
+    <div class="loading">Caricamento...</div>
+}
+else
+{
+    <div class="custom-painting-container">
+        <div class="header">
+            <div class="badge">✨ Quadro Personalizzato</div>
+            <h1>@painting.Title</h1>
+            <p class="subtitle">Creato appositamente per te dall'artista</p>
+        </div>
+
+        <div class="painting-details">
+            <div class="image-section">
+                @if (painting.ImageUrls.Any())
+                {
+                    <div class="main-image">
+                        <img src="@currentImage" alt="@painting.Title" />
+                    </div>
+                    
+                    @if (painting.ImageUrls.Count > 1)
+                    {
+                        <div class="thumbnail-gallery">
+                            @for (int i = 0; i < painting.ImageUrls.Count; i++)
+                            {
+                                var index = i; // Capture for closure
+                                var imageUrl = painting.ImageUrls[i];
+                                <button class="thumbnail @(imageUrl == currentImage ? "active" : "")" 
+                                        @onclick="() => SetCurrentImage(imageUrl)">
+                                    <img src="@imageUrl" alt="@painting.Title" />
+                                </button>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-image">
+                        <p>🎨 Immagine in arrivo...</p>
+                    </div>
+                }
+            </div>
+
+            <div class="info-section">
+                <div class="painting-info">
+                    @if (!string.IsNullOrEmpty(painting.Description))
+                    {
+                        <div class="description">
+                            <h3>Descrizione</h3>
+                            <p>@painting.Description</p>
+                        </div>
+                    }
+
+                    <div class="details">
+                        @if (painting.Year.HasValue)
+                        {
+                            <div class="detail-item">
+                                <span class="label">Anno:</span>
+                                <span class="value">@painting.Year</span>
+                            </div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(painting.Medium))
+                        {
+                            <div class="detail-item">
+                                <span class="label">Tecnica:</span>
+                                <span class="value">@painting.Medium</span>
+                            </div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(painting.Dimensions))
+                        {
+                            <div class="detail-item">
+                                <span class="label">Dimensioni:</span>
+                                <span class="value">@painting.Dimensions</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (painting.Price.HasValue && painting.IsForSale)
+                {
+                    <div class="purchase-section">
+                        <div class="price">
+                            <span class="currency">€</span>
+                            <span class="amount">@painting.Price.Value.ToString("N2")</span>
+                        </div>
+                        
+                        <p class="exclusive-note">
+                            🌟 Questo quadro è stato creato esclusivamente per te e sarà disponibile solo per un tempo limitato.
+                        </p>
+                        
+                        <button class="btn primary large" @onclick="AddToCart" disabled="@isAddingToCart">
+                            @if (isAddingToCart)
+                            {
+                                <span>Aggiunta in corso...</span>
+                            }
+                            else
+                            {
+                                <span>🛒 Aggiungi al Carrello</span>
+                            }
+                        </button>
+                        
+                        @if (addedToCart)
+                        {
+                            <div class="success-message">
+                                ✅ Aggiunto al carrello! 
+                                <a href="/cart" class="link">Vai al carrello</a>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (!painting.IsForSale)
+                {
+                    <div class="unavailable-section">
+                        <div class="unavailable-badge">Non più disponibile</div>
+                        <p>Questo quadro è già stato acquistato o non è più disponibile.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <h3>Hai domande sul tuo quadro?</h3>
+            <p>L'artista è a tua disposizione per qualsiasi chiarimento o modifica.</p>
+            <a href="mailto:renzo.agostini@example.com?subject=Domanda su quadro personalizzato - ID @painting.Id" 
+               class="btn secondary">
+                📧 Contatta l'Artista
+            </a>
+        </div>
+    </div>
+}

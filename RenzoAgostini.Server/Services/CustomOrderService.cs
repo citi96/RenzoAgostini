@@ -36,15 +36,9 @@ namespace RenzoAgostini.Server.Services
                     Description = dto.Description.Trim(),
                     AccessCode = GenerateAccessCode(),
                     Status = CustomOrderStatus.Pending,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    AttachmentPath = dto.AttachmentPath
                 };
-
-                if (dto.Attachment != null)
-                {
-                    var attachmentPath = await SaveAttachmentAsync(dto.Attachment);
-                    customOrder.AttachmentPath = attachmentPath;
-                    customOrder.AttachmentOriginalName = dto.Attachment.FileName;
-                }
 
                 await customOrderRepository.AddAsync(customOrder);
 
