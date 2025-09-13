@@ -83,8 +83,8 @@
     }
 
     .thumbnail.active {
-        border-color: #764ba2;
-        box-shadow: 0 0 0 2px rgba(118, 75, 162, 0.2);
+        border-color: #7e22ce;
+        box-shadow: 0 0 0 2px rgba(126, 34, 206, 0.2);
     }
 
     .thumbnail img {
@@ -170,8 +170,8 @@
 }
 
 .exclusive-note {
-    background: rgba(118, 75, 162, 0.1);
-    border: 1px solid rgba(118, 75, 162, 0.2);
+    background: rgba(126, 34, 206, 0.1);
+    border: 1px solid rgba(126, 34, 206, 0.2);
     border-radius: 0.5rem;
     padding: 1rem;
     color: #4c1d95;
@@ -179,41 +179,6 @@
     text-align: center;
     margin-bottom: 1.5rem;
 }
-/* Override button styles within this component (ensure full-width) */
-.btn {
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-    .btn.primary {
-        background-color: #764ba2;
-        color: #fff;
-    }
-
-        .btn.primary:hover:not(:disabled) {
-            background-color: #6a4392;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 25px rgba(118, 75, 162, 0.3);
-        }
-
-    .btn.secondary {
-        background-color: #6b7280;
-        color: #fff;
-    }
-
-        .btn.secondary:hover:not(:disabled) {
-            background-color: #4b5563;
-            transform: translateY(-1px);
-        }
-
-    .btn.large {
-        padding: 1rem 2rem;
-        font-size: 1.125rem;
-    }
 
 .success-message {
     background: #d1fae5;
@@ -222,10 +187,11 @@
     border-radius: 0.5rem;
     text-align: center;
     margin-top: 1rem;
+    font-weight: 500;
 }
 
 .link {
-    color: #059669;
+    color: #7e22ce;
     text-decoration: underline;
     font-weight: 600;
 }

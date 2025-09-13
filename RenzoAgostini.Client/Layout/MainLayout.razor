@@ -2,47 +2,47 @@
 @using RenzoAgostini.Client.Components
 @inherits LayoutComponentBase
 
-<div class="container">
-    <div class="nav">
-        <a class="brand" href="/">Galleria</a>
-        <AuthorizeView Roles="admin">
-            <Authorized>
-                <a class="brand" href="/admin/paintings">🎨 Gestisci Quadri</a>
-            </Authorized>
-        </AuthorizeView>
-        <AuthorizeView Roles="admin">
-            <Authorized>
-                <a class="brand" href="/admin/orders">Ordini</a>
-            </Authorized>
-        </AuthorizeView>
-        <AuthorizeView Roles="admin">
-            <Authorized>
-                <a class="brand" href="/admin/custom-orders">Richieste Quadri</a>
-            </Authorized>
-        </AuthorizeView>
+<div class="nav">
+    <a class="brand" href="/">Galleria</a>
+    <AuthorizeView Roles="admin">
+        <Authorized>
+            <a class="brand" href="/admin/paintings">🎨 Gestisci Quadri</a>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="admin">
+        <Authorized>
+            <a class="brand" href="/admin/orders">Ordini</a>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="admin">
+        <Authorized>
+            <a class="brand" href="/admin/custom-orders">Richieste Quadri</a>
+        </Authorized>
+    </AuthorizeView>
 
-        <div class="spacer"></div>
+    <div class="spacer"></div>
 
-        <a class="btn" href="/cart" title="Carrello">
-            🛒 <strong>@cartCount</strong>
-        </a>
-        
-        <AuthorizeView>
-            <Authorized>
-                <div class="user-info">
-                    <span class="welcome-text">Ciao, @context.User.Identity?.Name</span>
-                    <button class="btn secondary" @onclick="LogoutAsync" title="Logout">
-                        Esci
-                    </button>
-                </div>
-            </Authorized>
-            <NotAuthorized>
-                <button class="btn primary" @onclick="ShowLoginModal" title="Login">
-                    Accedi
+    <a class="btn" href="/cart" title="Carrello">
+        🛒 <strong>@cartCount</strong>
+    </a>
+
+    <AuthorizeView>
+        <Authorized>
+            <div class="user-info">
+                <span class="welcome-text">Ciao, @context.User.Identity?.Name</span>
+                <button class="btn secondary" @onclick="LogoutAsync" title="Logout">
+                    Esci
                 </button>
-            </NotAuthorized>
-        </AuthorizeView>
-    </div>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <button class="btn primary" @onclick="ShowLoginModal" title="Login">
+                Accedi
+            </button>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+<div class="container">
     <main>
         @Body
     </main>

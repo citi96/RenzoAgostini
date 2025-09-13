@@ -15,7 +15,7 @@
 .loading-section, .error-section, .success-section {
     padding: 2rem;
     border-radius: 12px;
-    background: white;
+    background: #fff;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -23,7 +23,7 @@
     width: 40px;
     height: 40px;
     border: 4px solid #f3f3f3;
-    border-top: 4px solid #3b82f6;
+    border-top: 4px solid #7e22ce;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 1rem;
@@ -56,26 +56,3 @@ p {
     margin-bottom: 1.5rem;
     line-height: 1.6;
 }
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.2s;
-}
-
-    .btn.primary {
-        background-color: #3b82f6;
-        color: white;
-    }
-
-        .btn.primary:hover {
-            background-color: #2563eb;
-            transform: translateY(-1px);
-        }
