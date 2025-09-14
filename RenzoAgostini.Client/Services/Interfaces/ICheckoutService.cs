@@ -2,7 +2,7 @@
 
 namespace RenzoAgostini.Client.Services.Interfaces
 {
-    public interface ICheckoutClient
+    public interface ICheckoutService
     {
         Task<StripeSessionDto> CreateCheckoutSessionAsync(CheckoutDto dto);
         Task ConfirmPaymentAsync(string sessionId);

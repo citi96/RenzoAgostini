@@ -1,39 +1,233 @@
 ﻿@page "/checkout"
+@using System.Globalization
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
 
-<h3>Conferma Ordine</h3>
+<PageTitle>Checkout - Galleria Agostini</PageTitle>
 
-@if (CartService.ItemsCount == 0 || CartService.CheckoutData == null)
-{
-    <p>Il carrello è vuoto o i dati di checkout non sono disponibili.</p>
-    <button class="btn" @onclick="NavigateToGallery">Torna alla galleria</button>
-}
-else
-{
-    <!-- Riepilogo ordine -->
-    <h4>Articoli (@CartService.ItemsCount)</h4>
-    <ul>
-        @foreach (var item in CartService.Items)
-        {
-            <li>@item.Title - @item.Price?.ToString("C")</li>
-        }
-    </ul>
-    <p>Totale articoli: @CartService.TotalAmount.ToString("C")</p>
+<div class="checkout-container">
+    <!-- Header -->
+    <div class="checkout-header">
+        <h1 class="checkout-title">Checkout Sicuro</h1>
+        <div class="checkout-subtitle">
+            <div class="security-badge">
+                <span>🔒</span>
+                <span>Connessione Sicura SSL</span>
+            </div>
+        </div>
+    </div>
 
-    @* Calcolo costo spedizione *@
+    <!-- Progress Steps -->
+    <div class="checkout-progress">
+        <div class="progress-step @(currentStep >= 1 ? "active" : "") @(currentStep > 1 ? "completed" : "")">
+            <div class="step-circle">@(currentStep > 1 ? "✓" : "1")</div>
+            <div class="step-label">Dati Personali</div>
+        </div>
+        <div class="progress-step @(currentStep >= 2 ? "active" : "") @(currentStep > 2 ? "completed" : "")">
+            <div class="step-circle">@(currentStep > 2 ? "✓" : "2")</div>
+            <div class="step-label">Spedizione</div>
+        </div>
+        <div class="progress-step @(currentStep >= 3 ? "active" : "") @(currentStep > 3 ? "completed" : "")">
+            <div class="step-circle">@(currentStep > 3 ? "✓" : "3")</div>
+            <div class="step-label">Pagamento</div>
+        </div>
+    </div>
 
-    <p>Spedizione (<em>@CartService.CheckoutData.ShippingMethod</em>): @GetShippingCost().ToString("C")</p>
-
-    <p><strong>Totale ordine (articoli + spedizione):</strong> @((CartService.TotalAmount + GetShippingCost()).ToString("C"))</p>
-
-    <p>Dati spedizione: <br />
-       <em>@CartService.CheckoutData.CustomerFirstName @CartService.CheckoutData.CustomerLastName, 
-       @CartService.CheckoutData.AddressLine, @CartService.CheckoutData.PostalCode @CartService.CheckoutData.City (@CartService.CheckoutData.Country)</em>
-    </p>
-
-    <button class="btn primary" @onclick="StartPayment">Conferma e paga ora</button>
-
-    @if (!string.IsNullOrEmpty(errorMessage))
+    @if (isLoading)
     {
-        <p class="text-danger">@errorMessage</p>
+        <div class="checkout-loading">
+            <div class="checkout-loading-spinner"></div>
+            <p>Caricamento checkout...</p>
+        </div>
     }
-}
+    else if (!cartItems.Any())
+    {
+        <div class="empty-cart">
+            <div class="empty-cart-icon">🛒</div>
+            <h2>Carrello Vuoto</h2>
+            <p>Non puoi procedere al checkout con un carrello vuoto.</p>
+            <a href="/cart" class="btn btn-primary">Torna al Carrello</a>
+        </div>
+    }
+    else
+    {
+        <!-- Checkout Layout -->
+        <div class="checkout-layout">
+            <!-- Checkout Form -->
+            <div class="checkout-form">
+                <EditForm Model="orderForm" OnValidSubmit="ProcessOrder">
+                    <DataAnnotationsValidator />
+
+                    <!-- Personal Information -->
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <div class="section-icon">👤</div>
+                            <span>Dati Personali</span>
+                        </h2>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label required">Nome</label>
+                                <InputText @bind-Value="orderForm.FirstName" class="form-input" placeholder="Il tuo nome" />
+                                <ValidationMessage For="@(() => orderForm.FirstName)" class="form-error" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Cognome</label>
+                                <InputText @bind-Value="orderForm.LastName" class="form-input" placeholder="Il tuo cognome" />
+                                <ValidationMessage For="@(() => orderForm.LastName)" class="form-error" />
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label required">Email</label>
+                                <InputText @bind-Value="orderForm.Email" class="form-input" type="email" placeholder="nome@example.com" />
+                                <ValidationMessage For="@(() => orderForm.Email)" class="form-error" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Telefono</label>
+                                <InputText @bind-Value="orderForm.Phone" class="form-input" placeholder="+39 123 456 7890" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <div class="section-icon">📍</div>
+                            <span>Indirizzo di Spedizione</span>
+                        </h2>
+
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label required">Indirizzo</label>
+                                <InputText @bind-Value="orderForm.Address.Street" class="form-input" placeholder="Via, Piazza, Viale..." />
+                                <ValidationMessage For="@(() => orderForm.Address.Street)" class="form-error" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Città</label>
+                                <InputText @bind-Value="orderForm.Address.City" class="form-input" placeholder="Milano" />
+                                <ValidationMessage For="@(() => orderForm.Address.City)" class="form-error" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">CAP</label>
+                                <InputText @bind-Value="orderForm.Address.PostalCode" class="form-input" placeholder="20100" />
+                                <ValidationMessage For="@(() => orderForm.Address.PostalCode)" class="form-error" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Provincia</label>
+                                <InputText @bind-Value="orderForm.Address.State" class="form-input" placeholder="MI" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Paese</label>
+                                <InputSelect @bind-Value="orderForm.Address.Country" class="form-select">
+                                    <option value="">Seleziona paese</option>
+                                    <option value="Italy">Italia</option>
+                                    <option value="San Marino">San Marino</option>
+                                    <option value="Vatican">Vaticano</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => orderForm.Address.Country)" class="form-error" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label class="form-check-label">
+                                <InputCheckbox @bind-Value="orderForm.AcceptTerms" class="form-checkbox" />
+                                <span>Accetto i <a href="/terms" target="_blank" style="color: var(--primary-600);">Termini e Condizioni</a> e la <a href="/privacy" target="_blank" style="color: var(--primary-600);">Privacy Policy</a></span>
+                            </label>
+                            <ValidationMessage For="@(() => orderForm.AcceptTerms)" class="form-error" />
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <h3 class="summary-title">Il Tuo Ordine</h3>
+                    </div>
+
+                    <div class="summary-body">
+                        @foreach (var item in cartItems)
+                        {
+                            <div class="order-item">
+                                <div>
+                                    @if (item.ImageUrls.Any())
+                                    {
+                                        <img src="@($"{Configuration["BaseUrl"]}/{item.ImageUrls[0]}")" 
+                                             alt="@item.Title" 
+                                             class="order-item-image" />
+                                    }
+                                    else
+                                    {
+                                        <div class="order-item-image" style="background: var(--neutral-200); display: flex; align-items: center; justify-content: center; color: var(--neutral-500);">
+                                            🎨
+                                        </div>
+                                    }
+                                </div>
+                                <div class="order-item-details">
+                                    <div class="order-item-title">@item.Title</div>
+                                    <div class="order-item-meta">
+                                        @if (item.Year.HasValue) { <span>@item.Year</span> }
+                                        @if (!string.IsNullOrEmpty(item.Medium)) { <span> • @item.Medium</span> }
+                                    </div>
+                                    <div class="order-item-price">
+                                        Qtà: @item.Price?.ToString("C", CultureInfo.GetCultureInfo("it-IT"))
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="summary-calculations">
+                            <div class="summary-row">
+                                <span class="summary-label">Subtotale (@GetTotalItems() articoli)</span>
+                                <span class="summary-value">@GetSubtotal().ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Spedizione</span>
+                                <span class="summary-value @(GetShipping() == 0 ? "free" : "")">
+                                    @if (GetShipping() == 0)
+                                    {
+                                        <span>Gratuita</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@GetShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
+                                    }
+                                </span>
+                            </div>
+                            <div class="summary-row total">
+                                <span class="summary-label">Totale</span>
+                                <span class="summary-value">@GetTotal().ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="place-order-section">
+                        <button class="place-order-btn" 
+                                @onclick="ProcessOrder" 
+                                disabled="@(!IsFormValid() || isProcessing)">
+                            @if (isProcessing)
+                            {
+                                <span class="animate-spin">⏳</span>
+                                <span>Elaborazione...</span>
+                            }
+                            else
+                            {
+                                <span>🔒</span>
+                                <span>Conferma Ordine (@GetTotal().ToString("C", CultureInfo.GetCultureInfo("it-IT")))</span>
+                            }
+                        </button>
+                        
+                        <div class="security-info">
+                            <span>🔒</span>
+                            <span>I tuoi dati sono protetti da crittografia SSL a 256-bit</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,7 +1,7 @@
 ﻿// RenzoAgostini.Server/Controllers/CustomOrdersController.cs
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RenzoAgostini.Server.Services.Interfaces;
+using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Server.Controllers
@@ -14,14 +14,14 @@ namespace RenzoAgostini.Server.Controllers
         public async Task<ActionResult<CustomOrderDto>> CreateCustomOrder([FromForm] CreateCustomOrderDto dto)
         {
             var result = await customOrderService.CreateCustomOrderAsync(dto);
-            return Ok(result.Value);
+            return Ok(result);
         }
 
         [HttpPost("access")]
         public async Task<ActionResult<CustomOrderDto>> GetByAccessCode([FromBody] AccessCustomOrderDto dto)
         {
             var result = await customOrderService.GetByAccessCodeAsync(dto.AccessCode, dto.CustomerEmail);
-            return Ok(result.Value);
+            return Ok(result);
         }
 
         [HttpGet]
@@ -37,7 +37,7 @@ namespace RenzoAgostini.Server.Controllers
         public async Task<ActionResult<CustomOrderDto>> AcceptCustomOrder(int id, [FromBody] AcceptCustomOrderDto dto)
         {
             var result = await customOrderService.AcceptCustomOrderAsync(id, dto);
-            return Ok(result.Value);
+            return Ok(result);
         }
 
         [HttpPost("{id}/reject")]
@@ -45,7 +45,7 @@ namespace RenzoAgostini.Server.Controllers
         public async Task<ActionResult<CustomOrderDto>> RejectCustomOrder(int id, [FromBody] string? reason)
         {
             var result = await customOrderService.RejectCustomOrderAsync(id, reason);
-            return Ok(result.Value);
+            return Ok(result);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using RenzoAgostini.Shared.DTOs;
 
-namespace RenzoAgostini.Client.Services.Interfaces
+namespace RenzoAgostini.Shared.Contracts
 {
     public interface ICustomOrderService
     {

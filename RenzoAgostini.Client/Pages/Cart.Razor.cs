@@ -1,205 +1,236 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Components;
-using RenzoAgostini.Client.Authentication;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
+using RenzoAgostini.Client.Services;
 using RenzoAgostini.Client.Services.Interfaces;
+using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Pages
 {
     public partial class Cart : ComponentBase, IDisposable
     {
-        [Inject] ICartService CartService { get; set; } = default!;
-        [Inject] ICheckoutClient CheckoutClient { get; set; } = default!;
-        [Inject] NavigationManager Navigation { get; set; } = default!;
-        [Inject] CustomAuthenticationStateProvider AuthProvider { get; set; } = default!;
-        [Inject] IConfiguration Configuration { get; set; } = default!;
+        [Inject] private ICartService CartService { get; set; } = default!;
+        [Inject] private IPaintingService PaintingService { get; set; } = default!;
+        [Inject] private NavigationManager Navigation { get; set; } = default!;
+        [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+        [Inject] private ILogger<Cart> Logger { get; set; } = default!;
+        [Inject] private IConfiguration Configuration { get; set; } = default!;
 
-        private readonly CheckoutFormModel _checkoutModel = new();
-        private string selectedShipping = "";
-        private string? errorMessage;
-        private bool showTermsModal = false;
+        protected List<PaintingDto> cartItems = [];
+        protected List<PaintingDto>? recommendedPaintings;
+        protected bool isLoading = true;
+        protected bool isUpdating = false;
 
         protected override async Task OnInitializedAsync()
         {
-            // Pre-popola i dati dell'utente se autenticato
-            var state = await AuthProvider.GetAuthenticationStateAsync();
-            if (state.User.Identity?.IsAuthenticated == true)
-            {
-                var user = state.User;
-                _checkoutModel.FirstName = user.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value
-                                          ?? user.Identity.Name?.Split(' ')?.FirstOrDefault() ?? "";
-                _checkoutModel.LastName = user.Claims.FirstOrDefault(c => c.Type == "family_name")?.Value
-                                         ?? user.Identity.Name?.Split(' ')?.LastOrDefault() ?? "";
-                _checkoutModel.Email = user.Claims.FirstOrDefault(c => c.Type == "email")?.Value ?? "";
-            }
+            // Subscribe to cart changes
+            CartService.OnChange += HandleCartChanged;
 
-            // Imposta spedizione standard come default
-            _checkoutModel.ShippingMethod = "Standard";
-            selectedShipping = "Standard";
+            await LoadCartItems();
+            await LoadRecommendedPaintings();
 
-            CartService.OnChange += StateHasChanged;
-        }
-
-        private void RemoveFromCart(int paintingId)
-        {
-            CartService.RemoveItem(paintingId);
-        }
-
-        private void NavigateToGallery()
-        {
-            Navigation.NavigateTo("/");
-        }
-
-        private async Task OnCountryChange(ChangeEventArgs e)
-        {
-            _checkoutModel.Country = e.Value?.ToString() ?? "";
-            // Reset shipping method quando cambia il paese
-            _checkoutModel.ShippingMethod = "";
-            selectedShipping = "";
-            StateHasChanged();
-        }
-
-        private void SelectShipping(string method)
-        {
-            _checkoutModel.ShippingMethod = method;
-            selectedShipping = method;
-            StateHasChanged();
-        }
-
-        private decimal GetShippingCost(string method)
-        {
-            if (string.IsNullOrEmpty(_checkoutModel.Country)) return 0m;
-
-            bool isDomestic = _checkoutModel.Country.ToLower().Contains("italia");
-
-            return method.ToLower() switch
-            {
-                "express" => isDomestic ? 20m : 50m,
-                "standard" => isDomestic ? 10m : 25m,
-                _ => 0m
-            };
-        }
-
-        private decimal GetTotalWithShipping()
-        {
-            var shippingCost = !string.IsNullOrEmpty(_checkoutModel.ShippingMethod)
-                ? GetShippingCost(_checkoutModel.ShippingMethod)
-                : 0m;
-            return CartService.TotalAmount + shippingCost;
-        }
-
-        private bool CanProceed()
-        {
-            return !string.IsNullOrWhiteSpace(_checkoutModel.FirstName) &&
-                   !string.IsNullOrWhiteSpace(_checkoutModel.LastName) &&
-                   !string.IsNullOrWhiteSpace(_checkoutModel.Email) &&
-                   !string.IsNullOrWhiteSpace(_checkoutModel.AddressLine) &&
-                   !string.IsNullOrWhiteSpace(_checkoutModel.City) &&
-                   !string.IsNullOrWhiteSpace(_checkoutModel.PostalCode) &&
-                   !string.IsNullOrWhiteSpace(_checkoutModel.Country) &&
-                   !string.IsNullOrWhiteSpace(_checkoutModel.ShippingMethod) &&
-                   _checkoutModel.TermsAccepted &&
-                   CartService.ItemsCount > 0;
-        }
-
-        private void ShowTerms()
-        {
-            showTermsModal = true;
-        }
-
-        private void HideTerms()
-        {
-            showTermsModal = false;
-        }
-
-        private void AcceptTerms()
-        {
-            _checkoutModel.TermsAccepted = true;
-            showTermsModal = false;
-            StateHasChanged();
-        }
-
-        private async Task ProceedToPayment()
-        {
-            try
-            {
-                errorMessage = null;
-
-                // Crea il CheckoutDto con tutti i dati
-                var checkoutDto = _checkoutModel.ToCheckoutDto([.. CartService.Items.Select(p => p.Id)]);
-
-                // Chiama direttamente Stripe per creare la sessione
-                var session = await CheckoutClient.CreateCheckoutSessionAsync(checkoutDto);
-
-                // Reindirizza direttamente a Stripe
-                Navigation.NavigateTo(session.SessionUrl, forceLoad: true);
-            }
-            catch (Exception ex)
-            {
-                errorMessage = "Si è verificato un errore durante la creazione della sessione di pagamento. Riprova.";
-                Console.Error.WriteLine("Errore checkout: " + ex.Message);
-            }
+            isLoading = false;
         }
 
         public void Dispose()
         {
-            CartService.OnChange -= StateHasChanged;
-            GC.SuppressFinalize(this);
+            CartService.OnChange -= HandleCartChanged;
         }
 
-        // Modello del form con validazione (stesso di prima)
-        public class CheckoutFormModel : IValidatableObject
+        private async Task LoadCartItems()
         {
-            [Required(ErrorMessage = "Nome richiesto")]
-            public string FirstName { get; set; } = string.Empty;
-
-            [Required(ErrorMessage = "Cognome richiesto")]
-            public string LastName { get; set; } = string.Empty;
-
-            [Required(ErrorMessage = "Email richiesta"), EmailAddress(ErrorMessage = "Email non valida")]
-            public string Email { get; set; } = string.Empty;
-
-            [Required(ErrorMessage = "Indirizzo richiesto")]
-            public string AddressLine { get; set; } = string.Empty;
-
-            [Required(ErrorMessage = "Città richiesta")]
-            public string City { get; set; } = string.Empty;
-
-            [Required(ErrorMessage = "CAP richiesto")]
-            public string PostalCode { get; set; } = string.Empty;
-
-            [Required(ErrorMessage = "Paese richiesto")]
-            public string Country { get; set; } = string.Empty;
-
-            [Required(ErrorMessage = "Seleziona un metodo di spedizione")]
-            public string ShippingMethod { get; set; } = string.Empty;
-
-            public bool TermsAccepted { get; set; } = false;
-
-            public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+            try
             {
-                if (!TermsAccepted)
-                {
-                    yield return new ValidationResult(
-                        "Devi accettare i termini e condizioni per procedere.",
-                        new[] { nameof(TermsAccepted) });
-                }
+                isLoading = true;
+                StateHasChanged();
+
+                var items = CartService.Items;
+                cartItems = items.ToList();
+
+                Logger.LogInformation("Loaded {Count} items in cart", cartItems.Count);
             }
-
-            public CheckoutDto ToCheckoutDto(List<int> paintingIds)
+            catch (Exception ex)
             {
-                return new CheckoutDto(TermsAccepted)
-                {
-                    PaintingIds = paintingIds,
-                    CustomerFirstName = FirstName,
-                    CustomerLastName = LastName,
-                    CustomerEmail = Email,
-                    AddressLine = AddressLine,
-                    City = City,
-                    PostalCode = PostalCode,
-                    Country = Country,
-                    ShippingMethod = ShippingMethod // Ora lo passiamo anche nel DTO
-                };
+                Logger.LogError(ex, "Error loading cart items");
+                await ShowErrorToast("Errore nello svuotare il carrello");
+            }
+            finally
+            {
+                isUpdating = false;
+                StateHasChanged();
+            }
+        }
+
+        protected void GoToCheckout()
+        {
+            if (!cartItems.Any() || isUpdating) return;
+
+            try
+            {
+                Navigation.NavigateTo("/checkout");
+                Logger.LogInformation("User navigated to checkout with {Count} items", cartItems.Count);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error navigating to checkout");
+                ShowErrorToast("Errore nel reindirizzamento al checkout").GetAwaiter().GetResult();
+            }
+        }
+
+        // Helper methods for calculations
+        protected int GetTotalItems()
+        {
+            return cartItems.Count;
+        }
+
+        protected decimal GetSubtotal()
+        {
+            return cartItems.Sum(item => (item.Price ?? 0));
+        }
+
+        protected decimal GetShipping()
+        {
+            return GetSubtotal() >= 200 ? 0 : 15;
+        }
+
+        protected decimal GetTotal()
+        {
+            return GetSubtotal() + GetShipping();
+        }
+
+        // Toast notifications
+        private async Task ShowSuccessToast(string message)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("showToast", message, "success");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error showing success toast");
+            }
+        }
+
+        private async Task ShowErrorToast(string message)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("showToast", message, "error");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error showing error toast");
+            }
+        }
+
+        private async Task ShowInfoToast(string message)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("showToast", message, "info");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error showing info toast");
+            }
+        }
+
+        private async Task LoadRecommendedPaintings()
+        {
+            try
+            {
+                var allPaintings = await PaintingService.GetAllPaintingsAsync();
+
+                // Filter out items already in cart and get random recommendations
+                var availablePaintings = allPaintings
+                    .Where(p => p.IsForSale && !cartItems.Any(ci => ci.Id == p.Id))
+                    .ToList();
+
+                // Simple random selection - in real app you'd use ML recommendations
+                var random = new Random();
+                recommendedPaintings = [.. availablePaintings
+                    .OrderBy(x => random.Next())
+                    .Take(6)];
+
+                StateHasChanged();
+
+                Logger.LogInformation("Loaded {Count} recommended paintings", recommendedPaintings.Count);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error loading recommended paintings");
+                // Non-critical error, don't show toast
+            }
+        }
+
+        private void HandleCartChanged()
+        {
+            InvokeAsync(async () =>
+            {
+                await LoadCartItems();
+                await LoadRecommendedPaintings(); // Refresh recommendations
+            });
+        }
+
+        protected async Task RemoveItem(int paintingId)
+        {
+            if (isUpdating) return;
+
+            try
+            {
+                isUpdating = true;
+                StateHasChanged();
+
+                var item = cartItems.FirstOrDefault(i => i.Id == paintingId);
+                if (item == null) return;
+
+                CartService.RemoveItem(paintingId);
+                await ShowSuccessToast($"'{item.Title}' rimosso dal carrello");
+
+                Logger.LogInformation("Removed painting {PaintingId} from cart", paintingId);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error removing item {PaintingId} from cart", paintingId);
+                await ShowErrorToast("Errore nella rimozione dell'articolo");
+            }
+            finally
+            {
+                isUpdating = false;
+                StateHasChanged();
+            }
+        }
+
+        protected async Task ClearCart()
+        {
+            if (isUpdating || cartItems.Count == 0) return;
+
+            // Confirm with user
+            var confirmed = await JSRuntime.InvokeAsync<bool>("confirm",
+                "Sei sicuro di voler svuotare completamente il carrello?");
+
+            if (!confirmed) return;
+
+            try
+            {
+                isUpdating = true;
+                StateHasChanged();
+
+                CartService.Clear();
+                await ShowSuccessToast("Carrello svuotato con successo");
+
+                Logger.LogInformation("Cart cleared by user");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error clearing cart");
+                await ShowErrorToast("Errore nel caricamento del carrello");
+            }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
             }
         }
     }

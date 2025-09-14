@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.Data;
 using RenzoAgostini.Shared.DTOs;
@@ -9,6 +10,7 @@ namespace RenzoAgostini.Client.Pages
     {
         [Inject] private IOrderService OrderService { get; set; } = default!;
         [Inject] private ILogger<AdminOrders> Logger { get; set; } = default!;
+        [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
         private List<OrderDto>? orders;
         private OrderDto? selectedOrder;
@@ -27,100 +29,174 @@ namespace RenzoAgostini.Client.Pages
             try
             {
                 orders = (await OrderService.GetAllOrdersAsync())?.ToList();
+
+                // Ordina per data decrescente
+                if (orders != null)
+                {
+                    orders = orders.OrderByDescending(o => o.OrderDate).ToList();
+                }
+
                 errorMessage = null;
+                Logger.LogInformation("Loaded {Count} orders successfully", orders?.Count ?? 0);
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error loading orders");
                 errorMessage = "Errore nel caricamento degli ordini.";
+                await ShowErrorToast("Errore nel caricamento degli ordini");
             }
         }
 
         private void ShowDetails(OrderDto order)
         {
-            // Mostra il pannello dei dettagli per l'ordine selezionato
             selectedOrder = order;
             newTrackingNumber = order.TrackingNumber ?? string.Empty;
             showDetail = true;
+            StateHasChanged();
         }
 
         private void CloseDetail()
         {
-            // Chiude il pannello dei dettagli senza salvare modifiche
             showDetail = false;
             selectedOrder = null;
             newTrackingNumber = string.Empty;
+            StateHasChanged();
         }
 
         private async Task UpdateTracking()
         {
-            if (selectedOrder is null) return;
+            if (selectedOrder is null || string.IsNullOrWhiteSpace(newTrackingNumber))
+                return;
+
             try
             {
-                // Aggiorna il tracking number tramite API
-                await OrderService.UpdateOrderTrackingAsync(selectedOrder.Id, newTrackingNumber);
-                // Ricarica la lista ordini per visualizzare il cambiamento
-                await LoadOrders();
+                await OrderService.UpdateOrderTrackingAsync(selectedOrder.Id, newTrackingNumber.Trim());
+
+                // Aggiorna l'ordine locale
+                if (orders != null)
+                {
+                    var orderIndex = orders.FindIndex(o => o.Id == selectedOrder.Id);
+                    if (orderIndex >= 0)
+                    {
+                        orders[orderIndex] = orders[orderIndex] with { TrackingNumber = newTrackingNumber.Trim() };
+                        selectedOrder = orders[orderIndex];
+                    }
+                }
+
                 successMessage = "Tracking aggiornato con successo.";
+                await ShowSuccessToast("Tracking aggiornato con successo!");
+
+                Logger.LogInformation("Tracking updated for order {OrderId}: {TrackingNumber}",
+                    selectedOrder.Id, newTrackingNumber);
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error updating tracking for order {OrderId}", selectedOrder.Id);
                 errorMessage = "Errore durante l'aggiornamento del tracking.";
+                await ShowErrorToast("Errore durante l'aggiornamento del tracking");
             }
             finally
             {
-                CloseDetail();
+                StateHasChanged();
             }
         }
 
         private async Task MarkAsShipped()
         {
             if (selectedOrder is null) return;
-            // Aggiorna il tracking (se inserito) prima di cambiare lo stato
-            if (!string.IsNullOrWhiteSpace(newTrackingNumber))
-            {
-                try
-                {
-                    await OrderService.UpdateOrderTrackingAsync(selectedOrder.Id, newTrackingNumber);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex, "Error updating tracking for order {OrderId} before shipping", selectedOrder.Id);
-                    errorMessage = "Errore durante l'aggiornamento del tracking.";
-                    CloseDetail();
-                    return;
-                }
-            }
+
             try
             {
-                // Imposta lo stato dell'ordine su "Spedito"
+                // Aggiorna il tracking se inserito
+                if (!string.IsNullOrWhiteSpace(newTrackingNumber) &&
+                    newTrackingNumber.Trim() != (selectedOrder.TrackingNumber ?? string.Empty))
+                {
+                    await OrderService.UpdateOrderTrackingAsync(selectedOrder.Id, newTrackingNumber.Trim());
+                }
+
+                // Cambia lo stato in spedito
                 await OrderService.UpdateOrderStatusAsync(selectedOrder.Id, OrderStatus.Shipped);
-                successMessage = "Ordine spedito con successo.";
+
+                // Aggiorna gli ordini locali
+                if (orders != null)
+                {
+                    var orderIndex = orders.FindIndex(o => o.Id == selectedOrder.Id);
+                    if (orderIndex >= 0)
+                    {
+                        orders[orderIndex] = orders[orderIndex] with
+                        {
+                            Status = OrderStatus.Shipped,
+                            TrackingNumber = newTrackingNumber.Trim()
+                        };
+                        selectedOrder = orders[orderIndex];
+                    }
+                }
+
+                successMessage = "Ordine segnato come spedito con successo.";
+                await ShowSuccessToast("Ordine spedito con successo!");
+
+                Logger.LogInformation("Order {OrderId} marked as shipped", selectedOrder.Id);
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error marking order {OrderId} as shipped", selectedOrder.Id);
                 errorMessage = "Errore durante l'aggiornamento dello stato dell'ordine.";
+                await ShowErrorToast("Errore durante l'aggiornamento dell'ordine");
             }
             finally
             {
-                await LoadOrders();
-                CloseDetail();
+                StateHasChanged();
             }
         }
 
-        private string GetStatusLabel(OrderStatus status)
+        // Helper methods per UI
+        private static string GetStatusLabel(OrderStatus status)
         {
-            // Restituisce l'etichetta in italiano per lo stato dell'ordine
             return status switch
             {
-                OrderStatus.Pending => "In attesa",
+                OrderStatus.Pending => "In Attesa",
                 OrderStatus.Paid => "Pagato",
                 OrderStatus.Shipped => "Spedito",
                 OrderStatus.Cancelled => "Cancellato",
                 _ => status.ToString()
             };
+        }
+
+        private static string GetStatusClass(OrderStatus status)
+        {
+            return status switch
+            {
+                OrderStatus.Pending => "pending",
+                OrderStatus.Paid => "paid",
+                OrderStatus.Shipped => "shipped",
+                OrderStatus.Cancelled => "cancelled",
+                _ => "pending"
+            };
+        }
+
+        // Toast notifications
+        private async Task ShowSuccessToast(string message)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("showToast", message, "success");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error showing success toast");
+            }
+        }
+
+        private async Task ShowErrorToast(string message)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("showToast", message, "error");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error showing error toast");
+            }
         }
     }
 }

@@ -1,10 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using RenzoAgostini.Client.Services.Interfaces;
+using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.Data;
 using RenzoAgostini.Shared.DTOs;
+using System.ComponentModel.DataAnnotations;
 
 namespace RenzoAgostini.Client.Pages
 {
@@ -43,14 +42,16 @@ namespace RenzoAgostini.Client.Pages
             try
             {
                 var orders = await CustomOrderService.GetAllCustomOrdersAsync();
-                customOrders = orders.ToList();
+                customOrders = orders.OrderByDescending(o => o.CreatedAt).ToList();
                 FilterOrders();
                 StateHasChanged();
+                Logger.LogInformation("Loaded {Count} custom orders successfully", customOrders.Count);
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error loading custom orders");
                 errorMessage = ex.Message;
+                await ShowErrorToast("Errore nel caricamento delle richieste");
                 StateHasChanged();
             }
         }
@@ -84,7 +85,7 @@ namespace RenzoAgostini.Client.Pages
                 ArtistNotes = "",
                 PaintingData = new(
                     $"custom-{order.Id}-{DateTime.Now:yyyyMMdd}",
-                    $"Quadro personalizzato per {order.CustomerEmail}",
+                    $"Quadro personalizzato per {order.CustomerEmail.Split('@')[0]}",
                     order.Description,
                     DateTime.Now.Year,
                     "Olio su tela",
@@ -126,13 +127,17 @@ namespace RenzoAgostini.Client.Pages
                 await CustomOrderService.AcceptCustomOrderAsync(selectedOrder.Id, dto);
 
                 successMessage = $"Richiesta #{selectedOrder.Id} accettata con successo!";
+                await ShowSuccessToast("Richiesta accettata e quadro creato!");
                 await LoadCustomOrders();
                 CloseAcceptModal();
+
+                Logger.LogInformation("Custom order {OrderId} accepted successfully", selectedOrder.Id);
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error accepting custom order {OrderId}", selectedOrder.Id);
+                Logger.LogError(ex, "Error accepting custom order {OrderId}", selectedOrder?.Id);
                 errorMessage = ex.Message;
+                await ShowErrorToast("Errore durante l'accettazione della richiesta");
             }
             finally
             {
@@ -153,13 +158,17 @@ namespace RenzoAgostini.Client.Pages
                 await CustomOrderService.RejectCustomOrderAsync(selectedOrder.Id, rejectReason);
 
                 successMessage = $"Richiesta #{selectedOrder.Id} rifiutata.";
+                await ShowSuccessToast("Richiesta rifiutata");
                 await LoadCustomOrders();
                 CloseRejectModal();
+
+                Logger.LogInformation("Custom order {OrderId} rejected", selectedOrder.Id);
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error rejecting custom order {OrderId}", selectedOrder.Id);
+                Logger.LogError(ex, "Error rejecting custom order {OrderId}", selectedOrder?.Id);
                 errorMessage = ex.Message;
+                await ShowErrorToast("Errore durante il rifiuto della richiesta");
             }
             finally
             {
@@ -188,12 +197,30 @@ namespace RenzoAgostini.Client.Pages
 
         protected async Task DownloadAttachment(int orderId)
         {
-            await JSRuntime.InvokeVoidAsync("open", $"/api/customorders/{orderId}/attachment", "_blank");
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("open", $"/api/customorders/{orderId}/attachment", "_blank");
+                Logger.LogInformation("Attachment download initiated for order {OrderId}", orderId);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error downloading attachment for order {OrderId}", orderId);
+                await ShowErrorToast("Errore nel download dell'allegato");
+            }
         }
 
         protected async Task ViewPainting(int paintingId)
         {
-            await JSRuntime.InvokeVoidAsync("open", $"/quadro-personalizzato/{paintingId}", "_blank");
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("open", $"/quadro-personalizzato/{paintingId}", "_blank");
+                Logger.LogInformation("Painting view opened for painting {PaintingId}", paintingId);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error opening painting view for painting {PaintingId}", paintingId);
+                await ShowErrorToast("Errore nell'apertura del quadro");
+            }
         }
 
         protected static string GetStatusLabel(CustomOrderStatus status) => status switch
@@ -211,7 +238,7 @@ namespace RenzoAgostini.Client.Pages
             CustomOrderStatus.Accepted => "accepted",
             CustomOrderStatus.Completed => "completed",
             CustomOrderStatus.Rejected => "rejected",
-            _ => ""
+            _ => "pending"
         };
 
         protected static string GetRowClass(CustomOrderStatus status) => status switch
@@ -220,6 +247,31 @@ namespace RenzoAgostini.Client.Pages
             CustomOrderStatus.Rejected => "row-rejected",
             _ => ""
         };
+
+        // Toast notifications
+        private async Task ShowSuccessToast(string message)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("showToast", message, "success");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error showing success toast");
+            }
+        }
+
+        private async Task ShowErrorToast(string message)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("showToast", message, "error");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error showing error toast");
+            }
+        }
 
         public class AcceptOrderForm
         {

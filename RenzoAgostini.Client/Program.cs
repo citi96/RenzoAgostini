@@ -40,7 +40,7 @@ builder.Services.AddScoped<ICookieService, CookieService>();
 builder.Services.AddScoped<IKeycloakService, KeycloakService>();
 builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<ICheckoutClient, CheckoutClient>();
+builder.Services.AddScoped<ICheckoutService, CheckoutClient>();
 builder.Services.AddScoped<IShippingClient, ShippingClient>();
 builder.Services.AddScoped<ICustomOrderService, CustomOrderService>();
 

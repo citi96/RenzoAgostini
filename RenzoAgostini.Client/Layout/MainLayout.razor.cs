@@ -11,9 +11,10 @@ namespace RenzoAgostini.Client.Layout
         [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
         [Inject] private IKeycloakService KeycloakService { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
-        [Inject] ICartService CartService { get; set; } = default!;
+        [Inject] private ICartService CartService { get; set; } = default!;
 
         private int cartCount = 0;
+        private bool showMobileMenu = false;
 
         protected override void OnInitialized()
         {
@@ -23,7 +24,20 @@ namespace RenzoAgostini.Client.Layout
 
         private void HandleCartChanged()
         {
-            cartCount = CartService.ItemsCount;
+            var newCount = CartService.ItemsCount;
+
+            // Trigger animation if count increased
+            if (newCount > cartCount)
+            {
+                InvokeAsync(async () =>
+                {
+                    StateHasChanged();
+                    await Task.Delay(100); // Small delay to ensure DOM is updated
+                    await JSRuntime.InvokeVoidAsync("addBounceAnimation", ".nav-cart-count");
+                });
+            }
+
+            cartCount = newCount;
             InvokeAsync(StateHasChanged);
         }
 
@@ -36,30 +50,68 @@ namespace RenzoAgostini.Client.Layout
         {
             try
             {
-                StateHasChanged();
-
                 var loginUrl = await KeycloakService.GetLoginUrlAsync();
                 await JSRuntime.InvokeVoidAsync("open", loginUrl, "_self");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Errore Keycloak login: {ex}");
-            }
-            finally
-            {
-                StateHasChanged();
+                // Qui potresti mostrare un toast di errore
+                await ShowToast("Errore durante il login", "error");
             }
         }
 
         private async Task LogoutAsync()
         {
-            if (AuthProvider is CustomAuthenticationStateProvider customProvider)
+            try
             {
-                await customProvider.LogoutAsync();
-            }
+                if (AuthProvider is CustomAuthenticationStateProvider customProvider)
+                {
+                    await customProvider.LogoutAsync();
+                }
 
-            var logoutUrl = KeycloakService.GetLogoutUrl();
-            await JSRuntime.InvokeVoidAsync("open", logoutUrl, "_self");
+                var logoutUrl = KeycloakService.GetLogoutUrl();
+                await JSRuntime.InvokeVoidAsync("open", logoutUrl, "_self");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore durante il logout: {ex}");
+                await ShowToast("Errore durante il logout", "error");
+            }
+        }
+
+        private void ToggleMobileMenu()
+        {
+            showMobileMenu = !showMobileMenu;
+            StateHasChanged();
+        }
+
+        private void CloseMobileMenu()
+        {
+            showMobileMenu = false;
+            StateHasChanged();
+        }
+
+        // Metodo helper per mostrare toast notifications
+        private async Task ShowToast(string message, string type = "info", string title = "")
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("showToast", message, type, title);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore nel mostrare il toast: {ex}");
+            }
+        }
+
+        // Metodi per gestire eventi della tastiera (accessibilità)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                //await JSRuntime.InvokeVoidAsync("initializeLayout");
+            }
         }
     }
 }

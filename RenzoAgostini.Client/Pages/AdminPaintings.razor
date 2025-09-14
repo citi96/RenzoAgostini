@@ -1,78 +1,137 @@
 ﻿@page "/admin/paintings"
-@using System.Globalization
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Authorization
 @attribute [Authorize(Roles = "admin")]
 
 <PageTitle>Gestione Quadri - Admin</PageTitle>
 
-<AuthorizeView Roles="admin">
-    <Authorized>
-        <div class="admin-container">
-            <div class="header">
-                <h1>Gestione Quadri</h1>
-                <button class="btn primary" @onclick="() => ShowEditor(null)">
-                    <span class="icon">➕</span> Nuovo Quadro
-                </button>
-            </div>
+<div class="admin-container">
+	<!-- Header -->
+	<div class="admin-header">
+		<div>
+			<h1 class="admin-title">Gestione Quadri</h1>
+			<p class="admin-subtitle">Crea, modifica ed elimina i quadri della galleria</p>
+		</div>
+		<button class="add-painting-btn" @onclick="() => ShowEditor(null)">
+			<span>➕</span>
+			<span>Nuovo Quadro</span>
+		</button>
+	</div>
 
-            <ErrorAlert Message="@errorMessage" Type="error" OnClose="() => errorMessage = null" />
-            <ErrorAlert Message="@successMessage" Type="success" OnClose="() => successMessage = null" />
+	<!-- Alert Messages -->
+	@if (!string.IsNullOrEmpty(errorMessage))
+	{
+		<div class="admin-alert error">
+			<span>❌</span>
+			<span>@errorMessage</span>
+			<button class="alert-close" @onclick="() => errorMessage = null">×</button>
+		</div>
+	}
 
-            @if (paintings is null)
-            {
-                <div class="loading">Caricamento...</div>
-            }
-            else
-            {
-                <div class="grid paintings-grid">
-                    @foreach (var p in paintings)
-                    {
-                        <div class="painting-item">
-                            <PaintingCard Title="@p.Title"
-                                          Description="@p.Description"
-                                          Year="@p.Year"
-                                          Medium="@p.Medium"
-                                          IsForSale="@p.IsForSale"
-                                          Price="@p.Price"
-                                          ImageUrls="@p.ImageUrls"
-                                          IsAdminMode="true"
-                                          PaintingDto="p"
-                                          OnEdit="ShowEditor"
-                                          OnDelete="ConfirmDelete" />
+	@if (!string.IsNullOrEmpty(successMessage))
+	{
+		<div class="admin-alert success">
+			<span>✅</span>
+			<span>@successMessage</span>
+			<button class="alert-close" @onclick="() => successMessage = null">×</button>
+		</div>
+	}
 
-                            @* <div class="actions mt-2">
-                                <button class="btn secondary small" @onclick="() => ShowEditor(p)">✏️ Modifica</button>
-                                <button class="btn danger small" @onclick="() => ConfirmDelete(p)">🗑️ Elimina</button>
-                            </div> *@
-                        </div>
-                    }
-                </div>
-            }
+	<!-- Stats Cards (Optional) -->
+	@if (paintings != null)
+	{
+		<div class="admin-stats">
+			<div class="admin-stat-card">
+				<div class="admin-stat-number">@paintings.Count()</div>
+				<div class="admin-stat-label">Totale Quadri</div>
+			</div>
+			<div class="admin-stat-card">
+				<div class="admin-stat-number">@paintings.Count(p => p.IsForSale)</div>
+				<div class="admin-stat-label">In Vendita</div>
+			</div>
+			<div class="admin-stat-card">
+				<div class="admin-stat-number">@paintings.Count(p => !p.IsForSale)</div>
+				<div class="admin-stat-label">Venduti</div>
+			</div>
+			<div class="admin-stat-card">
+				<div class="admin-stat-number">@paintings.Count(p => p.Year >= DateTime.Now.Year)</div>
+				<div class="admin-stat-label">Quest'Anno</div>
+			</div>
+		</div>
+	}
 
-            @if (showEditor)
-            {
-                <PaintingEditor Painting="editingPainting"
-                                OnSave="HandleSave"
-                                OnCancel="HideEditor" />
-            }
+	<!-- Loading State -->
+	@if (paintings is null)
+	{
+		<div class="admin-loading">
+			<div class="admin-loading-spinner"></div>
+			<p class="admin-loading-text">Caricamento quadri...</p>
+		</div>
+	}
+	else if (!paintings.Any()) //Empty State
+	{
+		<div class="admin-empty">
+			<div class="admin-empty-icon">🎨</div>
+			<h3 class="admin-empty-title">Nessun Quadro Trovato</h3>
+			<p class="admin-empty-description">
+				Inizia creando il tuo primo quadro per la galleria.
+			</p>
+			<button class="add-painting-btn" @onclick="() => ShowEditor(null)">
+				<span>➕</span>
+				<span>Crea Primo Quadro</span>
+			</button>
+		</div>
+	}
+	else //Paintings Grid
+	{
+		<div class="admin-paintings-grid">
+			@foreach (var painting in paintings)
+			{
+				<PaintingCard Title="@painting.Title"
+							  Description="@painting.Description"
+							  Year="@painting.Year"
+							  Medium="@painting.Medium"
+							  IsForSale="@painting.IsForSale"
+							  Price="@painting.Price"
+							  ImageUrls="@painting.ImageUrls"
+							  IsAdminMode="true"
+							  PaintingDto="painting"
+							  OnEdit="ShowEditor"
+							  OnDelete="ConfirmDelete" />
+			}
+		</div>
+	}
 
-            @if (showDeleteConfirm && paintingToDelete is not null)
-            {
-                <div class="modal-overlay" @onclick="CancelDelete">
-                    <div class="modal" @onclick:stopPropagation="true">
-                        <h3>Conferma eliminazione</h3>
-                        <p>Eliminare "<strong>@paintingToDelete.Title</strong>"?</p>
-                        <div class="modal-actions">
-                            <button class="btn secondary" @onclick="CancelDelete">Annulla</button>
-                            <button class="btn danger" @onclick="ExecuteDelete">Elimina</button>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    </Authorized>
-    <NotAuthorized>
-        <p>Non hai i requisiti per vedere questa pagina.</p>
-    </NotAuthorized>
-</AuthorizeView>
+	<!-- Editor Modal -->
+	@if (showEditor)
+	{
+		<PaintingEditor Painting="editingPainting"
+						OnSave="HandleSave"
+						OnCancel="HideEditor" />
+	}
+
+	<!-- Delete Confirmation Modal -->
+	@if (showDeleteConfirm && paintingToDelete is not null)
+	{
+		<div class="delete-modal-overlay" @onclick="CancelDelete">
+			<div class="delete-modal" @onclick:stopPropagation="true">
+				<div class="delete-modal-icon">🗑️</div>
+				<h3 class="delete-modal-title">Conferma Eliminazione</h3>
+				<p class="delete-modal-text">
+					Sei sicuro di voler eliminare il quadro<br />
+					<span class="delete-modal-painting">"@paintingToDelete.Title"</span>?
+				</p>
+				<p class="delete-modal-text" style="font-size: 0.8125rem; color: var(--neutral-500);">
+					Questa azione non può essere annullata.
+				</p>
+				<div class="delete-modal-actions">
+					<button class="delete-cancel-btn" @onclick="CancelDelete">
+						Annulla
+					</button>
+					<button class="delete-confirm-btn" @onclick="ExecuteDelete">
+						Elimina Quadro
+					</button>
+				</div>
+			</div>
+		</div>
+	}
+</div>

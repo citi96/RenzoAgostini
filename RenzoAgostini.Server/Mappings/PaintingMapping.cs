@@ -17,7 +17,7 @@ namespace RenzoAgostini.Server.Mappings
                 painting.Price,
                 painting.IsForSale,
                 painting.Dimensions,
-                [.. painting.Images.Select(img => img.Url)]
+                [.. painting.Images.OrderByDescending(i => i.IsPrimary).Select(img => img.Url)]
             );
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Components;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
@@ -7,8 +8,7 @@ namespace RenzoAgostini.Client.Pages
 {
     public partial class CustomPainting : ComponentBase
     {
-        [Parameter] public int PaintingId { get; set; }
-
+        [Inject] private ICookieService CookieService { get; set; } = default!;
         [Inject] private IPaintingService PaintingService { get; set; } = default!;
         [Inject] private ICartService CartService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
@@ -23,7 +23,15 @@ namespace RenzoAgostini.Client.Pages
         {
             try
             {
-                painting = await PaintingService.GetPaintingByIdAsync(PaintingId);
+                var customOrderDtoJson = await CookieService.GetAsync<string>("customOrder");
+                var customOrderDto = JsonSerializer.Deserialize<CustomOrderDto>(customOrderDtoJson);
+                if (customOrderDto?.PaintingId == null)
+                {
+                    Navigation.NavigateTo("/not-found");
+                    return;
+                }
+
+                painting = await PaintingService.GetPaintingByIdAsync(customOrderDto.PaintingId.Value);
                 if (painting == null)
                     return;
 
@@ -32,7 +40,7 @@ namespace RenzoAgostini.Client.Pages
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error loading custom painting {PaintingId}", PaintingId);
+                Logger.LogError(ex, "Error loading custom painting");
                 Navigation.NavigateTo("/not-found");
             }
         }

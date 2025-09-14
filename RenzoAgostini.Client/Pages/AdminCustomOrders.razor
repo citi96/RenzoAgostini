@@ -8,283 +8,335 @@
 <PageTitle>Gestione Richieste Personalizzate - Admin</PageTitle>
 
 <div class="admin-container">
-	<div class="header">
-		<h1>Gestione Richieste Personalizzate</h1>
-	</div>
+    <!-- Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">Richieste Quadri Personalizzati</h1>
+        <p class="admin-subtitle">Gestisci le richieste di commissioni personalizzate dai clienti</p>
+    </div>
 
-	@if (!string.IsNullOrEmpty(errorMessage))
-	{
-		<div class="alert alert-danger">
-			<p>❌ @errorMessage</p>
-		</div>
-	}
+    <!-- Alert Messages -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="admin-alert error">
+            <span>❌</span>
+            <span>@errorMessage</span>
+            <button class="alert-close" @onclick="() => errorMessage = null">×</button>
+        </div>
+    }
 
-	@if (!string.IsNullOrEmpty(successMessage))
-	{
-		<div class="alert alert-success">
-			<p>✅ @successMessage</p>
-		</div>
-	}
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="admin-alert success">
+            <span>✅</span>
+            <span>@successMessage</span>
+            <button class="alert-close" @onclick="() => successMessage = null">×</button>
+        </div>
+    }
 
-	@if (customOrders == null)
-	{
-		<div class="loading">Caricamento...</div>
-	}
-	else if (!customOrders.Any())
-	{
-		<div class="empty-state">
-			<p>📝 Nessuna richiesta personalizzata al momento</p>
-		</div>
-	}
-	else
-	{
-		<!-- Filtri -->
-		<div class="filters">
-			<select class="filter-select" @onchange="FilterOrders">
-				<option value="">Tutti gli stati</option>
-				<option value="@CustomOrderStatus.Pending">In Attesa</option>
-				<option value="@CustomOrderStatus.Accepted">Accettate</option>
-				<option value="@CustomOrderStatus.Completed">Completate</option>
-				<option value="@CustomOrderStatus.Rejected">Rifiutate</option>
-			</select>
-		</div>
+    @if (customOrders == null)
+    {
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Caricamento richieste...</p>
+        </div>
+    }
+    else if (!customOrders.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <h3>Nessuna Richiesta Personalizzata</h3>
+            <p>Non ci sono richieste di quadri personalizzati al momento.</p>
+        </div>
+    }
+    else
+    {
+        <!-- Filtri -->
+        <div class="filters">
+            <span class="filter-label">Filtra per stato:</span>
+            <select class="filter-select" @onchange="FilterOrders">
+                <option value="">Tutti gli stati (@customOrders.Count)</option>
+                <option value="@CustomOrderStatus.Pending">In Attesa (@customOrders.Count(o => o.Status == CustomOrderStatus.Pending))</option>
+                <option value="@CustomOrderStatus.Accepted">Accettate (@customOrders.Count(o => o.Status == CustomOrderStatus.Accepted))</option>
+                <option value="@CustomOrderStatus.Completed">Completate (@customOrders.Count(o => o.Status == CustomOrderStatus.Completed))</option>
+                <option value="@CustomOrderStatus.Rejected">Rifiutate (@customOrders.Count(o => o.Status == CustomOrderStatus.Rejected))</option>
+            </select>
+        </div>
 
-		<!-- Tabella richieste -->
-		<div class="table-container">
-			<table class="custom-orders-table">
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Cliente</th>
-						<th>Stato</th>
-						<th>Data Richiesta</th>
-						<th>Prezzo Quotato</th>
-						<th>Codice Accesso</th>
-						<th>Azioni</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var order in filteredOrders)
-					{
-						<tr class="@GetRowClass(order.Status)">
-							<td>@order.Id</td>
-							<td>
-								<a href="mailto:@order.CustomerEmail">@order.CustomerEmail</a>
-							</td>
-							<td>
-								<span class="status-badge @GetStatusClass(order.Status)">
-									@GetStatusLabel(order.Status)
-								</span>
-							</td>
-							<td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm", CultureInfo.GetCultureInfo("it-IT"))</td>
-							<td>
-								@if (order.QuotedPrice.HasValue)
-								{
-									@order.QuotedPrice.Value.ToString("C", CultureInfo.GetCultureInfo("it-IT"))
-								}
-								else
-								{
-									<span class="text-muted">-</span>
-								}
-							</td>
-							<td>
-								<code class="access-code">@order.AccessCode</code>
-							</td>
-							<td>
-								<div class="action-buttons">
-									<button class="btn-small primary" @onclick="() => ShowDetails(order)">
-										👁️ Dettagli
-									</button>
-									@if (order.Status == CustomOrderStatus.Pending)
-									{
-										<button class="btn-small success" @onclick="() => ShowAcceptModal(order)">
-											✅ Accetta
-										</button>
-										<button class="btn-small danger" @onclick="() => ShowRejectModal(order)">
-											❌ Rifiuta
-										</button>
-									}
-									@if (order.PaintingId.HasValue)
-									{
-										<button class="btn-small secondary" @onclick="() => ViewPainting(order.PaintingId.Value)">
-											🎨 Vedi Quadro
-										</button>
-									}
-								</div>
-							</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		</div>
-	}
+        <!-- Tabella richieste -->
+        <div class="custom-orders-table-container">
+            <table class="custom-orders-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Stato</th>
+                        <th>Data Richiesta</th>
+                        <th>Prezzo Quotato</th>
+                        <th>Codice Accesso</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in filteredOrders)
+                    {
+                        <tr class="@GetRowClass(order.Status)">
+                            <td><strong>#@order.Id</strong></td>
+                            <td>
+                                <a href="mailto:@order.CustomerEmail">@order.CustomerEmail</a>
+                            </td>
+                            <td>
+                                <span class="status-badge @GetStatusClass(order.Status)">
+                                    @GetStatusLabel(order.Status)
+                                </span>
+                            </td>
+                            <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm", CultureInfo.GetCultureInfo("it-IT"))</td>
+                            <td>
+                                @if (order.QuotedPrice.HasValue)
+                                {
+                                    <strong>@order.QuotedPrice.Value.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</strong>
+                                }
+                                else
+                                {
+                                    <span style="color: var(--neutral-500);">-</span>
+                                }
+                            </td>
+                            <td>
+                                <code class="access-code">@order.AccessCode</code>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-small primary" @onclick="() => ShowDetails(order)">
+                                        👁️ Dettagli
+                                    </button>
+                                    @if (order.Status == CustomOrderStatus.Pending)
+                                    {
+                                        <button class="btn-small success" @onclick="() => ShowAcceptModal(order)">
+                                            ✅ Accetta
+                                        </button>
+                                        <button class="btn-small danger" @onclick="() => ShowRejectModal(order)">
+                                            ❌ Rifiuta
+                                        </button>
+                                    }
+                                    @if (order.PaintingId.HasValue)
+                                    {
+                                        <button class="btn-small secondary" @onclick="() => ViewPainting(order.PaintingId.Value)">
+                                            🎨 Vedi Quadro
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 
-	<!-- Modal Dettagli -->
-	@if (showDetailsModal && selectedOrder != null)
-	{
-		<div class="modal-overlay" @onclick="CloseDetailsModal">
-			<div class="modal large" @onclick:stopPropagation="true">
-				<div class="modal-header">
-					<h2>Dettagli Richiesta #@selectedOrder.Id</h2>
-					<button class="btn-close" @onclick="CloseDetailsModal">✕</button>
-				</div>
-				<div class="modal-body">
-					<div class="details-grid">
-						<div class="detail-section">
-							<h3>Informazioni Cliente</h3>
-							<p><strong>Email:</strong> <a href="mailto:@selectedOrder.CustomerEmail">@selectedOrder.CustomerEmail</a></p>
-							<p><strong>Data richiesta:</strong> @selectedOrder.CreatedAt.ToString("dd/MM/yyyy HH:mm", CultureInfo.GetCultureInfo("it-IT"))</p>
-							<p><strong>Codice accesso:</strong> <code>@selectedOrder.AccessCode</code></p>
-						</div>
+    <!-- Modal Dettagli -->
+    @if (showDetailsModal && selectedOrder != null)
+    {
+        <div class="modal-overlay" @onclick="CloseDetailsModal">
+            <div class="modal large" @onclick:stopPropagation="true">
+                <div class="modal-header">
+                    <h2>Dettagli Richiesta #@selectedOrder.Id</h2>
+                    <button class="btn-close" @onclick="CloseDetailsModal">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="details-grid">
+                        <div class="detail-section">
+                            <h3>Informazioni Cliente</h3>
+                            <p><strong>Email:</strong> <a href="mailto:@selectedOrder.CustomerEmail">@selectedOrder.CustomerEmail</a></p>
+                            <p><strong>Data richiesta:</strong> @selectedOrder.CreatedAt.ToString("dd/MM/yyyy HH:mm", CultureInfo.GetCultureInfo("it-IT"))</p>
+                            <p><strong>Codice accesso:</strong> <code class="access-code">@selectedOrder.AccessCode</code></p>
+                            <p>
+                                <strong>Stato:</strong>
+                                <span class="status-badge @GetStatusClass(selectedOrder.Status)">
+                                    @GetStatusLabel(selectedOrder.Status)
+                                </span>
+                            </p>
+                        </div>
 
-						<div class="detail-section">
-							<h3>Descrizione del Quadro</h3>
-							<div class="description-box">
-								@selectedOrder.Description
-							</div>
-						</div>
+                        <div class="detail-section">
+                            <h3>Dettagli Commerciali</h3>
+                            @if (selectedOrder.QuotedPrice.HasValue)
+                            {
+                                <p><strong>Prezzo quotato:</strong> @selectedOrder.QuotedPrice.Value.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</p>
+                            }
+                            @if (selectedOrder.PaintingId.HasValue)
+                            {
+                                <p><strong>Quadro creato:</strong> ID #@selectedOrder.PaintingId</p>
+                            }
+                        </div>
+                    </div>
 
-						@if (!string.IsNullOrEmpty(selectedOrder.AttachmentOriginalName))
-						{
-							<div class="detail-section">
-								<h3>Allegato</h3>
-								<p>📎 @selectedOrder.AttachmentOriginalName</p>
-								<button class="btn-small secondary" @onclick="() => DownloadAttachment(selectedOrder.Id)">
-									⬇️ Scarica
-								</button>
-							</div>
-						}
+                    <div class="detail-section">
+                        <h3>Descrizione del Quadro Richiesto</h3>
+                        <div class="description-box">
+                            @selectedOrder.Description
+                        </div>
+                    </div>
 
-						@if (!string.IsNullOrEmpty(selectedOrder.ArtistNotes))
-						{
-							<div class="detail-section">
-								<h3>Note dell'Artista</h3>
-								<div class="notes-box">
-									@selectedOrder.ArtistNotes
-								</div>
-							</div>
-						}
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button class="btn secondary" @onclick="CloseDetailsModal">Chiudi</button>
-				</div>
-			</div>
-		</div>
-	}
+                    @if (!string.IsNullOrEmpty(selectedOrder.AttachmentOriginalName))
+                    {
+                        <div class="detail-section">
+                            <h3>Allegato</h3>
+                            <p>📎 <strong>@selectedOrder.AttachmentOriginalName</strong></p>
+                            <button class="btn secondary" @onclick="() => DownloadAttachment(selectedOrder.Id)">
+                                ⬇️ Scarica Allegato
+                            </button>
+                        </div>
+                    }
 
-	<!-- Modal Accettazione -->
-	@if (showAcceptModal && selectedOrder != null)
-	{
-		<div class="modal-overlay" @onclick="CloseAcceptModal">
-			<div class="modal" @onclick:stopPropagation="true">
-				<div class="modal-header">
-					<h2>Accetta Richiesta #@selectedOrder.Id</h2>
-					<button class="btn-close" @onclick="CloseAcceptModal">✕</button>
-				</div>
-				<div class="modal-body">
-					<EditForm Model="@acceptForm" OnValidSubmit="@AcceptOrder" FormName="AcceptForm">
-						<DataAnnotationsValidator />
+                    @if (!string.IsNullOrEmpty(selectedOrder.ArtistNotes))
+                    {
+                        <div class="detail-section">
+                            <h3>Note dell'Artista</h3>
+                            <div class="notes-box">
+                                @selectedOrder.ArtistNotes
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" @onclick="CloseDetailsModal">Chiudi</button>
+                    @if (selectedOrder.Status == CustomOrderStatus.Pending)
+                    {
+                        <button class="btn success" @onclick="() => ShowAcceptModal(selectedOrder)">
+                            ✅ Accetta Richiesta
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
 
-						<div class="form-group">
-							<label>Prezzo Quotato (€) *</label>
-							<InputNumber @bind-Value="acceptForm.QuotedPrice" class="form-control" step="0.01" />
-							<ValidationMessage For="@(() => acceptForm.QuotedPrice)" />
-						</div>
+    <!-- Modal Accettazione -->
+    @if (showAcceptModal && selectedOrder != null)
+    {
+        <div class="modal-overlay" @onclick="CloseAcceptModal">
+            <div class="modal large" @onclick:stopPropagation="true">
+                <div class="modal-header">
+                    <h2>Accetta Richiesta #@selectedOrder.Id</h2>
+                    <button class="btn-close" @onclick="CloseAcceptModal">✕</button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@acceptForm" OnValidSubmit="@AcceptOrder" FormName="AcceptForm">
+                        <DataAnnotationsValidator />
 
-						<div class="form-group">
-							<label>Note per il Cliente</label>
-							<InputTextArea @bind-Value="acceptForm.ArtistNotes" class="form-control" rows="3"
-										   placeholder="Eventuali note o dettagli aggiuntivi..." />
-						</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Prezzo Quotato (€) *</label>
+                                <InputNumber @bind-Value="acceptForm.QuotedPrice" class="form-control" step="0.01" placeholder="0.00" />
+                                <ValidationMessage For="@(() => acceptForm.QuotedPrice)" />
+                            </div>
+                            <div></div>
+                        </div>
 
-						<!-- Dati del quadro -->
-						<h3>Dati del Quadro da Creare</h3>
+                        <div class="form-group">
+                            <label>Note per il Cliente</label>
+                            <InputTextArea @bind-Value="acceptForm.ArtistNotes" class="form-control" rows="3"
+                                           placeholder="Eventuali note o dettagli aggiuntivi..." />
+                        </div>
 
-						<div class="form-group">
-							<label>Titolo *</label>
-							<InputText @bind-Value="acceptForm.PaintingData.Title" class="form-control" />
-							<ValidationMessage For="@(() => acceptForm.PaintingData.Title)" />
-						</div>
+                        <h3 style="margin: var(--spacing-6) 0 var(--spacing-4) 0; padding-bottom: var(--spacing-2); border-bottom: 1px solid var(--neutral-200);">
+                            Dati del Quadro da Creare
+                        </h3>
 
-						<div class="form-group">
-							<label>Slug *</label>
-							<InputText @bind-Value="acceptForm.PaintingData.Slug" class="form-control"
-									   placeholder="es: quadro-personalizzato-cliente" />
-							<ValidationMessage For="@(() => acceptForm.PaintingData.Slug)" />
-						</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Titolo *</label>
+                                <InputText @bind-Value="acceptForm.PaintingData.Title" class="form-control" placeholder="Titolo del quadro" />
+                                <ValidationMessage For="@(() => acceptForm.PaintingData.Title)" />
+                            </div>
+                            <div class="form-group">
+                                <label>Slug *</label>
+                                <InputText @bind-Value="acceptForm.PaintingData.Slug" class="form-control"
+                                           placeholder="quadro-personalizzato-cliente" />
+                                <ValidationMessage For="@(() => acceptForm.PaintingData.Slug)" />
+                            </div>
+                        </div>
 
-						<div class="form-group">
-							<label>Descrizione</label>
-							<InputTextArea @bind-Value="acceptForm.PaintingData.Description" class="form-control" rows="3" />
-						</div>
+                        <div class="form-group">
+                            <label>Descrizione</label>
+                            <InputTextArea @bind-Value="acceptForm.PaintingData.Description" class="form-control" rows="3"
+                                           placeholder="Descrizione del quadro personalizzato" />
+                        </div>
 
-						<div class="form-row">
-							<div class="form-group">
-								<label>Anno</label>
-								<InputNumber @bind-Value="acceptForm.PaintingData.Year" class="form-control" />
-							</div>
-							<div class="form-group">
-								<label>Tecnica</label>
-								<InputText @bind-Value="acceptForm.PaintingData.Medium" class="form-control" />
-							</div>
-						</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Anno</label>
+                                <InputNumber @bind-Value="acceptForm.PaintingData.Year" class="form-control" placeholder="2024" />
+                            </div>
+                            <div class="form-group">
+                                <label>Tecnica</label>
+                                <InputText @bind-Value="acceptForm.PaintingData.Medium" class="form-control" placeholder="Olio su tela" />
+                            </div>
+                        </div>
 
-						<div class="form-group">
-							<label>Dimensioni</label>
-							<InputText @bind-Value="acceptForm.PaintingData.Dimensions" class="form-control"
-									   placeholder="es: 50x70 cm" />
-						</div>
+                        <div class="form-group">
+                            <label>Dimensioni</label>
+                            <InputText @bind-Value="acceptForm.PaintingData.Dimensions" class="form-control"
+                                       placeholder="50x70 cm" />
+                        </div>
 
-						<div class="modal-footer">
-							<button type="button" class="btn secondary" @onclick="CloseAcceptModal">Annulla</button>
-							<button type="submit" class="btn success" disabled="@isProcessingAccept">
-								@if (isProcessingAccept)
-								{
-									<span>Elaborazione...</span>
-								}
-								else
-								{
-									<span>✅ Accetta e Crea Quadro</span>
-								}
-							</button>
-						</div>
-					</EditForm>
-				</div>
-			</div>
-		</div>
-	}
+                        <div class="modal-footer">
+                            <button type="button" class="btn secondary" @onclick="CloseAcceptModal">Annulla</button>
+                            <button type="submit" class="btn success" disabled="@isProcessingAccept">
+                                @if (isProcessingAccept)
+                                {
+                                    <span>⏳</span>
+                                    <span>Elaborazione...</span>
+                                }
+                                else
+                                {
+                                    <span>✅</span>
+                                    <span>Accetta e Crea Quadro</span>
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    }
 
-	<!-- Modal Rifiuto -->
-	@if (showRejectModal && selectedOrder != null)
-	{
-		<div class="modal-overlay" @onclick="CloseRejectModal">
-			<div class="modal" @onclick:stopPropagation="true">
-				<div class="modal-header">
-					<h2>Rifiuta Richiesta #@selectedOrder.Id</h2>
-					<button class="btn-close" @onclick="CloseRejectModal">✕</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label>Motivo del Rifiuto (opzionale)</label>
-						<textarea @bind="rejectReason" class="form-control" rows="4"
-								  placeholder="Spiega al cliente il motivo del rifiuto..."></textarea>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button class="btn secondary" @onclick="CloseRejectModal">Annulla</button>
-					<button class="btn danger" @onclick="RejectOrder" disabled="@isProcessingReject">
-						@if (isProcessingReject)
-						{
-							<span>Elaborazione...</span>
-						}
-						else
-						{
-							<span>❌ Conferma Rifiuto</span>
-						}
-					</button>
-				</div>
-			</div>
-		</div>
-	}
-</div>  
+    <!-- Modal Rifiuto -->
+    @if (showRejectModal && selectedOrder != null)
+    {
+        <div class="modal-overlay" @onclick="CloseRejectModal">
+            <div class="modal" @onclick:stopPropagation="true">
+                <div class="modal-header">
+                    <h2>Rifiuta Richiesta #@selectedOrder.Id</h2>
+                    <button class="btn-close" @onclick="CloseRejectModal">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom: var(--spacing-4); padding: var(--spacing-4); background: var(--neutral-50); border-radius: var(--radius-lg);">
+                        <strong>Cliente:</strong> @selectedOrder.CustomerEmail<br>
+                        <strong>Richiesta:</strong> @selectedOrder.Description.Substring(0, Math.Min(100, selectedOrder.Description.Length))@(selectedOrder.Description.Length > 100 ? "..." : "")
+                    </div>
+
+                    <div class="form-group">
+                        <label>Motivo del Rifiuto (opzionale)</label>
+                        <textarea @bind="rejectReason" class="form-control" rows="4"
+                                  placeholder="Spiega al cliente il motivo del rifiuto (es: richiesta non fattibile, fuori budget, etc.)..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" @onclick="CloseRejectModal">Annulla</button>
+                    <button class="btn danger" @onclick="RejectOrder" disabled="@isProcessingReject">
+                        @if (isProcessingReject)
+                        {
+                            <span>⏳</span>
+                            <span>Elaborazione...</span>
+                        }
+                        else
+                        {
+                            <span>❌</span>
+                            <span>Conferma Rifiuto</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

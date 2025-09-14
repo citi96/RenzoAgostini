@@ -1,5 +1,5 @@
 ﻿using System.Net.Http.Json;
-using RenzoAgostini.Client.Services.Interfaces;
+using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Services

@@ -1,34 +1,250 @@
 ﻿@page "/"
 
-<PageTitle>Galleria Renzo Agostini</PageTitle>
+<PageTitle>Galleria Renzo Agostini - Arte Contemporanea</PageTitle>
 
-<h2 class="sr-only">Quadri</h2>
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-container">
+        <div class="hero-badge">🎨 Arte Autentica dal 1987</div>
 
-@if (paintings == null)
-{
-    <div class="text-center">
-        <p>Caricamento...</p>
+        <h1 class="hero-title">
+            Scopri l'<span class="hero-title-gradient">Arte</span><br />
+            che Emoziona
+        </h1>
+
+        <p class="hero-subtitle">
+            Collezione esclusiva di quadri originali creati con passione.
+            Ogni opera racconta una storia unica, dipinta a mano con tecniche tradizionali e moderne.
+        </p>
+
+        <div class="hero-actions">
+            <a href="#gallery" class="hero-btn-primary">
+                <span>🎨</span>
+                <span>Esplora la Galleria</span>
+            </a>
+            <a href="/richiedi-quadro" class="hero-btn-secondary">
+                <span>✨</span>
+                <span>Commissiona Opera</span>
+            </a>
+        </div>
     </div>
-}
-else if (!paintings.Any())
-{
-    <div class="text-center">
-        <p>Nessun quadro disponibile al momento.</p>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="features-container">
+        <div class="features-header">
+            <h2 class="features-title">Perché Scegliere le Nostre Opere</h2>
+            <p class="features-subtitle">
+                Ogni quadro è un investimento nell'arte e nella bellezza,
+                creato con materiali di prima qualità e tecniche raffinate.
+            </p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Opere Originali</h3>
+                <p class="feature-description">
+                    Ogni quadro è un pezzo unico, dipinto a mano dall'artista.
+                    Nessuna riproduzione, solo arte autentica e certificata.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">Qualità Garantita</h3>
+                <p class="feature-description">
+                    Utilizziamo solo materiali premium: tele di lino, colori professionali
+                    e vernici protettive per una durata nel tempo.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">✨</div>
+                <h3 class="feature-title">Commissioni Personalizzate</h3>
+                <p class="feature-description">
+                    Realizziamo opere su misura per te. Dalle tue idee nascono
+                    quadri unici che riflettono il tuo gusto e la tua personalità.
+                </p>
+            </div>
+        </div>
     </div>
-}
-else
-{
-    <div class="grid">
-        @foreach (var p in paintings)
+</section>
+
+<!-- Gallery Preview Section -->
+<section class="gallery-preview" id="gallery">
+    <div class="gallery-preview-container">
+        <div class="gallery-preview-header">
+            <div class="gallery-preview-content">
+                <h2 class="gallery-preview-title">Galleria d'Arte</h2>
+                <p class="gallery-preview-subtitle">
+                    Una selezione delle nostre opere più apprezzate,
+                    dalla pittura classica all'arte contemporanea.
+                </p>
+            </div>
+            <div class="gallery-preview-actions">
+                <div class="gallery-filters">
+                    <button class="filter-tab @(selectedFilter == "all" ? "active" : "")"
+                            @onclick="@(() => FilterPaintings("all"))">
+                        Tutti (@allPaintings?.Count() ?? 0)
+                    </button>
+                    <button class="filter-tab @(selectedFilter == "sale" ? "active" : "")"
+                            @onclick="@(() => FilterPaintings("sale"))">
+                        In Vendita (@(allPaintings?.Count(p => p.IsForSale) ?? 0))
+                    </button>
+                    <button class="filter-tab @(selectedFilter == "new" ? "active" : "")"
+                            @onclick="@(() => FilterPaintings("new"))">
+                        Recenti (@(allPaintings?.Count(p => p.Year >= DateTime.Now.Year - 1) ?? 0))
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        @if (isLoading)
         {
-            <PaintingCard Title="@p.Title"
-                          Description="@p.Description"
-                          Year="@p.Year"
-                          Medium="@p.Medium"
-                          Price="@p.Price"
-                          IsForSale="@p.IsForSale"
-                          ImageUrls="@p.ImageUrls" 
-                          PaintingDto="p"/>
+            <div class="paintings-loading">
+                <div class="paintings-loading-spinner"></div>
+                <p class="loading-text">Caricamento opere d'arte...</p>
+            </div>
+        }
+        else if (string.IsNullOrEmpty(errorMessage) && filteredPaintings?.Any() == true)
+        {
+            <div class="paintings-grid">
+                @foreach (var painting in filteredPaintings.Take(displayCount))
+                {
+                    <PaintingCard Title="@painting.Title"
+                                  Description="@painting.Description"
+                                  Year="@painting.Year"
+                                  Medium="@painting.Medium"
+                                  Price="@painting.Price"
+                                  IsForSale="@painting.IsForSale"
+                                  ImageUrls="@painting.ImageUrls"
+                                  PaintingDto="painting"
+                                  IsLoading="false" />
+                }
+            </div>
+
+            @if (filteredPaintings.Count() > displayCount)
+            {
+                <div style="text-align: center; margin-top: 3rem;">
+                    <button class="btn btn-outline btn-lg" @onclick="LoadMore">
+                        <span>👁️</span>
+                        <span>Carica Altri (@(filteredPaintings.Count() - displayCount) rimasti)</span>
+                    </button>
+                </div>
+            }
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="paintings-empty">
+                <div class="paintings-empty-icon">⚠️</div>
+                <h3 class="paintings-empty-title">Errore nel Caricamento</h3>
+                <p class="paintings-empty-description">@errorMessage</p>
+                <button class="btn btn-primary" @onclick="ReloadPaintings">
+                    <span>🔄</span>
+                    <span>Riprova</span>
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="paintings-empty">
+                <div class="paintings-empty-icon">🎨</div>
+                <h3 class="paintings-empty-title">Nessuna Opera Trovata</h3>
+                <p class="paintings-empty-description">
+                    Non ci sono quadri disponibili al momento per questa categoria.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" @onclick="@(() => FilterPaintings(" all"))">
+                        <span>🎨</span>
+                        <span>Vedi Tutti</span>
+                    </button>
+                    <a href="/richiedi-quadro" class="btn btn-primary">
+                        <span>✨</span>
+                        <span>Commissiona Opera</span>
+                    </a>
+                </div>
+            </div>
         }
     </div>
-}
+</section>
+
+<!-- Stats Section -->
+<section class="stats">
+    <div class="stats-container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-target="@(allPaintings?.Count() ?? 0)">@(allPaintings?.Count() ?? 0)</div>
+                <div class="stat-label">Opere Create</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="37">37</div>
+                <div class="stat-label">Anni di Esperienza</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="@(allPaintings?.Count(p => !p.IsForSale) ?? 0)">@(allPaintings?.Count(p => !p.IsForSale) ?? 0)</div>
+                <div class="stat-label">Opere Vendute</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="100">100</div>
+                <div class="stat-label">% Clienti Soddisfatti</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta">
+    <div class="cta-container">
+        <h2 class="cta-title">Inizia il Tuo Viaggio nell'Arte</h2>
+        <p class="cta-description">
+            Che tu stia cercando il quadro perfetto per la tua casa o desideri commissionaire
+            un'opera personalizzata, siamo qui per trasformare la tua visione in realtà.
+        </p>
+        <div class="cta-actions">
+            <a href="/richiedi-quadro" class="cta-btn-primary">
+                <span>🎯</span>
+                <span>Commissiona Quadro Personalizzato</span>
+            </a>
+            <a href="mailto:info@galleriaagostini.it" class="cta-btn-secondary">
+                <span>💬</span>
+                <span>Contattaci per Info</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section (Optional) -->
+<section class="newsletter" style="background: var(--primary-50); padding: 3rem 0; text-align: center;">
+    <div class="container-narrow">
+        <h3 style="color: var(--primary-800); margin-bottom: 1rem;">Resta Aggiornato</h3>
+        <p style="color: var(--primary-700); margin-bottom: 2rem;">
+            Ricevi notifiche sulle nuove opere e sulle mostre esclusive.
+        </p>
+        <div style="display: flex; gap: 0.75rem; max-width: 400px; margin: 0 auto;">
+            <input type="email"
+                   placeholder="La tua email"
+                   class="form-input"
+                   style="border-color: var(--primary-300);"
+                   @bind="newsletterEmail" />
+            <button class="btn btn-primary" @onclick="SubscribeNewsletter" disabled="@isSubscribing">
+                @if (isSubscribing)
+                {
+                    <span class="animate-spin">⏳</span>
+                }
+                else
+                {
+                    <span>📧</span>
+                }
+                <span>Iscriviti</span>
+            </button>
+        </div>
+        @if (!string.IsNullOrEmpty(subscriptionMessage))
+        {
+            <p style="margin-top: 1rem; color: var(--accent-emerald); font-weight: 500;">
+                @subscriptionMessage
+            </p>
+        }
+    </div>
+</section>

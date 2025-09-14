@@ -4,7 +4,7 @@ using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Services
 {
-    public class CheckoutClient(HttpClient http) : ICheckoutClient
+    public class CheckoutClient(HttpClient http) : ICheckoutService
     {
         public async Task<StripeSessionDto> CreateCheckoutSessionAsync(CheckoutDto dto)
         {

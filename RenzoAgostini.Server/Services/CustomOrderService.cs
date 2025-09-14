@@ -5,8 +5,8 @@ using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Server.Exceptions;
 using RenzoAgostini.Server.Mappings;
 using RenzoAgostini.Server.Repositories.Interfaces;
-using RenzoAgostini.Server.Services.Interfaces;
 using RenzoAgostini.Shared.Common;
+using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.Data;
 using RenzoAgostini.Shared.DTOs;
 
@@ -17,11 +17,12 @@ namespace RenzoAgostini.Server.Services
         IPaintingRepository paintingRepository,
         ICustomEmailSender emailSender,
         IWebHostEnvironment env,
+        IConfiguration configuration,
         ILogger<CustomOrderService> logger) : ICustomOrderService
     {
         private readonly string _uploadsPath = Path.Combine(env.WebRootPath, "custom-orders");
 
-        public async Task<Result<CustomOrderDto>> CreateCustomOrderAsync(CreateCustomOrderDto dto)
+        public async Task<CustomOrderDto> CreateCustomOrderAsync(CreateCustomOrderDto dto)
         {
             try
             {
@@ -46,7 +47,7 @@ namespace RenzoAgostini.Server.Services
                 await SendArtistNotificationEmail(customOrder);
 
                 logger.LogInformation("Creata richiesta personalizzata {CustomOrderId}", customOrder.Id);
-                return Result<CustomOrderDto>.Success(customOrder.ToDto());
+                return customOrder.ToDto();
             }
             catch (Exception ex)
             {
@@ -55,7 +56,7 @@ namespace RenzoAgostini.Server.Services
             }
         }
 
-        public async Task<Result<CustomOrderDto>> AcceptCustomOrderAsync(int customOrderId, AcceptCustomOrderDto dto)
+        public async Task<CustomOrderDto> AcceptCustomOrderAsync(int customOrderId, AcceptCustomOrderDto dto)
         {
             try
             {
@@ -82,7 +83,7 @@ namespace RenzoAgostini.Server.Services
                 await SendAcceptanceEmailToCustomer(customOrder);
 
                 logger.LogInformation("Richiesta personalizzata {CustomOrderId} accettata", customOrderId);
-                return Result<CustomOrderDto>.Success(customOrder.ToDto());
+                return customOrder.ToDto();
             }
             catch (Exception ex)
             {
@@ -91,7 +92,7 @@ namespace RenzoAgostini.Server.Services
             }
         }
 
-        public async Task<Result<CustomOrderDto>> RejectCustomOrderAsync(int customOrderId, string? reason)
+        public async Task<CustomOrderDto> RejectCustomOrderAsync(int customOrderId, string? reason)
         {
             try
             {
@@ -108,7 +109,7 @@ namespace RenzoAgostini.Server.Services
                 await SendRejectionEmailToCustomer(customOrder);
 
                 logger.LogInformation("Richiesta personalizzata {CustomOrderId} rifiutata", customOrderId);
-                return Result<CustomOrderDto>.Success(customOrder.ToDto());
+                return customOrder.ToDto();
             }
             catch (Exception ex)
             {
@@ -117,19 +118,19 @@ namespace RenzoAgostini.Server.Services
             }
         }
 
-        public async Task<Result<CustomOrderDto>> GetByAccessCodeAsync(string accessCode, string customerEmail)
+        public async Task<CustomOrderDto> GetByAccessCodeAsync(string accessCode, string customerEmail)
         {
             try
             {
                 var customOrder = await customOrderRepository.GetByAccessCodeAndEmailAsync(accessCode, customerEmail);
 
                 if (customOrder == null)
-                    return Result<CustomOrderDto>.Failure("Codice di accesso non valido o email non corrispondente");
+                    throw new ApiException(HttpStatusCode.NotFound, "Codice di accesso non valido o email non corrispondente");
 
-                if (customOrder.Status != CustomOrderStatus.Accepted)
-                    return Result<CustomOrderDto>.Failure("La richiesta non è ancora stata accettata");
+                //if (customOrder.Status != CustomOrderStatus.Accepted)
+                //    throw new ApiException(HttpStatusCode.BadRequest, "La richiesta non è ancora stata accettata");
 
-                return Result<CustomOrderDto>.Success(customOrder.ToDto());
+                return customOrder.ToDto();
             }
             catch (Exception ex)
             {
@@ -191,7 +192,7 @@ namespace RenzoAgostini.Server.Services
         private async Task SendArtistNotificationEmail(CustomOrder customOrder)
         {
             // Email per l'artista - configurabile
-            var artistEmail = "renzo.agostini@example.com"; // TODO: da configuration
+            var artistEmail = configuration["ArtistNotificationEmail"];
 
             var attachmentInfo = customOrder.AttachmentPath != null
                 ? $"<p><strong>Allegato:</strong> {customOrder.AttachmentOriginalName}</p>"

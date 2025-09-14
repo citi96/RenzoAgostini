@@ -26,7 +26,7 @@ namespace RenzoAgostini.Server.Services
             // 1. Validazione input
             if (!checkout.TermsAccepted)
                 throw new ApiException(HttpStatusCode.BadRequest, "Devi accettare le condizioni di vendita prima di procedere all'acquisto.");
-            if (checkout.PaintingIds == null || checkout.PaintingIds.Count == 0)
+            if (checkout.PaintingIds == null || checkout.PaintingIds.Count() == 0)
                 throw new ApiException(HttpStatusCode.BadRequest, "Nessun articolo presente nel carrello.");
 
             // 2. Recupera i quadri dal DB e verifica disponibilità

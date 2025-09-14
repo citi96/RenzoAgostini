@@ -2,48 +2,152 @@
 @using RenzoAgostini.Client.Components
 @inherits LayoutComponentBase
 
-<div class="nav">
-    <a class="brand" href="/">Galleria</a>
-    <AuthorizeView Roles="admin">
-        <Authorized>
-            <a class="brand" href="/admin/paintings">🎨 Gestisci Quadri</a>
-        </Authorized>
-    </AuthorizeView>
-    <AuthorizeView Roles="admin">
-        <Authorized>
-            <a class="brand" href="/admin/orders">Ordini</a>
-        </Authorized>
-    </AuthorizeView>
-    <AuthorizeView Roles="admin">
-        <Authorized>
-            <a class="brand" href="/admin/custom-orders">Richieste Quadri</a>
-        </Authorized>
-    </AuthorizeView>
+<nav class="nav">
+    <div class="nav-container">
+        <!-- Brand Logo -->
+        <a class="nav-brand" href="/">
+            <span class="nav-brand-icon">🎨</span>
+            <span>Galleria Agostini</span>
+        </a>
 
-    <div class="spacer"></div>
+        <!-- Desktop Navigation Links -->
+        <div class="nav-links">
+            <a class="nav-link" href="/">
+                <span>🏠</span>
+                <span>Home</span>
+            </a>
+            <AuthorizeView Roles="admin">
+                <Authorized>
+                    <a class="nav-link" href="/admin/paintings">
+                        <span>🎨</span>
+                        <span>Gestisci Quadri</span>
+                    </a>
+                    <a class="nav-link" href="/admin/orders">
+                        <span>📦</span>
+                        <span>Ordini</span>
+                    </a>
+                    <a class="nav-link" href="/admin/custom-orders">
+                        <span>✨</span>
+                        <span>Richieste</span>
+                    </a>
+                </Authorized>
+            </AuthorizeView>
+            <a class="nav-link" href="/richiedi-quadro">
+                <span>🎯</span>
+                <span>Quadro Personalizzato</span>
+            </a>
+        </div>
 
-    <a class="btn" href="/cart" title="Carrello">
-        🛒 <strong>@cartCount</strong>
-    </a>
+        <!-- Spacer -->
+        <div class="nav-spacer"></div>
 
-    <AuthorizeView>
-        <Authorized>
-            <div class="user-info">
-                <span class="welcome-text">Ciao, @context.User.Identity?.Name</span>
-                <button class="btn secondary" @onclick="LogoutAsync" title="Logout">
-                    Esci
-                </button>
-            </div>
-        </Authorized>
-        <NotAuthorized>
-            <button class="btn primary" @onclick="ShowLoginModal" title="Login">
-                Accedi
-            </button>
-        </NotAuthorized>
-    </AuthorizeView>
+        <!-- Cart Button -->
+        <a class="nav-cart" href="/cart">
+            <span>🛒</span>
+            <span>Carrello</span>
+            <span class="nav-cart-count @(cartCount > 0 ? "animate-bounce" : "")">@cartCount</span>
+        </a>
+
+        <!-- User Section -->
+        <div class="nav-user">
+            <AuthorizeView>
+                <Authorized>
+                    <div class="nav-user-info">
+                        <span class="nav-welcome">Benvenuto</span>
+                        <span class="nav-username">@context.User.Identity?.Name</span>
+                    </div>
+                    <button class="nav-logout-btn" @onclick="LogoutAsync">
+                        <span>👋</span>
+                        <span>Esci</span>
+                    </button>
+                </Authorized>
+                <NotAuthorized>
+                    <button class="nav-login-btn" @onclick="ShowLoginModal">
+                        <span>🔐</span>
+                        <span>Accedi</span>
+                    </button>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="nav-mobile-toggle" @onclick="ToggleMobileMenu">
+            <span>☰</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile Navigation -->
+<div class="nav-mobile @(showMobileMenu ? "active" : "")" @onclick="CloseMobileMenu">
+    <div class="nav-mobile-content" @onclick:stopPropagation="true">
+        <div class="nav-mobile-header">
+            <a class="nav-brand" href="/" @onclick="CloseMobileMenu">
+                <span class="nav-brand-icon">🎨</span>
+                <span>Galleria</span>
+            </a>
+            <button class="nav-mobile-close" @onclick="CloseMobileMenu">✕</button>
+        </div>
+
+        <div class="nav-mobile-links">
+            <a class="nav-mobile-link" href="/" @onclick="CloseMobileMenu">
+                <span>🏠</span>
+                <span>Home</span>
+            </a>
+            <a class="nav-mobile-link" href="/richiedi-quadro" @onclick="CloseMobileMenu">
+                <span>🎯</span>
+                <span>Quadro Personalizzato</span>
+            </a>
+            <AuthorizeView Roles="admin">
+                <Authorized>
+                    <a class="nav-mobile-link" href="/admin/paintings" @onclick="CloseMobileMenu">
+                        <span>🎨</span>
+                        <span>Gestisci Quadri</span>
+                    </a>
+                    <a class="nav-mobile-link" href="/admin/orders" @onclick="CloseMobileMenu">
+                        <span>📦</span>
+                        <span>Ordini</span>
+                    </a>
+                    <a class="nav-mobile-link" href="/admin/custom-orders" @onclick="CloseMobileMenu">
+                        <span>✨</span>
+                        <span>Richieste Personalizzate</span>
+                    </a>
+                </Authorized>
+            </AuthorizeView>
+        </div>
+
+        <div class="nav-mobile-actions">
+            <a class="btn btn-outline btn-full" href="/cart" @onclick="CloseMobileMenu">
+                <span>🛒</span>
+                <span>Carrello (@cartCount)</span>
+            </a>
+            <AuthorizeView>
+                <Authorized>
+                    <div class="nav-user-info" style="text-align: center; margin-bottom: 1rem;">
+                        <div class="nav-welcome">Benvenuto</div>
+                        <div class="nav-username">@context.User.Identity?.Name</div>
+                    </div>
+                    <button class="btn btn-secondary btn-full" @onclick="LogoutAsync">
+                        <span>👋</span>
+                        <span>Esci</span>
+                    </button>
+                </Authorized>
+                <NotAuthorized>
+                    <button class="btn btn-primary btn-full" @onclick="ShowLoginModal">
+                        <span>🔐</span>
+                        <span>Accedi</span>
+                    </button>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
 </div>
-<div class="container">
-    <main>
+
+<!-- Main Content -->
+<div class="main-container">
+    <div class="main-content">
         @Body
-    </main>
+    </div>
 </div>
+
+<!-- Toast Container (per notifiche future) -->
+<div class="toast-container" id="toast-container"></div>

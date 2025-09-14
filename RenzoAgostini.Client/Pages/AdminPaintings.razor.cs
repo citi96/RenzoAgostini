@@ -9,7 +9,7 @@ namespace RenzoAgostini.Client.Pages
         [Inject] private IPaintingService PaintingService { get; set; } = default!;
         [Inject] private ILogger<AdminPaintings> Logger { get; set; } = default!;
 
-        private IEnumerable<PaintingDto>? paintings;
+        private IEnumerable<PaintingDto> paintings = [];
         private bool showEditor = false;
         private bool showDeleteConfirm = false;
         private PaintingDto? editingPainting = null;

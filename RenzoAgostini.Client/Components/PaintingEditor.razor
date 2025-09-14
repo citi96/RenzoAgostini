@@ -1,112 +1,164 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
 @using RenzoAgostini.Shared.DTOs
 
-<div class="modal-overlay" @onclick="OnCancel">
-    <div class="modal editor" @onclick:stopPropagation="true">
-        <div class="modal-header">
-            <h2>@(IsEditing ? "Modifica Quadro" : "Nuovo Quadro")</h2>
-            <button class="btn-close" @onclick="OnCancel">✕</button>
+<div class="editor-overlay" @onclick="OnCancel">
+    <div class="editor-modal" @onclick:stopPropagation="true">
+        <!-- Header -->
+        <div class="editor-header">
+            <h2 class="editor-title">@(IsEditing ? "Modifica Quadro" : "Nuovo Quadro")</h2>
+            <button class="editor-close" @onclick="OnCancel" type="button">✕</button>
         </div>
 
-        <EditForm Model="form" OnValidSubmit="HandleSubmit">
-            <DataAnnotationsValidator />
+        <!-- Body -->
+        <div class="editor-body">
+            <EditForm Model="form" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Titolo *</label>
-                    <InputText @bind-Value="form.Title" class="form-control" />
-                    <ValidationMessage For="() => form.Title" />
+                <!-- Basic Info Grid -->
+                <div class="editor-form-grid">
+                    <div class="editor-form-group">
+                        <label class="editor-label required">Titolo</label>
+                        <InputText @bind-Value="form.Title"
+                                   class="editor-input"
+                                   placeholder="Inserisci il titolo del quadro" />
+                        <ValidationMessage For="() => form.Title" class="editor-validation" />
+                    </div>
+
+                    <div class="editor-form-group">
+                        <label class="editor-label required">Slug</label>
+                        <InputText @bind-Value="form.Slug"
+                                   class="editor-input"
+                                   placeholder="titolo-del-quadro" />
+                        <ValidationMessage For="() => form.Slug" class="editor-validation" />
+                    </div>
+
+                    <div class="editor-form-group full-width">
+                        <label class="editor-label">Descrizione</label>
+                        <InputTextArea @bind-Value="form.Description"
+                                       class="editor-textarea"
+                                       rows="3"
+                                       placeholder="Descrivi il quadro, il soggetto, lo stile..." />
+                    </div>
+
+                    <div class="editor-form-group">
+                        <label class="editor-label">Anno</label>
+                        <InputNumber @bind-Value="form.Year"
+                                     class="editor-input"
+                                     placeholder="2024" />
+                    </div>
+
+                    <div class="editor-form-group">
+                        <label class="editor-label">Tecnica</label>
+                        <InputText @bind-Value="form.Medium"
+                                   class="editor-input"
+                                   placeholder="Olio su tela, Acrilico su cartone..." />
+                    </div>
+
+                    <div class="editor-form-group">
+                        <label class="editor-label">Dimensioni</label>
+                        <InputText @bind-Value="form.Dimensions"
+                                   class="editor-input"
+                                   placeholder="50x70 cm" />
+                    </div>
+
+                    <div class="editor-form-group">
+                        <label class="editor-label">Prezzo (€)</label>
+                        <InputNumber @bind-Value="form.Price"
+                                     class="editor-input"
+                                     step="0.01"
+                                     placeholder="0.00" />
+                    </div>
+
+                    <div class="editor-form-group checkbox-group">
+                        <InputCheckbox @bind-Value="form.IsForSale" class="editor-checkbox" />
+                        <label class="editor-label">Disponibile per la vendita</label>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Slug *</label>
-                    <InputText @bind-Value="form.Slug" class="form-control" placeholder="titolo-del-quadro" />
-                    <ValidationMessage For="() => form.Slug" />
-                </div>
+                <!-- Images Section -->
+                <div class="editor-images-section">
+                    <h3 class="editor-images-title">Immagini del Quadro</h3>
 
-                <div class="form-group full-width">
-                    <label>Descrizione</label>
-                    <InputTextArea @bind-Value="form.Description" class="form-control" rows="3" />
-                </div>
+                    <!-- File Upload -->
+                    <div class="editor-file-upload">
+                        <InputFile OnChange="HandleFileSelection"
+                                   multiple
+                                   accept="image/*"
+                                   class="editor-file-input" />
+                        <label class="editor-file-label">
+                            <div class="editor-file-icon">📁</div>
+                            <div class="editor-file-text">
+                                Clicca per selezionare immagini
+                            </div>
+                            <div class="editor-file-hint">
+                                @if (!IsEditing)
+                                {
+                                    <span>Almeno un'immagine è obbligatoria</span>
+                                }
+                                else
+                                {
+                                    <span>Aggiungi nuove immagini (opzionale)</span>
+                                }
+                            </div>
+                        </label>
+                    </div>
 
-                <div class="form-group">
-                    <label>Anno</label>
-                    <InputNumber @bind-Value="form.Year" class="form-control" />
-                </div>
-
-                <div class="form-group">
-                    <label>Tecnica</label>
-                    <InputText @bind-Value="form.Medium" class="form-control" placeholder="Olio su tela" />
-                </div>
-
-                <div class="form-group">
-                    <label>Dimensioni</label>
-                    <InputText @bind-Value="form.Dimensions" class="form-control" placeholder="50x70 cm" />
-                </div>
-
-                <div class="form-group">
-                    <label>Prezzo</label>
-                    <InputNumber @bind-Value="form.Price" class="form-control" step="0.01" />
-                </div>
-
-                <div class="form-group checkbox-group">
-                    <label class="checkbox-label">
-                        <InputCheckbox @bind-Value="form.IsForSale" />
-                        <span>In vendita</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="images-section">
-                <h3>Immagini</h3>
-
-                <div class="image-upload">
-                    <label class="upload-button">
-                        <InputFile OnChange="HandleFileSelection" multiple accept="image/*" />
-                        📁 Seleziona immagini
-                    </label>
-                    @if (!IsEditing)
+                    <!-- Images Preview -->
+                    @if (form.Images.Any())
                     {
-                        <small>*Almeno un'immagine è obbligatoria</small>
+                        <div class="editor-images-grid">
+                            @for (int i = 0; i < form.Images.Count; i++)
+                            {
+                                var index = i;
+                                var image = form.Images[i];
+                                <div class="editor-image-item @(image.IsPrimary ? "primary" : "")">
+                                    @if (image.IsPrimary)
+                                    {
+                                        <div class="editor-primary-badge">⭐ Principale</div>
+                                    }
+                                    <img src="@image.Url" alt="Anteprima" class="editor-image" />
+                                    <div class="editor-image-overlay">
+                                        @if (!image.IsPrimary)
+                                        {
+                                            <button type="button"
+                                                    class="editor-image-btn primary"
+                                                    @onclick="() => SetPrimary(index)">
+                                                ⭐ Principale
+                                            </button>
+                                        }
+                                        <button type="button"
+                                                class="editor-image-btn danger"
+                                                @onclick="() => RemoveImage(index)">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     }
                 </div>
 
-                @if (form.Images.Any())
-                {
-                    <div class="images-preview">
-                        @for (int i = 0; i < form.Images.Count; i++)
+                <!-- Footer -->
+                <div class="editor-footer">
+                    <button type="button" class="editor-btn-cancel" @onclick="OnCancel">
+                        Annulla
+                    </button>
+                    <button type="submit"
+                            class="editor-btn-save @(isSaving ? "editor-loading" : "")"
+                            disabled="@(!CanSave || isSaving)">
+                        @if (isSaving)
                         {
-                            var index = i;
-                            var image = form.Images[i];
-                            <div class="image-item @(image.IsPrimary ? "primary" : "")">
-                                <img src="@image.Url" alt="Preview" />
-                                <div class="image-actions">
-                                    @if (!image.IsPrimary)
-                                    {
-                                        <button type="button" class="btn-mini primary" @onclick="() => SetPrimary(index)">
-                                            ⭐ Principale
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <span class="primary-badge">⭐ Principale</span>
-                                    }
-                                    <button type="button" class="btn-mini danger" @onclick="() => RemoveImage(index)">
-                                        🗑️
-                                    </button>
-                                </div>
-                            </div>
+                            <span class="editor-spinner"></span>
+                            <span>Salvataggio...</span>
                         }
-                    </div>
-                }
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn secondary" @onclick="OnCancel">Annulla</button>
-                <button type="submit" class="btn primary" disabled="@(!CanSave)">
-                    @(IsEditing ? "Salva modifiche" : "Crea quadro")
-                </button>
-            </div>
-        </EditForm>
+                        else
+                        {
+                            <span>💾</span>
+                            <span>@(IsEditing ? "Salva Modifiche" : "Crea Quadro")</span>
+                        }
+                    </button>
+                </div>
+            </EditForm>
+        </div>
     </div>
 </div>

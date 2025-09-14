@@ -1,9 +1,12 @@
 ﻿// RenzoAgostini.Client/Pages/CustomOrder.razor.cs
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using RenzoAgostini.Client.Authentication;
 using RenzoAgostini.Client.Services.Interfaces;
+using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Pages
@@ -12,7 +15,9 @@ namespace RenzoAgostini.Client.Pages
     {
         [Inject] private IImageUploadService ImageUploadService { get; set; } = default!;
         [Inject] private ICustomOrderService CustomOrderService { get; set; } = default!;
+        [Inject] private ICookieService CookieService { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+        [Inject] CustomAuthenticationStateProvider AuthProvider { get; set; } = default!;
         [Inject] private ILogger<CustomOrder> Logger { get; set; } = default!;
 
         protected CustomOrderRequestModel customOrderRequest = new();
@@ -25,6 +30,24 @@ namespace RenzoAgostini.Client.Pages
         protected string? accessCode;
         protected bool isSubmitting = false;
         protected bool isAccessingOrder = false;
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                var state = await AuthProvider.GetAuthenticationStateAsync();
+                if (state.User.Identity?.IsAuthenticated == true)
+                {
+                    var user = state.User;
+                    customOrderRequest.CustomerEmail = user.Claims.FirstOrDefault(c => c.Type == "email")?.Value ?? "";
+                    accessRequest.CustomerEmail = user.Claims.FirstOrDefault(c => c.Type == "email")?.Value ?? "";
+                }               
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error setting logged user email");
+            }
+        }
 
         protected void HandleFileChange(InputFileChangeEventArgs e)
         {
@@ -92,7 +115,8 @@ namespace RenzoAgostini.Client.Pages
                 if (result.PaintingId.HasValue)
                 {
                     // Reindirizza alla pagina del quadro
-                    await JSRuntime.InvokeVoidAsync("open", $"/quadro-personalizzato/{result.PaintingId}", "_self");
+                    await CookieService.PutAsync("customOrder", JsonSerializer.Serialize(result));
+                    await JSRuntime.InvokeVoidAsync("open", $"/quadro-personalizzato", "_self");
                 }
                 else
                 {

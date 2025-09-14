@@ -1,33 +1,140 @@
 ﻿@if (IsVisible)
 {
-    <div class="lightbox-overlay" @onclick="Close" @onkeydown="HandleKeyDown" tabindex="0">
+    <div class="lightbox-overlay @(isFullscreen ? "fullscreen" : "")" @onclick="HandleOverlayClick" @onkeydown="HandleKeyDown" tabindex="0">
         <div class="lightbox-container" @onclick:stopPropagation="true">
-            <button class="lightbox-close" @onclick="Close" title="Chiudi">✕</button>
 
-            @if (Images.Count > 1)
-            {
-                <button class="lightbox-nav lightbox-prev" @onclick="PreviousImage" title="Immagine precedente">‹</button>
-                <button class="lightbox-nav lightbox-next" @onclick="NextImage" title="Immagine successiva">›</button>
-            }
-
-            <div class="lightbox-image-container">
-                <img src="@($"{Configuration["BaseUrl"]}/{CurrentImage}")"
-                     alt="@Title"
-                     class="lightbox-image"
-                     @onload="OnImageLoad" />
-
-                @if (IsLoading)
+            <!-- Header -->
+            <div class="lightbox-header">
+                <h3 class="lightbox-title">@Title</h3>
+                @if (Images.Count > 1)
                 {
-                    <div class="lightbox-loading">
-                        <div class="spinner"></div>
-                    </div>
+                    <div class="lightbox-counter">@(CurrentIndex + 1) di @Images.Count</div>
                 }
+                <button class="lightbox-close" @onclick="Close" title="Chiudi (Esc)">
+                    ✕
+                </button>
             </div>
 
-            @if (Images.Count > 1)
+            <!-- Main Content -->
+            <div class="lightbox-content">
+                <!-- Info Toggle Button -->
+                <button class="lightbox-info-toggle" @onclick="ToggleInfo" title="Mostra/Nascondi Info (I)">
+                    ℹ️
+                </button>
+
+                <!-- Image Container -->
+                <div class="lightbox-image-container">
+                    @if (isImageLoading)
+                    {
+                        <div class="lightbox-loading">
+                            <div class="lightbox-loading-spinner"></div>
+                            <p>Caricamento...</p>
+                        </div>
+                    }
+
+                    @if (Images.Any() && CurrentIndex < Images.Count)
+                    {
+                        <img src="@GetCurrentImageUrl()"
+                             alt="@Title"
+                             class="lightbox-image @(isZoomed ? "zoomed" : "")"
+                             @onclick="ToggleZoom"
+                             @onload="OnImageLoaded"
+                             @onerror="OnImageError"
+                             style="@(isImageLoading ? "display: none;" : "")" />
+                    }
+                </div>
+
+                <!-- Navigation Buttons -->
+                @if (Images.Count > 1)
+                {
+                    <button class="lightbox-nav lightbox-nav-prev"
+                            @onclick="PreviousImage"
+                            disabled="@(CurrentIndex == 0 && !isLooping)"
+                            title="Immagine Precedente (←)">
+                        ‹
+                    </button>
+                    <button class="lightbox-nav lightbox-nav-next"
+                            @onclick="NextImage"
+                            disabled="@(CurrentIndex == Images.Count - 1 && !isLooping)"
+                            title="Immagine Successiva (→)">
+                        ›
+                    </button>
+                }
+
+                <!-- Zoom Controls -->
+                <div class="lightbox-controls">
+                    <button class="lightbox-control" @onclick="ToggleZoom" title="Zoom (Z)">
+                        @(isZoomed ? "🔍-" : "🔍+")
+                    </button>
+                    <button class="lightbox-control" @onclick="ToggleFullscreen" title="Schermo Intero (F)">
+                        @(isFullscreen ? "⤓" : "⤢")
+                    </button>
+                    @if (Images.Count > 1)
+                    {
+                        <button class="lightbox-control" @onclick="StartSlideshow" title="Slideshow (S)" disabled="@isSlideshowActive">
+                            ▶️
+                        </button>
+                        @if (isSlideshowActive)
+                        {
+                            <button class="lightbox-control" @onclick="StopSlideshow" title="Ferma Slideshow">
+                                ⏸️
+                            </button>
+                        }
+                    }
+                </div>
+
+                <!-- Info Panel -->
+                <div class="lightbox-info @(showInfo ? "visible" : "")">
+                    <div class="lightbox-info-title">@Title</div>
+                    <div class="lightbox-info-meta">
+                        @if (ImageMetadata != null && ImageMetadata.ContainsKey(CurrentIndex))
+                        {
+                            var meta = ImageMetadata[CurrentIndex];
+                            @if (!string.IsNullOrEmpty(meta.Year))
+                            {
+                                <span>📅 @meta.Year</span>
+                            }
+                            @if (!string.IsNullOrEmpty(meta.Medium))
+                            {
+                                <span>🎨 @meta.Medium</span>
+                            }
+                            @if (!string.IsNullOrEmpty(meta.Dimensions))
+                            {
+                                <span>📏 @meta.Dimensions</span>
+                            }
+                        }
+                        <span>🖼️ @(CurrentIndex + 1) di @Images.Count</span>
+                    </div>
+                </div>
+
+                <!-- Keyboard Shortcuts -->
+                <div class="lightbox-shortcuts">
+                    <div>ESC - Chiudi</div>
+                    <div>← → - Naviga</div>
+                    <div>Z - Zoom</div>
+                    <div>F - Schermo Intero</div>
+                    <div>I - Info</div>
+                    @if (Images.Count > 1)
+                    {
+                        <div>S - Slideshow</div>
+                    }
+                </div>
+            </div>
+
+            <!-- Footer with Thumbnails -->
+            @if (Images.Count > 1 && showThumbnails)
             {
-                <div class="lightbox-counter">
-                    @(CurrentIndex + 1) di @Images.Count
+                <div class="lightbox-footer">
+                    <div class="lightbox-thumbnails">
+                        @for (int i = 0; i < Images.Count; i++)
+                        {
+                            var index = i;
+                            <img src="@GetThumbnailUrl(index)"
+                                 alt="Miniatura @(index + 1)"
+                                 class="lightbox-thumbnail @(index == CurrentIndex ? "active" : "")"
+                                 @onclick="() => GoToImage(index)" />
+                        }
+                    </div>
                 </div>
             }
         </div>

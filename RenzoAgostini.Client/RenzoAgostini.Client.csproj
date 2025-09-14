@@ -32,8 +32,4 @@
 	  <ProjectReference Include="..\RenzoAgostini.Shared\RenzoAgostini.Shared.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="wwwroot\js\" />
-	</ItemGroup>
-
 </Project>

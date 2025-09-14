@@ -6,7 +6,7 @@ namespace RenzoAgostini.Client.Pages
 {
     public partial class CheckoutSuccess
     {
-        [Inject] ICheckoutClient CheckoutClient { get; set; } = default!;
+        [Inject] ICheckoutService CheckoutClient { get; set; } = default!;
         [Inject] ICartService CartService { get; set; } = default!;
         [Inject] NavigationManager Navigation { get; set; } = default!;
 

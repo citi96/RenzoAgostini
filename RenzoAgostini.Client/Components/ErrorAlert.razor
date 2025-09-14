@@ -1,8 +1,64 @@
-﻿@if (!string.IsNullOrEmpty(Message))
+﻿@if (IsVisible && !string.IsNullOrEmpty(Message))
 {
-    <div class="alert alert-@Type" role="alert">
-        <span class="alert-icon">@GetIcon()</span>
-        <span class="alert-message">@Message</span>
-        <button class="alert-close" @onclick="Close">✕</button>
+    <div class="alert alert-@Type.ToLower() @SizeClass @(IsCompact ? "alert-compact" : "") @(IsLarge ? "alert-large" : "") @(IsBorderless ? "alert-borderless" : "") @(IsRounded ? "alert-rounded" : "") @(HasActions ? "has-actions" : "") @(IsRich ? "alert-rich" : "") @(isDismissing ? "dismissing" : "")"
+         role="alert">
+
+        @if (ShowIcon)
+        {
+            <div class="alert-icon">
+                @GetIcon()
+            </div>
+        }
+
+        <div class="alert-content">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="alert-title">@Title</div>
+            }
+
+            <div class="alert-message">
+                @if (ChildContent != null)
+                {
+                    @ChildContent
+                }
+                else
+                {
+                    @((MarkupString)Message)
+                }
+            </div>
+
+            @if (Actions != null)
+            {
+                <div class="alert-actions">
+                    @Actions
+                </div>
+            }
+
+            @if (IsRich && ShowMetadata)
+            {
+                <div class="alert-meta">
+                    @if (!string.IsNullOrEmpty(Source))
+                    {
+                        <span>📍 @Source</span>
+                    }
+                    @if (ShowTimestamp)
+                    {
+                        <span class="alert-timestamp">🕒 @DateTime.Now.ToString("HH:mm")</span>
+                    }
+                </div>
+            }
+        </div>
+
+        @if (IsDismissible && OnClose.HasDelegate)
+        {
+            <button class="alert-close" @onclick="HandleClose" title="Chiudi">
+                ✕
+            </button>
+        }
+
+        @if (AutoDismiss && AutoDismissSeconds > 0)
+        {
+            <div class="alert-progress" style="width: @(progressWidth)%; transition-duration: @(AutoDismissSeconds)s;"></div>
+        }
     </div>
 }

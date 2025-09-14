@@ -1,38 +1,160 @@
 ﻿@using System.Globalization
 
-<div class="card">
-	<img src="@($"{Configuration["BaseUrl"]}/{@PrimaryImageUrl}")"
-		 alt="@Title"
-		 @onclick="() => ShowLightbox(0)"
-		 class="clickable-image" />
-	<div class="body">
-		<div class="title">@Title</div>
-		@if (!string.IsNullOrWhiteSpace(Description))
+<div class="painting-card @(IsAdminMode ? "admin-mode" : "") @(IsLoading ? "loading" : "")"
+	 @onclick="() => HandleCardClick()">
+
+	<!-- Image Container -->
+	<div class="painting-card-image-container">
+		@if (!string.IsNullOrEmpty(PrimaryImageUrl))
 		{
-			<div class="meta">@Description</div>
-		}
-		<div class="meta">@Year @Medium</div>
-		@if (IsAdminMode && PaintingDto != null)
-		{
-			<div class="actions">
-				<button class="btn secondary small" @onclick="() => OnEdit.InvokeAsync(PaintingDto)">✏️ Modifica</button>
-				<button class="btn danger small" @onclick="() => OnDelete.InvokeAsync(PaintingDto)">🗑️ Elimina</button>
-			</div>
-		}
-		else if (IsForSale && Price is not null)
-		{
-			<div class="price">@Price?.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</div>
-			<button class="btn primary w-100" @onclick="AddToCart">Aggiungi al carrello</button>
+			<img src="@($"{Configuration["BaseUrl"]}/{PrimaryImageUrl}")"
+				 alt="@Title"
+				 class="painting-card-image"
+				 loading="lazy" />
 		}
 		else
 		{
-			<span class="btn w-100" disabled>Non disponibile</span>
+			<div class="painting-card-image painting-card-placeholder">
+				<span>🎨</span>
+				<span>Immagine non disponibile</span>
+			</div>
 		}
+
+		<!-- For Sale Badge -->
+		@if (IsForSale && Price.HasValue && !IsAdminMode)
+		{
+			<div class="painting-card-for-sale-badge">
+				✨ In Vendita
+			</div>
+		}
+		else if (!IsForSale && !IsAdminMode)
+		{
+			<div class="painting-card-sold-badge">
+				Venduto
+			</div>
+		}
+
+		<!-- Favorite Button -->
+		@if (!IsAdminMode)
+		{
+			<button class="painting-card-favorite @(IsFavorite ? "active" : "")"
+					@onclick:stopPropagation="true"
+					@onclick="ToggleFavorite">
+				@(IsFavorite ? "❤️" : "🤍")
+			</button>
+		}
+
+		<!-- Image Overlay with Quick Actions -->
+		<div class="painting-card-overlay">
+			<div class="painting-card-quick-actions">
+				@if (ImageUrls.Count > 1)
+				{
+					<button class="painting-card-quick-action"
+							@onclick:stopPropagation="true"
+							@onclick="() => ShowLightbox(0)"
+							title="Visualizza galleria">
+						📷
+					</button>
+				}
+				@if (!IsAdminMode)
+				{
+					<button class="painting-card-quick-action"
+							@onclick:stopPropagation="true"
+							@onclick="SharePainting"
+							title="Condividi">
+						🔗
+					</button>
+				}
+			</div>
+		</div>
 	</div>
+
+	<!-- Card Body -->
+	<div class="painting-card-body">
+		<h3 class="painting-card-title">@Title</h3>
+
+		@if (!string.IsNullOrWhiteSpace(Description))
+		{
+			<p class="painting-card-description">@Description</p>
+		}
+
+		<!-- Meta Information -->
+		<div class="painting-card-meta">
+			@if (Year.HasValue)
+			{
+				<span class="painting-card-meta-item year">
+					📅 @Year
+				</span>
+			}
+			@if (!string.IsNullOrWhiteSpace(Medium))
+			{
+				<span class="painting-card-meta-item">
+					🎨 @Medium
+				</span>
+			}
+			@if (ImageUrls.Count > 1)
+			{
+				<span class="painting-card-meta-item">
+					🖼️ @ImageUrls.Count foto
+				</span>
+			}
+		</div>
+	</div>
+
+	@* Admin Actions *@
+	@if (IsAdminMode && PaintingDto != null)
+	{
+		<div class="painting-card-admin-actions">
+			<button class="painting-card-admin-btn edit"
+					@onclick:stopPropagation="true"
+					@onclick="() => OnEdit.InvokeAsync(PaintingDto)">
+				✏️ Modifica
+			</button>
+			<button class="painting-card-admin-btn delete"
+					@onclick:stopPropagation="true"
+					@onclick="() => OnDelete.InvokeAsync(PaintingDto)">
+				🗑️ Elimina
+			</button>
+		</div>
+	}
+	else if (IsForSale && Price.HasValue)
+	{
+		<div class="painting-card-price">
+			<div class="painting-card-price-amount">
+				<span class="painting-card-price-currency">€</span>
+				<span>@Price.Value.ToString("N2", CultureInfo.GetCultureInfo("it-IT"))</span>
+			</div>
+			<button class="painting-card-add-to-cart @(IsAddingToCart ? "loading" : "")"
+					@onclick:stopPropagation="true"
+					@onclick="AddToCart"
+					disabled="@IsAddingToCart">
+				@if (IsAddingToCart)
+				{
+					<span class="animate-spin">⏳</span>
+					<span>Aggiunta...</span>
+				}
+				else
+				{
+					<span>🛒</span>
+					<span>Aggiungi</span>
+				}
+			</button>
+		</div>
+	}
+	else if (!IsAdminMode)
+	{
+		<div class="painting-card-price">
+			<div class="painting-card-unavailable">Non disponibile</div>
+		</div>
+	}
 </div>
 
-<ImageLightbox IsVisible="showLightbox"
-			   Images="ImageUrls"
-			   InitialIndex="lightboxIndex"
-			   Title="@Title"
-			   OnClose="HideLightbox" />
+<!-- Lightbox Component -->
+@if (ImageUrls.Any())
+{
+	<ImageLightbox IsVisible="showLightbox"
+				   Images="ImageUrls"
+				   InitialIndex="lightboxIndex"
+				   Title="@Title"
+				   OnClose="HideLightbox" />
+}
