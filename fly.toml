@@ -5,10 +5,10 @@ primary_region = "ams"
   dockerfile = "docker/Dockerfile"
 
 [env]
-  # Credentials are provided via `fly secrets set`
-  KC_HOSTNAME = "renzoagostini-keycloak.fly.dev"
+  KC_HOSTNAME = "auth.renzoagostini.it"
   KC_HOSTNAME_STRICT = "false"
   KC_PROXY = "edge"
+  KC_HTTP_ENABLED = "true"
 
 [[mounts]]
   source = "keycloak_h2"
