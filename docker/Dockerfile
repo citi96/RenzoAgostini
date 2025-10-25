@@ -9,5 +9,9 @@ RUN mkdir -p /opt/keycloak/data/h2 \
 # Copy any additional configuration or themes if needed in the future
 # COPY themes /opt/keycloak/themes
 
-# Entrypoint inherited from Keycloak image
-
+# Explicitly start Keycloak in optimized mode when the container launches.
+# Without passing "start" the base entrypoint prints the CLI help and exits
+# immediately, which is what happened nei log mostrati dopo il comando di
+# riavvio della macchina.
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
+CMD ["start", "--optimized"]

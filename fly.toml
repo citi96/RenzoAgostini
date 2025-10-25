@@ -6,16 +6,18 @@ primary_region = "ams"
 
 [env]
   # Credentials are provided via `fly secrets set`
+  KC_HOSTNAME = "renzoagostini-keycloak.fly.dev"
+  KC_HOSTNAME_STRICT = "false"
+  KC_PROXY = "edge"
 
 [[mounts]]
   source = "keycloak_h2"
   destination = "/opt/keycloak/data/h2"
-  size_gb = 1
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = false
+  auto_stop_machines = "off"
   auto_start_machines = true
   min_machines_running = 1
   max_machines = 1
