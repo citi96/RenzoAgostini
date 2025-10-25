@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
-using Microsoft.JSInterop;
+using Microsoft.Extensions.Configuration;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.DTOs;
 
@@ -16,6 +16,7 @@ namespace RenzoAgostini.Client.Services
         private readonly string _realm;
         private readonly string _clientId;
         private readonly string _redirectUri;
+        private readonly string _postLogoutRedirectUri;
 
         public KeycloakService(HttpClient httpClient, ICookieService cookieService, IConfiguration configuration)
         {
@@ -28,6 +29,8 @@ namespace RenzoAgostini.Client.Services
             _realm = _configuration["Keycloak:Realm"] ?? "your-realm";
             _clientId = _configuration["Keycloak:ClientId"] ?? "your-client-id";
             _redirectUri = _configuration["Keycloak:RedirectUri"] ?? "https://localhost:7189/auth/callback";
+            _postLogoutRedirectUri =
+                _configuration["Keycloak:PostLogoutRedirectUri"] ?? "https://localhost:7189/";
         }
 
         public async Task<string> GetLoginUrlAsync()
@@ -132,7 +135,7 @@ namespace RenzoAgostini.Client.Services
         {
             var logoutUrl = $"{_keycloakUrl}/realms/{_realm}/protocol/openid-connect/logout" +
                            $"?client_id={Uri.EscapeDataString(_clientId)}" +
-                           $"&post_logout_redirect_uri={Uri.EscapeDataString("https://localhost:7189/")}";
+                           $"&post_logout_redirect_uri={Uri.EscapeDataString(_postLogoutRedirectUri)}";
 
             return logoutUrl;
         }

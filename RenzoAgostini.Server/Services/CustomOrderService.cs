@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using Microsoft.Extensions.Options;
+using RenzoAgostini.Server.Config;
 using RenzoAgostini.Server.Emailing.Interfaces;
 using RenzoAgostini.Server.Emailing.Models;
 using RenzoAgostini.Server.Entities;
@@ -18,9 +20,10 @@ namespace RenzoAgostini.Server.Services
         ICustomEmailSender emailSender,
         IWebHostEnvironment env,
         IConfiguration configuration,
+        IOptions<StorageOptions> storageOptions,
         ILogger<CustomOrderService> logger) : ICustomOrderService
     {
-        private readonly string _uploadsPath = Path.Combine(env.WebRootPath, "custom-orders");
+        private readonly string _customOrdersPath = ResolveCustomOrdersPath(env, storageOptions.Value);
 
         public async Task<CustomOrderDto> CreateCustomOrderAsync(CreateCustomOrderDto dto)
         {
@@ -160,10 +163,10 @@ namespace RenzoAgostini.Server.Services
 
         private async Task<string> SaveAttachmentAsync(IFormFile file)
         {
-            Directory.CreateDirectory(_uploadsPath);
+            Directory.CreateDirectory(_customOrdersPath);
 
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-            var filePath = Path.Combine(_uploadsPath, fileName);
+            var filePath = Path.Combine(_customOrdersPath, fileName);
 
             using var stream = new FileStream(filePath, FileMode.Create);
             await file.CopyToAsync(stream);
@@ -254,5 +257,18 @@ namespace RenzoAgostini.Server.Services
 
             await emailSender.SendAsync(message);
         }
+    }
+
+    private static string ResolveCustomOrdersPath(IWebHostEnvironment environment, StorageOptions options)
+    {
+        var configuredPath = options.CustomOrdersPath;
+        if (string.IsNullOrWhiteSpace(configuredPath))
+        {
+            return Path.Combine(environment.WebRootPath, "custom-orders");
+        }
+
+        return Path.IsPathRooted(configuredPath)
+            ? configuredPath
+            : Path.Combine(environment.ContentRootPath, configuredPath);
     }
 }

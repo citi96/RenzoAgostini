@@ -1,3 +1,5 @@
+using System.IO;
+using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -27,6 +29,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Config
 var allowAnyCorsInDev = "_allowAnyCorsInDev";
+var allowConfiguredCors = "_allowConfiguredCors";
+
+var keycloakOptions = builder.Configuration.GetSection("Keycloak").Get<KeycloakOptions>() ?? new();
+var storageOptions = builder.Configuration.GetSection("Storage").Get<StorageOptions>() ?? new();
+var configuredOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>()
+    ?.Where(o => !string.IsNullOrWhiteSpace(o))
+    .Select(o => o.TrimEnd('/'))
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray() ?? Array.Empty<string>();
+
+builder.Services.Configure<KeycloakOptions>(builder.Configuration.GetSection("Keycloak"));
+builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection("Storage"));
 
 // Services
 builder.Services.AddControllers();
@@ -65,7 +81,11 @@ builder.Services.AddScoped<ICustomOrderService, CustomOrderService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.Configure<StripeOptions>(builder.Configuration.GetSection("Stripe"));
-StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+var stripeApiKey = builder.Configuration["Stripe:SecretKey"];
+if (!string.IsNullOrWhiteSpace(stripeApiKey))
+{
+    StripeConfiguration.ApiKey = stripeApiKey;
+}
 
 // CORS per sviluppo: client e server su origini diverse
 builder.Services.AddCors(options =>
@@ -74,6 +94,16 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
+
+    if (configuredOrigins.Length > 0)
+    {
+        options.AddPolicy(name: allowConfiguredCors, policy =>
+        {
+            policy.WithOrigins(configuredOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+    }
 });
 
 builder.Services.AddSwaggerGen(o =>
@@ -96,23 +126,34 @@ builder.Services.AddAuthentication(o =>
 })
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
     {
-        o.Authority = "http://localhost:8080/realms/RenzoAgostiniRealm";
+        var authority = keycloakOptions.Authority?.TrimEnd('/');
+        var audiences = keycloakOptions.Audiences
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .ToList();
+
+        if (!audiences.Any() && !string.IsNullOrWhiteSpace(keycloakOptions.ClientId))
+        {
+            audiences.Add(keycloakOptions.ClientId);
+        }
+
+        if (!string.IsNullOrWhiteSpace(authority))
+        {
+            o.Authority = authority;
+            o.MetadataAddress = $"{authority}/.well-known/openid-configuration";
+        }
+
+        o.RequireHttpsMetadata = keycloakOptions.RequireHttpsMetadata;
+
         o.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidIssuer = "http://localhost:8080/realms/RenzoAgostiniRealm",
-            ValidateAudience = true,
-            ValidAudiences =
-            [
-                "web-a1e0f0a5-ed40-4a9f-bd85-87a2273e38f7"
-            ],
+            ValidateIssuer = !string.IsNullOrWhiteSpace(authority),
+            ValidIssuer = authority,
+            ValidateAudience = audiences.Any(),
+            ValidAudiences = audiences,
             ValidateIssuerSigningKey = true,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.FromSeconds(30)
         };
-
-        o.MetadataAddress = "http://localhost:8080/realms/RenzoAgostiniRealm/.well-known/openid-configuration";
-        o.RequireHttpsMetadata = false; // Solo per sviluppo con Keycloak in HTTP
 
         o.Events = new JwtBearerEvents
         {
@@ -121,10 +162,12 @@ builder.Services.AddAuthentication(o =>
                 var id = (ClaimsIdentity)ctx.Principal!.Identity!;
 
                 var res = ctx.Principal.FindFirst("resource_access")?.Value;
-                if (!string.IsNullOrEmpty(res))
+                var clientId = keycloakOptions.ClientId;
+
+                if (!string.IsNullOrEmpty(res) && !string.IsNullOrWhiteSpace(clientId))
                 {
                     var obj = System.Text.Json.JsonDocument.Parse(res);
-                    if (obj.RootElement.TryGetProperty("web-a1e0f0a5-ed40-4a9f-bd85-87a2273e38f7", out var client)
+                    if (obj.RootElement.TryGetProperty(clientId, out var client)
                         && client.TryGetProperty("roles", out var arr2))
                         foreach (var r in arr2.EnumerateArray())
                             id.AddClaim(new Claim(ClaimTypes.Role, r.GetString()!));
@@ -146,12 +189,29 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+var uploadsRoot = ResolvePath(storageOptions.UploadsPath, builder.Environment);
+var customOrdersRoot = ResolvePath(storageOptions.CustomOrdersPath, builder.Environment);
+
+if (!string.IsNullOrWhiteSpace(uploadsRoot))
+{
+    Directory.CreateDirectory(uploadsRoot);
+}
+
+if (!string.IsNullOrWhiteSpace(customOrdersRoot))
+{
+    Directory.CreateDirectory(customOrdersRoot);
+}
+
 // Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseCors(allowAnyCorsInDev);
+}
+else if (configuredOrigins.Length > 0)
+{
+    app.UseCors(allowConfiguredCors);
 }
 
 app.UseHttpsRedirection();
@@ -161,11 +221,28 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseStaticFiles();
-app.UseStaticFiles(new StaticFileOptions
+if (!string.IsNullOrWhiteSpace(uploadsRoot))
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.WebRootPath, "uploads")),
-    RequestPath = "/uploads",
-});
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(uploadsRoot),
+        RequestPath = "/uploads",
+    });
+}
 
 app.Run();
+
+static string? ResolvePath(string? configuredPath, IWebHostEnvironment environment)
+{
+    if (string.IsNullOrWhiteSpace(configuredPath))
+    {
+        return null;
+    }
+
+    if (Path.IsPathRooted(configuredPath))
+    {
+        return configuredPath;
+    }
+
+    return Path.Combine(environment.ContentRootPath, configuredPath);
+}

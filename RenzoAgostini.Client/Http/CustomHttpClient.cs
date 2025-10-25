@@ -1,4 +1,5 @@
-﻿using RenzoAgostini.Client.Http.Handlers;
+﻿using Microsoft.Extensions.Configuration;
+using RenzoAgostini.Client.Http.Handlers;
 
 namespace RenzoAgostini.Client.Http
 {
@@ -6,9 +7,16 @@ namespace RenzoAgostini.Client.Http
     {
         public new Uri? BaseAddress => base.BaseAddress;
 
-        public CustomHttpClient(AuthorizationMessageHandler authorizationHandler, RefreshTokenHandler refreshTokenHandler, ErrorMessageHandler errorMessageHandler) : base(authorizationHandler)
+        public CustomHttpClient(
+            AuthorizationMessageHandler authorizationHandler,
+            RefreshTokenHandler refreshTokenHandler,
+            ErrorMessageHandler errorMessageHandler,
+            IConfiguration configuration) : base(authorizationHandler)
         {
-            base.BaseAddress = new Uri("https://localhost:7215");
+            var baseUrl = configuration["BaseUrl"];
+            base.BaseAddress = !string.IsNullOrWhiteSpace(baseUrl)
+                ? new Uri(baseUrl)
+                : new Uri("https://localhost:7215");
 
             authorizationHandler.InnerHandler = refreshTokenHandler;
             refreshTokenHandler.InnerHandler = errorMessageHandler;
