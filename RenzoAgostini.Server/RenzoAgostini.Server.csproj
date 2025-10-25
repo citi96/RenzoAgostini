@@ -6,6 +6,21 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <UserSecretsId>RenzoAgostini.Server-Local</UserSecretsId>
+    <AppSettingsConfiguration Condition="'$(Configuration)' == 'Debug'">Development</AppSettingsConfiguration>
+    <AppSettingsConfiguration Condition="'$(Configuration)' == 'Release'">Production</AppSettingsConfiguration>
+    <AppSettingsConfiguration Condition="'$(AppSettingsConfiguration)' == ''">$(Configuration)</AppSettingsConfiguration>
+  </PropertyGroup>
+
+  <ItemGroup Condition="Exists('appsettings.$(AppSettingsConfiguration).json')">
+    <Content Include="appsettings.$(AppSettingsConfiguration).json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <TargetPath>appsettings.json</TargetPath>
+    </Content>
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="MailKit" Version="4.13.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8" />
