@@ -257,18 +257,18 @@ namespace RenzoAgostini.Server.Services
 
             await emailSender.SendAsync(message);
         }
-    }
 
-    private static string ResolveCustomOrdersPath(IWebHostEnvironment environment, StorageOptions options)
-    {
-        var configuredPath = options.CustomOrdersPath;
-        if (string.IsNullOrWhiteSpace(configuredPath))
+        private static string ResolveCustomOrdersPath(IWebHostEnvironment environment, StorageOptions options)
         {
-            return Path.Combine(environment.WebRootPath, "custom-orders");
-        }
+            var configuredPath = options.CustomOrdersPath;
+            if (string.IsNullOrWhiteSpace(configuredPath))
+            {
+                return Path.Combine(environment.WebRootPath, "custom-orders");
+            }
 
-        return Path.IsPathRooted(configuredPath)
-            ? configuredPath
-            : Path.Combine(environment.ContentRootPath, configuredPath);
+            return Path.IsPathRooted(configuredPath)
+                ? configuredPath
+                : Path.Combine(environment.ContentRootPath, configuredPath);
+        }
     }
 }

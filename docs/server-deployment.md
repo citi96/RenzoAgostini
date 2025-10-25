@@ -26,6 +26,7 @@ Keycloak seguendo la guida `keycloak-deployment.md` e che `flyctl` sia installat
    Puoi usare un nome diverso, ma ricordati di aggiornare `fly.server.toml`.
 
 2. Crea i volumi necessari. Uno ospita il database SQLite, l'altro le immagini e gli allegati:
+2. Crea il volume necessario (ospita sia il database SQLite sia gli upload):
    ```bash
    fly volumes create renzoagostini_api_data --region ams --size 1
    fly volumes create renzoagostini_api_assets --region ams --size 1
@@ -52,6 +53,8 @@ Se hai percorsi custom per gli upload:
 fly secrets set \
   Storage__UploadsPath="/app/wwwroot/uploads" \
   Storage__CustomOrdersPath="/app/wwwroot/custom-orders"
+  Storage__UploadsPath="/data/uploads" \
+  Storage__CustomOrdersPath="/data/custom-orders"
 ```
 
 ## 4. Deploy
@@ -75,6 +78,7 @@ fly secrets set \
    ```
 2. Esegui un health-check manuale visitando `https://api.tuodominio.it/health` (se hai esposto l'endpoint) o un endpoint dell'API.
 3. Verifica che gli upload vengano salvati correttamente sul volume montato (`fly ssh console` > controlla `/app/wwwroot`).
+3. Verifica che gli upload vengano salvati correttamente sul volume montato (`fly ssh console` > controlla `/data`).
 
 ## 6. Aggiornamenti futuri
 

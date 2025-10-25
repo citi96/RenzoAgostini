@@ -365,3 +365,5 @@ FodyWeavers.xsd
 appsettings.json
 /RenzoAgostini.Server/appsettings.json
 /RenzoAgostini.Server/appsettings.json
+/RenzoAgostini.Server/appsettings.Development.json
+/RenzoAgostini.Server/appsettings.Production.json

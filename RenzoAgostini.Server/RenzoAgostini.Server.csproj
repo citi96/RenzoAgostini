@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="Exists('appsettings.$(AppSettingsConfiguration).json')">
-    <Content Include="appsettings.$(AppSettingsConfiguration).json">
+	  <Content Update="appsettings.$(AppSettingsConfiguration).json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <TargetPath>appsettings.json</TargetPath>

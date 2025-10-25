@@ -6,32 +6,37 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <AppSettingsConfiguration Condition="'$(Configuration)' == 'Debug'">Development</AppSettingsConfiguration>
-    <AppSettingsConfiguration Condition="'$(Configuration)' == 'Release'">Production</AppSettingsConfiguration>
-    <AppSettingsConfiguration Condition="'$(AppSettingsConfiguration)' == ''">$(Configuration)</AppSettingsConfiguration>
-  </PropertyGroup>
+	<PropertyGroup>
+		<AppSettingsConfiguration Condition="'$(Configuration)' == 'Debug'">Development</AppSettingsConfiguration>
+		<AppSettingsConfiguration Condition="'$(Configuration)' == 'Release'">Production</AppSettingsConfiguration>
+		<AppSettingsConfiguration Condition="'$(AppSettingsConfiguration)' == ''">$(Configuration)</AppSettingsConfiguration>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="**/*.razor.css" />
-    <None Include="**/*.razor.css" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="**/*.razor.css" />
+		<None Include="**/*.razor.css" />
+	</ItemGroup>
 
-  <ItemGroup Condition="Exists('wwwroot/appsettings.$(AppSettingsConfiguration).json')">
-    <Content Include="wwwroot/appsettings.$(AppSettingsConfiguration).json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <TargetPath>wwwroot/appsettings.json</TargetPath>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Remove="wwwroot/appsettings.Development.json" />
+		<Content Remove="wwwroot/appsettings.Production.json" />
+	</ItemGroup>
 
-  <ItemGroup Condition="Exists('wwwroot/appsettings.$(AppSettingsConfiguration).template.json')">
-    <Content Include="wwwroot/appsettings.$(AppSettingsConfiguration).template.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <TargetPath>wwwroot/appsettings.template.json</TargetPath>
-    </Content>
-  </ItemGroup>
+	<ItemGroup Condition="Exists('wwwroot/appsettings.$(AppSettingsConfiguration).json')">
+		<Content Update="wwwroot/appsettings.$(AppSettingsConfiguration).json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<TargetPath>wwwroot/appsettings.json</TargetPath>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup Condition="Exists('wwwroot/appsettings.$(AppSettingsConfiguration).template.json')">
+		<Content Include="wwwroot/appsettings.$(AppSettingsConfiguration).template.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<TargetPath>wwwroot/appsettings.template.json</TargetPath>
+		</Content>
+	</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.8" />
@@ -52,6 +57,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RenzoAgostini.Shared\RenzoAgostini.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\appsettings.Production.json" TargetPath="wwwroot/appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

@@ -20,8 +20,8 @@ ENV ASPNETCORE_URLS=http://+:8080 \
 
 COPY --from=build /app/publish ./
 
-# Ensure data directories exist for mounted volumes
-RUN mkdir -p /data && mkdir -p /app/wwwroot/uploads && mkdir -p /app/wwwroot/custom-orders
+# Ensure data directories exist for mounted volume
+RUN mkdir -p /data/uploads && mkdir -p /data/custom-orders
 
 EXPOSE 8080
 

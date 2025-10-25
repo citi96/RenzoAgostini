@@ -189,6 +189,12 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<RenzoAgostiniDbContext>();
+    db.Database.Migrate();
+}
+
 var uploadsRoot = ResolvePath(storageOptions.UploadsPath, builder.Environment);
 var customOrdersRoot = ResolvePath(storageOptions.CustomOrdersPath, builder.Environment);
 
@@ -203,6 +209,9 @@ if (!string.IsNullOrWhiteSpace(customOrdersRoot))
 }
 
 // Pipeline
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseCors(allowAnyCorsInDev);
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

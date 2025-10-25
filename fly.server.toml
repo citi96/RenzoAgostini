@@ -12,10 +12,6 @@ primary_region = "ams"
   source = "renzoagostini_api_data"
   destination = "/data"
 
-[[mounts]]
-  source = "renzoagostini_api_assets"
-  destination = "/app/wwwroot"
-
 [http_service]
   internal_port = 8080
   force_https = true
