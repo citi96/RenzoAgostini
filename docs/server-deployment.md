@@ -8,9 +8,9 @@ Keycloak seguendo la guida `keycloak-deployment.md` e che `flyctl` sia installat
 
 1. Assicurati di avere una copia aggiornata del repository in locale.
 2. Verifica di avere il CLI di Fly configurato: `fly auth login`.
-3. Copia `RenzoAgostini.Server/appsettings.Production.template.json` in `RenzoAgostini.Server/appsettings.json`
-   (non committarlo) e sostituisci i segnaposto con i valori del tuo ambiente. In alternativa puoi impostare
-   tutto tramite secrets di Fly. In particolare verifica:
+3. Aggiorna `RenzoAgostini.Server/appsettings.Production.json` con i valori del tuo ambiente (il file viene
+   incluso automaticamente nei build `Release` come `appsettings.json`). In alternativa puoi impostare tutto
+   tramite secrets di Fly. In particolare verifica:
    - `ConnectionStrings:DefaultConnection`
    - `Keycloak:Authority`, `Keycloak:ClientId`, eventuali `Keycloak:Audiences`
    - `Cors:AllowedOrigins`
