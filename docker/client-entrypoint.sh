@@ -15,4 +15,6 @@ if [ -f "$TEMPLATE" ]; then
   envsubst < "$TEMPLATE" > "$TARGET"
 fi
 
-exec "$@"
+if [ "$#" -gt 0 ]; then
+  exec "$@"
+fi
