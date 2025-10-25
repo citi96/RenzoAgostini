@@ -1,35 +1,51 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
-	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
 
-	<ItemGroup>
-	   <None Remove="**/*.razor.css" />
-        <None Include="**/*.razor.css" />
-	</ItemGroup>
+  <PropertyGroup>
+    <AppSettingsEnvironment Condition="'$(Configuration)'=='Debug'">Development</AppSettingsEnvironment>
+    <AppSettingsEnvironment Condition="'$(Configuration)'=='Release'">Production</AppSettingsEnvironment>
+    <AppSettingsEnvironment Condition="'$(AppSettingsEnvironment)'==''">$(Configuration)</AppSettingsEnvironment>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.8" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.4" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.4" PrivateAssets="all" />
-		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.8" />
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
-	</ItemGroup>
+  <Target Name="PrepareClientAppSettings" BeforeTargets="Build;Publish">
+    <PropertyGroup>
+      <_AppSettingsSource>$(MSBuildProjectDirectory)/wwwroot/appsettings.$(AppSettingsEnvironment).json</_AppSettingsSource>
+      <_AppSettingsDestination>$(MSBuildProjectDirectory)/wwwroot/appsettings.json</_AppSettingsDestination>
+    </PropertyGroup>
+    <Message Importance="High" Text="Using $(AppSettingsEnvironment) appsettings from $(_AppSettingsSource)" Condition="Exists($(_AppSettingsSource))" />
+    <Copy SourceFiles="$(_AppSettingsSource)" DestinationFiles="$(_AppSettingsDestination)" SkipUnchangedFiles="true" Condition="Exists($(_AppSettingsSource))" />
+    <Error Condition="'$(AppSettingsEnvironment)'=='Production' and !Exists($(_AppSettingsSource))" Text="Missing wwwroot/appsettings.Production.json. Create it from appsettings.Production.template.json before building in Release." />
+  </Target>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\RenzoAgostini.Shared\RenzoAgostini.Shared.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Remove="**/*.razor.css" />
+    <None Include="**/*.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RenzoAgostini.Shared\RenzoAgostini.Shared.csproj" />
+  </ItemGroup>
 
 </Project>

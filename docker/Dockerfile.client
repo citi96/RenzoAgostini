@@ -1,0 +1,21 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY RenzoAgostini.sln ./
+COPY RenzoAgostini.Client/RenzoAgostini.Client.csproj RenzoAgostini.Client/
+COPY RenzoAgostini.Shared/RenzoAgostini.Shared.csproj RenzoAgostini.Shared/
+RUN dotnet restore RenzoAgostini.Client/RenzoAgostini.Client.csproj
+
+COPY . .
+RUN dotnet publish RenzoAgostini.Client/RenzoAgostini.Client.csproj -c Release -o /app/publish
+
+# Runtime stage
+FROM nginx:1.27-alpine AS runtime
+
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
+
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]

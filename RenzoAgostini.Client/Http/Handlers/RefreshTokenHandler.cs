@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.Extensions.Configuration;
 using RenzoAgostini.Client.Services.Interfaces;
 
 namespace RenzoAgostini.Client.Http.Handlers
@@ -7,14 +8,13 @@ namespace RenzoAgostini.Client.Http.Handlers
     {
         private static readonly SemaphoreSlim Gate = new(1, 1);
 
-        private readonly Uri TokenEndpoint =
-            new($"{configuration["Keycloak:Url"]}/realms/RenzoAgostiniRealm/protocol/openid-connect/token");
-        private readonly string? ClientId = configuration["Keycloak:ClientId"];
+        private readonly Uri? _tokenEndpoint = BuildTokenEndpoint(configuration);
+        private readonly string? _clientId = configuration["Keycloak:ClientId"];
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage req, CancellationToken ct)
         {
             var res = await base.SendAsync(req, ct);
-            if (res.StatusCode != HttpStatusCode.Unauthorized) 
+            if (res.StatusCode != HttpStatusCode.Unauthorized)
                 return res;
 
             await Gate.WaitAsync(ct);
@@ -30,17 +30,17 @@ namespace RenzoAgostini.Client.Http.Handlers
                 }
 
                 var refresh = await cookies.GetAsync<string>("refresh_token");
-                if (string.IsNullOrWhiteSpace(refresh) || string.IsNullOrWhiteSpace(ClientId))
+                if (_tokenEndpoint is null || string.IsNullOrWhiteSpace(refresh) || string.IsNullOrWhiteSpace(_clientId))
                     return res;
 
                 using var hc = new HttpClient();
                 var form = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                     ["grant_type"] = "refresh_token",
-                    ["client_id"] = ClientId,
+                    ["client_id"] = _clientId!,
                     ["refresh_token"] = refresh
                 });
-                using var tok = await hc.PostAsync(TokenEndpoint, form, ct);
+                using var tok = await hc.PostAsync(_tokenEndpoint, form, ct);
                 if (!tok.IsSuccessStatusCode) 
                     return res;
 
@@ -57,6 +57,16 @@ namespace RenzoAgostini.Client.Http.Handlers
                 return await base.SendAsync(req, ct);
             }
             finally { Gate.Release(); }
+        }
+        private static Uri? BuildTokenEndpoint(IConfiguration configuration)
+        {
+            var baseUrl = configuration["Keycloak:Url"];
+            var realm = configuration["Keycloak:Realm"];
+
+            if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(realm))
+                return null;
+
+            return new Uri($"{baseUrl.TrimEnd('/')}/realms/{realm}/protocol/openid-connect/token");
         }
     }
 }

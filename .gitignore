@@ -362,6 +362,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# Local configuration that should stay out of source control
 appsettings.json
 /RenzoAgostini.Server/appsettings.json
-/RenzoAgostini.Server/appsettings.json
+/RenzoAgostini.Server/appsettings.Production.json
+/RenzoAgostini.Client/wwwroot/appsettings.json
+/RenzoAgostini.Client/wwwroot/appsettings.Production.json

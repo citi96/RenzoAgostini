@@ -1,0 +1,28 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY RenzoAgostini.sln ./
+COPY RenzoAgostini.Server/RenzoAgostini.Server.csproj RenzoAgostini.Server/
+COPY RenzoAgostini.Client/RenzoAgostini.Client.csproj RenzoAgostini.Client/
+COPY RenzoAgostini.Shared/RenzoAgostini.Shared.csproj RenzoAgostini.Shared/
+RUN dotnet restore RenzoAgostini.Server/RenzoAgostini.Server.csproj
+
+COPY . .
+RUN dotnet publish RenzoAgostini.Server/RenzoAgostini.Server.csproj -c Release -o /app/publish
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+
+ENV ASPNETCORE_URLS=http://+:8080 \
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
+COPY --from=build /app/publish ./
+
+# Ensure data directories exist for mounted volumes
+RUN mkdir -p /data && mkdir -p /app/wwwroot/uploads && mkdir -p /app/wwwroot/custom-orders
+
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "RenzoAgostini.Server.dll"]
