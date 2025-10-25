@@ -16,8 +16,9 @@ FROM nginx:1.27-alpine AS runtime
 RUN apk add --no-cache gettext
 
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
-COPY docker/client-entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY docker/client-entrypoint.sh /usr/local/bin/client-entrypoint.sh
+RUN chmod +x /usr/local/bin/client-entrypoint.sh \
+  && ln -sf /usr/local/bin/client-entrypoint.sh /entrypoint.sh
 COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
 
 EXPOSE 8080

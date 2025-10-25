@@ -16,7 +16,7 @@
 
 # Mono auto generated files
 **\mono_crash.*
-
+ 
 # Build results
 **\[Dd]ebug
 **\[Dd]ebugPublic
@@ -367,3 +367,7 @@
 RenzoAgostini.Server\appsettings.json
 RenzoAgostini.Server\appsettings.json
 fly.toml
+
+!docker/Dockerfile.client
+!docker/client-entrypoint.sh
+!docker/nginx.conf
