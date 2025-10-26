@@ -17,12 +17,18 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 var http = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
 using var s1 = await http.GetStreamAsync("appsettings.json");
 builder.Configuration.AddJsonStream(s1);
-try
-{
-    using var s2 = await http.GetStreamAsync($"appsettings.{builder.HostEnvironment.Environment}.json");
-    builder.Configuration.AddJsonStream(s2);
-}
-catch { /* ok se non esiste */ }
+//var view = ((IConfigurationRoot)builder.Configuration).GetDebugView();
+//Console.WriteLine(view);
+
+//try
+//{
+//    using var s2 = await http.GetStreamAsync($"appsettings.{builder.HostEnvironment.Environment}.json");
+//    builder.Configuration.AddJsonStream(s2);
+//    view = ((IConfigurationRoot)builder.Configuration).GetDebugView();
+//    Console.WriteLine(view);
+
+//}
+//catch { /* ok se non esiste */ }
 
 builder.Services.AddScoped<AuthorizationMessageHandler>();
 builder.Services.AddScoped<RefreshTokenHandler>();

@@ -2,12 +2,13 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Authentication
 {
-    public class CustomAuthenticationStateProvider(ICookieService cookieService) : AuthenticationStateProvider, IDisposable
+    public class CustomAuthenticationStateProvider(ICookieService cookieService, IConfiguration configuration) : AuthenticationStateProvider, IDisposable
     {
         public UserDto? CurrentUser { get; set; }
 
@@ -29,7 +30,7 @@ namespace RenzoAgostini.Client.Authentication
             return new AuthenticationState(principal);
         }
 
-        private static ClaimsPrincipal CreatePrincipalFromKeycloakToken(string jwt)
+        private ClaimsPrincipal CreatePrincipalFromKeycloakToken(string jwt)
         {
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(jwt);
@@ -38,11 +39,10 @@ namespace RenzoAgostini.Client.Authentication
 
             claims.AddRange(token.Claims);
                         
-            const string clientId = "web-a1e0f0a5-ed40-4a9f-bd85-87a2273e38f7";
             if (token.Payload.TryGetValue("resource_access", out var res))
             {
                 using var doc = JsonDocument.Parse(res.ToString()!);
-                if (doc.RootElement.TryGetProperty(clientId, out var client) &&
+                if (doc.RootElement.TryGetProperty(configuration["Keycloak:ClientId"] ?? string.Empty, out var client) &&
                     client.TryGetProperty("roles", out var arr2))
                     foreach (var r in arr2.EnumerateArray())
                         claims.Add(new Claim(ClaimTypes.Role, r.GetString()!));

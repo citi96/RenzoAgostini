@@ -31,7 +31,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="Exists('wwwroot/appsettings.$(AppSettingsConfiguration).template.json')">
-		<Content Include="wwwroot/appsettings.$(AppSettingsConfiguration).template.json">
+		<Content Update="wwwroot/appsettings.$(AppSettingsConfiguration).template.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 			<TargetPath>wwwroot/appsettings.template.json</TargetPath>

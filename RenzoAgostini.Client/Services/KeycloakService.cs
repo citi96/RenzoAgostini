@@ -91,7 +91,7 @@ namespace RenzoAgostini.Client.Services
 
                 return accessToken;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return null;
             }
