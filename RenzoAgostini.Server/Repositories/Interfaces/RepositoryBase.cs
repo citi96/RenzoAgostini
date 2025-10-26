@@ -50,7 +50,12 @@ namespace RenzoAgostini.Server.Repositories.Interfaces
 
         public virtual Task DeleteAsync(T entity)
         {
+            if (context.Entry(entity).State == EntityState.Detached)
+                _dbSet.Attach(entity);
+
             _dbSet.Remove(entity);
+            context.SaveChangesAsync();
+
             return Task.CompletedTask;
         }
 
