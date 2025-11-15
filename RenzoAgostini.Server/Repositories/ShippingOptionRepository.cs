@@ -14,12 +14,15 @@ namespace RenzoAgostini.Server.Repositories
 
         public async Task<IReadOnlyList<ShippingOption>> GetActiveAsync()
         {
-            return await _dbSet
+            var activeOptions = await _dbSet
                 .Where(option => option.IsActive)
+                .ToListAsync();
+
+            return activeOptions
                 .OrderBy(option => option.IsPickup ? 0 : 1)
                 .ThenBy(option => option.Cost)
                 .ThenBy(option => option.Name)
-                .ToListAsync();
+                .ToList();
         }
 
         public Task<bool> ExistsByNameAsync(string name, int? excludeId = null)
