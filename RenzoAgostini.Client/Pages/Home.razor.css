@@ -31,7 +31,7 @@
 
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--spacing-6);
 }
 
@@ -98,7 +98,13 @@
     }
 
     .gallery-grid {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: minmax(0, 1fr) !important;
         gap: var(--spacing-4);
+    }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
 }

@@ -28,7 +28,7 @@
     }
     else if (Paintings?.Any() == true)
     {
-        <div class="gallery-grid">
+        <div class="gallery-grid" style="@GalleryGridStyle">
             @foreach (var painting in Paintings)
             {
                 <div class="gallery-item">

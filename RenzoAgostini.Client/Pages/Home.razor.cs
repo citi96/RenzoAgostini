@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Configuration;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
 using System.Linq;
@@ -7,15 +8,23 @@ namespace RenzoAgostini.Client.Pages;
 
 public partial class Home : ComponentBase
 {
+    private const int DefaultGalleryColumns = 3;
+    private const int MinGalleryColumns = 1;
+    private const int MaxGalleryColumns = 12;
+
     [Inject] private IPaintingService PaintingService { get; set; } = default!;
     [Inject] private ILogger<Home> Logger { get; set; } = default!;
+    [Inject] private IConfiguration Configuration { get; set; } = default!;
 
     protected IReadOnlyList<PaintingDto>? Paintings { get; private set; }
     protected bool IsLoading { get; private set; } = true;
     protected string? ErrorMessage { get; private set; }
+    protected int GalleryColumns { get; private set; } = DefaultGalleryColumns;
+    protected string GalleryGridStyle => $"grid-template-columns: repeat({GalleryColumns}, minmax(0, 1fr));";
 
     protected override async Task OnInitializedAsync()
     {
+        ConfigureGalleryColumns();
         await LoadPaintingsAsync();
     }
 
@@ -50,6 +59,20 @@ public partial class Home : ComponentBase
         {
             IsLoading = false;
             await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void ConfigureGalleryColumns()
+    {
+        var configuredValue = Configuration["Gallery:DefaultColumns"];
+
+        if (int.TryParse(configuredValue, out var parsedColumns))
+        {
+            GalleryColumns = Math.Clamp(parsedColumns, MinGalleryColumns, MaxGalleryColumns);
+        }
+        else
+        {
+            GalleryColumns = DefaultGalleryColumns;
         }
     }
 }
