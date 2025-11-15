@@ -1,4 +1,4 @@
-﻿@page "/admin/orders"
+@page "/admin/orders"
 @using System.Globalization
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
@@ -63,6 +63,7 @@
                         <th>Stato</th>
                         <th>Data Ordine</th>
                         <th>Totale</th>
+                        <th>Spedizione</th>
                         <th>Articoli</th>
                         <th>Pagamento</th>
                         <th>Indirizzo</th>
@@ -87,6 +88,21 @@
                             <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm", CultureInfo.GetCultureInfo("it-IT"))</td>
                             <td>
                                 <strong>@order.Total.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</strong>
+                            </td>
+                            <td class="shipping-cell">
+                                @if (order.Shipping is not null)
+                                {
+                                    <div class="shipping-cell-name">@order.Shipping.Method</div>
+                                    <div class="@(order.Shipping.Cost == 0 ? "shipping-cell-cost free" : "shipping-cell-cost")">
+                                        @(order.Shipping.Cost == 0
+                                            ? "Gratuita"
+                                            : order.Shipping.Cost.ToString("C", CultureInfo.GetCultureInfo("it-IT")))
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
                             </td>
                             <td>@order.ItemCount</td>
                             <td>@(string.IsNullOrEmpty(order.PaymentMethod) ? "-" : order.PaymentMethod)</td>
@@ -156,6 +172,27 @@
                             <div class="order-info-item">
                                 <span class="order-info-label">Metodo Pagamento</span>
                                 <span class="order-info-value">@(selectedOrder.PaymentMethod ?? "Non specificato")</span>
+                            </div>
+                            <div class="order-info-item">
+                                <span class="order-info-label">Subtotale opere</span>
+                                <span class="order-info-value">@selectedOrder.ItemsTotal.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
+                            </div>
+                            <div class="order-info-item">
+                                <span class="order-info-label">Spedizione</span>
+                                <span class="order-info-value">
+                                    @if (selectedOrder.Shipping.Cost == 0)
+                                    {
+                                        <span>Gratuita (@selectedOrder.Shipping.Method)</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@selectedOrder.Shipping.Method - @selectedOrder.Shipping.Cost.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(selectedOrder.Shipping.EstimatedDelivery))
+                                    {
+                                        <div class="order-info-subtext">@selectedOrder.Shipping.EstimatedDelivery</div>
+                                    }
+                                </span>
                             </div>
                             <div class="order-info-item">
                                 <span class="order-info-label">Totale</span>

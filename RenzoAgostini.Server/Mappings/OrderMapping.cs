@@ -1,4 +1,4 @@
-﻿using RenzoAgostini.Server.Entities;
+using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Server.Mappings
@@ -23,6 +23,15 @@ namespace RenzoAgostini.Server.Mappings
 
             string paymentMethod = "Stripe";
 
+            var shipping = new OrderShippingDto(
+                order.ShippingOptionId,
+                order.ShippingMethodName,
+                order.ShippingCost,
+                order.ShippingFreeThreshold,
+                order.ShippingIsPickup,
+                order.ShippingEstimatedDelivery
+            );
+
             return new OrderDto(
                 order.Id,
                 order.CustomerFirstName,
@@ -30,11 +39,14 @@ namespace RenzoAgostini.Server.Mappings
                 order.CustomerEmail,
                 order.Status,
                 order.CreatedAt,
+                order.ItemsTotal,
+                order.ShippingCost,
                 order.TotalAmount,
                 itemsDto.Count,
                 paymentMethod,
                 address,
                 order.TrackingNumber,
+                shipping,
                 itemsDto
             );
         }

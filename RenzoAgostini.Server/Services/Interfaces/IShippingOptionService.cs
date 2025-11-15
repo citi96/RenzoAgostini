@@ -1,10 +1,10 @@
-using RenzoAgostini.Shared.DTOs;
+﻿using RenzoAgostini.Shared.DTOs;
 
-namespace RenzoAgostini.Client.Services.Interfaces
+namespace RenzoAgostini.Server.Services.Interfaces
 {
-    public interface IShippingClient
+    public interface IShippingOptionService
     {
-        Task<IReadOnlyList<ShippingOptionDto>> GetOptionsAsync(string country);
+        Task<IReadOnlyList<ShippingOptionDto>> GetActiveForCountryAsync(string country);
         Task<IReadOnlyList<ShippingOptionDto>> GetAllAsync();
         Task<ShippingOptionDto> CreateAsync(CreateShippingOptionDto dto);
         Task<ShippingOptionDto> UpdateAsync(int id, UpdateShippingOptionDto dto);

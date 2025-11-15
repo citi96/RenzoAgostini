@@ -1,7 +1,6 @@
 namespace RenzoAgostini.Shared.DTOs
 {
-    public record ShippingOptionDto(
-        int Id,
+    public record UpdateShippingOptionDto(
         string Name,
         string? Description,
         decimal Cost,
