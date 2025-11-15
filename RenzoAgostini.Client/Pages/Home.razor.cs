@@ -29,7 +29,7 @@ public partial class Home : ComponentBase
             MaxGalleryColumns);
 
     protected string GalleryGridStyle
-        => $"grid-template-columns: repeat({EffectiveGalleryColumns}, minmax(0, 1fr));";
+        => $"--gallery-columns: {EffectiveGalleryColumns};";
 
     protected override async Task OnInitializedAsync()
     {
