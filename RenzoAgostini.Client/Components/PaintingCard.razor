@@ -1,7 +1,8 @@
 ﻿@using System.Globalization
 
-<div class="painting-card @(IsAdminMode ? "admin-mode" : "") @(IsLoading ? "loading" : "")"
-	 @onclick="() => HandleCardClick()">
+<div class="@CssClass"
+         @onclick="() => HandleCardClick()"
+         @attributes="AdditionalAttributesWithoutClass">
 
 	<!-- Image Container -->
 	<div class="painting-card-image-container">
