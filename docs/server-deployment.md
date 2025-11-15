@@ -15,6 +15,7 @@ Keycloak seguendo la guida `keycloak-deployment.md` e che `flyctl` sia installat
    - `Keycloak:Authority`, `Keycloak:ClientId`, eventuali `Keycloak:Audiences`
    - `Cors:AllowedOrigins`
    - `Stripe:SecretKey`
+   - `Email:Smtp` (host, credenziali e indirizzi predefiniti per il mittente/BCC)
    - `Storage:UploadsPath` e `Storage:CustomOrdersPath` se vuoi percorsi diversi da quelli predefiniti.
 
 ## 2. Creazione delle app Fly
@@ -43,10 +44,19 @@ fly secrets set \
   Keycloak__ClientId="web-client" \
   Keycloak__Audiences__0="web-client" \
   Stripe__SecretKey="sk_live_xxx" \
-  Cors__AllowedOrigins__0="https://app.tuodominio.it"
+  Cors__AllowedOrigins__0="https://app.tuodominio.it" \
+  Email__Smtp__Host="smtp.renzoagostini.it" \
+  Email__Smtp__Port="587" \
+  Email__Smtp__Username="postmaster@renzoagostini.it" \
+  Email__Smtp__Password="super-secret" \
+  Email__Smtp__SecureSocket="StartTls" \
+  Email__Smtp__DefaultFromAddress="noreply@renzoagostini.it" \
+  Email__Smtp__DefaultFromName="Renzo Agostini" \
+  Email__Smtp__DefaultBcc__0="fchiti071@gmail.com"
 ```
 
 Puoi aggiungere ulteriori origini CORS usando indici incrementali (`Cors__AllowedOrigins__1`, ecc.).
+Per il campo `Email__Smtp__DefaultBcc__*` aggiungi un indice per ogni destinatario in copia nascosta.
 Se hai percorsi custom per gli upload:
 
 ```bash
