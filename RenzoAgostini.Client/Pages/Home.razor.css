@@ -31,7 +31,7 @@
 
 .gallery-grid {
     --gallery-columns: 3;
-    --gallery-column-min-width: clamp(18.75rem, calc(100% / var(--gallery-columns)), 1fr);
+    --gallery-column-min-width: clamp(18.75rem, calc(100% / var(--gallery-columns)), 100%);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--gallery-column-min-width), 1fr));
     gap: var(--spacing-6);
@@ -108,6 +108,6 @@
 
 @media (max-width: 1024px) and (min-width: 769px) {
     .gallery-grid {
-        --gallery-column-min-width: clamp(18rem, calc(50% - var(--spacing-4)), 1fr);
+        --gallery-column-min-width: clamp(18rem, calc(50% - var(--spacing-4)), 100%);
     }
 }
