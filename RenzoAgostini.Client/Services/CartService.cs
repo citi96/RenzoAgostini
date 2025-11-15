@@ -1,4 +1,4 @@
-﻿using RenzoAgostini.Client.Services.Interfaces;
+using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Services
@@ -6,6 +6,7 @@ namespace RenzoAgostini.Client.Services
     public class CartService : ICartService
     {
         private readonly List<PaintingDto> _items = new();
+        private ShippingOptionDto? _selectedShippingOption;
         public IReadOnlyList<PaintingDto> Items => _items.AsReadOnly();
 
         public event Action? OnChange;
@@ -14,6 +15,7 @@ namespace RenzoAgostini.Client.Services
         public decimal TotalAmount => _items.Sum(p => p.Price ?? 0m);
 
         public CheckoutDto? CheckoutData { get; set; }
+        public ShippingOptionDto? SelectedShippingOption => _selectedShippingOption;
 
         public void AddItem(PaintingDto painting)
         {
@@ -36,6 +38,13 @@ namespace RenzoAgostini.Client.Services
         public void Clear()
         {
             _items.Clear();
+            _selectedShippingOption = null;
+            OnChange?.Invoke();
+        }
+
+        public void SetShippingOption(ShippingOptionDto? option)
+        {
+            _selectedShippingOption = option;
             OnChange?.Invoke();
         }
     }

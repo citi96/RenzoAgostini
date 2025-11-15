@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using RenzoAgostini.Server.Entities;
 
@@ -10,6 +10,7 @@ namespace RenzoAgostini.Server.Data
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<CustomOrder> CustomOrders => Set<CustomOrder>();
+        public DbSet<ShippingOption> ShippingOptions => Set<ShippingOption>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -71,12 +72,22 @@ namespace RenzoAgostini.Server.Data
                 entity.Property(o => o.PostalCode).IsRequired().HasMaxLength(20);
                 entity.Property(o => o.Country).IsRequired().HasMaxLength(50);
                 entity.Property(o => o.TermsAccepted).IsRequired();
+                entity.Property(o => o.ItemsTotal).HasColumnType("decimal(10,2)");
+                entity.Property(o => o.ShippingCost).HasColumnType("decimal(10,2)");
                 entity.Property(o => o.TotalAmount).HasColumnType("decimal(10,2)");
+                entity.Property(o => o.ShippingFreeThreshold).HasColumnType("decimal(10,2)");
                 entity.Property(o => o.Status).HasConversion<int>(); // memorizza enum come int
                 entity.Property(o => o.StripeSessionId).HasMaxLength(200);
+                entity.Property(o => o.ShippingMethodName).HasMaxLength(200);
+                entity.Property(o => o.ShippingEstimatedDelivery).HasMaxLength(200);
                 entity.HasMany(o => o.Items)
                       .WithOne(i => i.Order)
                       .HasForeignKey(i => i.OrderId);
+
+                entity.HasOne(o => o.ShippingOption)
+                      .WithMany(s => s.Orders)
+                      .HasForeignKey(o => o.ShippingOptionId)
+                      .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<OrderItem>(entity =>
@@ -84,6 +95,17 @@ namespace RenzoAgostini.Server.Data
                 entity.HasKey(i => i.Id);
                 entity.Property(i => i.Price).HasColumnType("decimal(10,2)");
                 entity.HasIndex(i => new { i.OrderId, i.PaintingId }).IsUnique();
+            });
+
+            modelBuilder.Entity<ShippingOption>(entity =>
+            {
+                entity.HasKey(s => s.Id);
+                entity.Property(s => s.Name).IsRequired().HasMaxLength(200);
+                entity.Property(s => s.Description).HasMaxLength(500);
+                entity.Property(s => s.Cost).HasColumnType("decimal(10,2)");
+                entity.Property(s => s.FreeShippingThreshold).HasColumnType("decimal(10,2)");
+                entity.Property(s => s.EstimatedDelivery).HasMaxLength(200);
+                entity.HasIndex(s => s.Name).IsUnique();
             });
 
 
@@ -134,6 +156,42 @@ namespace RenzoAgostini.Server.Data
 
         private void SeedData(ModelBuilder modelBuilder)
         {
+            var shippingOptions = new[]
+            {
+                new ShippingOption
+                {
+                    Id = 1,
+                    Name = "Ritiro a mano",
+                    Description = "Ritira direttamente presso lo studio dell'artista.",
+                    Cost = 0m,
+                    FreeShippingThreshold = null,
+                    SupportsItaly = true,
+                    SupportsInternational = false,
+                    IsPickup = true,
+                    EstimatedDelivery = "Su appuntamento",
+                    IsActive = true,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                }
+            };
+
+            modelBuilder.Entity<ShippingOption>().HasData(
+                shippingOptions.Select(option => new
+                {
+                    option.Id,
+                    option.Name,
+                    option.Description,
+                    option.Cost,
+                    option.FreeShippingThreshold,
+                    option.SupportsItaly,
+                    option.SupportsInternational,
+                    option.IsPickup,
+                    option.EstimatedDelivery,
+                    option.IsActive,
+                    option.CreatedAt,
+                    option.UpdatedAt
+                })
+            );
+
             var paintings = new[]
             {
                 new Painting {

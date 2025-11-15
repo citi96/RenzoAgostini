@@ -1,4 +1,4 @@
-﻿@page "/cart"
+@page "/cart"
 @using System.Globalization
 
 <PageTitle>Carrello - Galleria Agostini</PageTitle>
@@ -118,27 +118,36 @@
                             <span class="summary-label">Subtotale (@GetTotalItems() articoli)</span>
                             <span class="summary-value">@GetSubtotal().ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
                         </div>
-                        <div class="summary-row">
+                        <div class="summary-row shipping-row">
                             <span class="summary-label">Spedizione</span>
-                            <span class="summary-value">
-                                @if (GetSubtotal() >= 200)
+                            <span class="summary-value shipping-value">
+                                @if (SelectedShippingOption is null)
                                 {
-                                    <span style="color: var(--accent-emerald);">Gratuita</span>
+                                    <span class="shipping-not-selected">Seleziona la modalità al checkout</span>
                                 }
                                 else
                                 {
-                                    <span>€15,00</span>
+                                    <span class="shipping-option-name">@SelectedShippingOption.Name</span>
+                                    <span class="shipping-option-price @(GetShipping() == 0 ? "free" : string.Empty)">
+                                        @(GetShipping() == 0
+                                            ? "Gratuita"
+                                            : GetShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT")))
+                                    </span>
+                                    @if (!string.IsNullOrWhiteSpace(SelectedShippingOption.EstimatedDelivery))
+                                    {
+                                        <span class="shipping-option-estimate">@SelectedShippingOption.EstimatedDelivery</span>
+                                    }
                                 }
                             </span>
                         </div>
-                        @if (GetSubtotal() >= 200)
+                        @if (ShouldShowFreeShippingBanner())
                         {
-                            <div class="summary-row" style="color: var(--accent-emerald); font-size: 0.875rem;">
-                                <span>🎉 Spedizione gratuita applicata!</span>
+                            <div class="summary-row shipping-incentive">
+                                <span>🚚 Aggiungi @GetAmountForFreeShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT")) per ottenere la spedizione gratuita con @SelectedShippingOption!.Name.</span>
                             </div>
                         }
                         <div class="summary-row">
-                            <span class="summary-label">Totale</span>
+                            <span class="summary-label">Totale stimato</span>
                             <span class="summary-value">@GetTotal().ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
                         </div>
                     </div>
@@ -167,14 +176,21 @@
                 </div>
 
                 <!-- Free Shipping Banner -->
-                @if (GetSubtotal() < 200)
+                @if (ShouldShowFreeShippingBanner())
                 {
-                    <div style="margin-top: var(--spacing-4); padding: var(--spacing-4); background: var(--primary-50); border-radius: var(--radius-lg); text-align: center; border: 1px solid var(--primary-200);">
-                        <div style="color: var(--primary-700); font-weight: 600; margin-bottom: var(--spacing-1);">
-                            🚚 Spedizione Gratuita
+                    <div class="free-shipping-banner">
+                        <div class="free-shipping-title">🚚 Spedizione Gratuita</div>
+                        <div class="free-shipping-text">
+                            Ti mancano @GetAmountForFreeShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT")) per ottenere la spedizione gratuita con @SelectedShippingOption!.Name.
                         </div>
-                        <div style="color: var(--primary-600); font-size: 0.875rem;">
-                            Aggiungi altri @((200 - GetSubtotal()).ToString("C", CultureInfo.GetCultureInfo("it-IT"))) per la spedizione gratuita!
+                    </div>
+                }
+                else if (SelectedShippingOption is not null && !SelectedShippingOption.IsPickup && GetShipping() == 0)
+                {
+                    <div class="free-shipping-banner success">
+                        <div class="free-shipping-title">🎉 Spedizione gratuita applicata</div>
+                        <div class="free-shipping-text">
+                            Con @SelectedShippingOption.Name la spedizione è gratuita sul tuo ordine attuale.
                         </div>
                     </div>
                 }

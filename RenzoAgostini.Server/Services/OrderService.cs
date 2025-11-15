@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Microsoft.Extensions.Options;
 using RenzoAgostini.Server.Config;
 using RenzoAgostini.Server.Emailing.Interfaces;
@@ -16,8 +16,14 @@ using Stripe.Checkout;
 
 namespace RenzoAgostini.Server.Services
 {
-    public class OrderService(IOrderRepository orderRepository, IPaintingRepository paintingRepository,
-                         IOptions<StripeOptions> stripeOptions, ICustomEmailSender emailSender, IWebHostEnvironment env, ILogger<OrderService> logger) : IOrderService
+    public class OrderService(
+        IOrderRepository orderRepository,
+        IPaintingRepository paintingRepository,
+        IShippingOptionRepository shippingOptionRepository,
+        IOptions<StripeOptions> stripeOptions,
+        ICustomEmailSender emailSender,
+        IWebHostEnvironment env,
+        ILogger<OrderService> logger) : IOrderService
     {
         private readonly StripeOptions _stripeOptions = stripeOptions.Value;
 
@@ -46,6 +52,27 @@ namespace RenzoAgostini.Server.Services
                 totalAmount += painting.Price.Value;
             }
 
+            if (checkout.ShippingOptionId is null)
+            {
+                throw new ApiException(HttpStatusCode.BadRequest, "Seleziona un metodo di spedizione valido.");
+            }
+
+            var shippingOption = await shippingOptionRepository.GetByIdAsync(checkout.ShippingOptionId.Value)
+                ?? throw new ApiException(HttpStatusCode.NotFound, "Metodo di spedizione selezionato non trovato.");
+
+            if (!shippingOption.IsActive)
+            {
+                throw new ApiException(HttpStatusCode.BadRequest, "Il metodo di spedizione selezionato non è più disponibile.");
+            }
+
+            var country = checkout.Country ?? string.Empty;
+            if (!IsShippingOptionValidForCountry(shippingOption, country))
+            {
+                throw new ApiException(HttpStatusCode.BadRequest, "Il metodo di spedizione selezionato non è disponibile per il paese indicato.");
+            }
+
+            var shippingCost = CalculateShippingCost(totalAmount, shippingOption);
+
             // 3. Crea l'oggetto Order (Pending) con gli OrderItem
             var order = new Order
             {
@@ -58,8 +85,15 @@ namespace RenzoAgostini.Server.Services
                 Country = checkout.Country,
                 TermsAccepted = checkout.TermsAccepted,
                 Status = OrderStatus.Pending,
-                TotalAmount = totalAmount,
+                ItemsTotal = totalAmount,
+                ShippingCost = shippingCost,
+                TotalAmount = totalAmount + shippingCost,
                 CreatedAt = DateTime.UtcNow,
+                ShippingOptionId = shippingOption.Id,
+                ShippingMethodName = shippingOption.Name,
+                ShippingFreeThreshold = shippingOption.FreeShippingThreshold,
+                ShippingIsPickup = shippingOption.IsPickup,
+                ShippingEstimatedDelivery = shippingOption.EstimatedDelivery,
                 Items = []
             };
 
@@ -103,6 +137,23 @@ namespace RenzoAgostini.Server.Services
                         Quantity = 1
                     };
                     options.LineItems.Add(lineItem);
+                }
+
+                if (shippingCost > 0)
+                {
+                    options.LineItems.Add(new SessionLineItemOptions
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            UnitAmount = Convert.ToInt64(shippingCost * 100),
+                            Currency = "eur",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = $"Spedizione - {shippingOption.Name}"
+                            }
+                        },
+                        Quantity = 1
+                    });
                 }
 
                 var sessionService = new SessionService();
@@ -232,6 +283,50 @@ namespace RenzoAgostini.Server.Services
             }
 
             return order.ToOrderAdminDto();
+        }
+
+        private static decimal CalculateShippingCost(decimal itemsTotal, ShippingOption option)
+        {
+            if (option.IsPickup)
+            {
+                return 0;
+            }
+
+            if (option.FreeShippingThreshold is decimal threshold && itemsTotal >= threshold)
+            {
+                return 0;
+            }
+
+            return option.Cost;
+        }
+
+        private static bool IsShippingOptionValidForCountry(ShippingOption option, string country)
+        {
+            var isDomestic = IsDomesticDestination(country);
+
+            if (option.IsPickup)
+            {
+                return isDomestic && option.SupportsItaly;
+            }
+
+            return isDomestic ? option.SupportsItaly : option.SupportsInternational;
+        }
+
+        private static bool IsDomesticDestination(string? country)
+        {
+            if (string.IsNullOrWhiteSpace(country))
+            {
+                return true;
+            }
+
+            var normalized = country.Trim().ToLowerInvariant();
+
+            return normalized switch
+            {
+                "italy" or "italia" or "repubblica italiana" or "san marino" or "repubblica di san marino" or
+                "vatican" or "vaticano" or "città del vaticano" or "holy see" => true,
+                _ => false
+            };
         }
 
         private static string GetHtmlMessage(string templatePath)

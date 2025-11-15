@@ -1,4 +1,4 @@
-﻿namespace RenzoAgostini.Shared.DTOs
+namespace RenzoAgostini.Shared.DTOs
 {
     public record CheckoutDto(bool TermsAccepted)
     {
@@ -10,6 +10,6 @@
         public string City { get; set; } = string.Empty;
         public string PostalCode { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
-        public string ShippingMethod { get; set; } = "Standard";
+        public int? ShippingOptionId { get; set; }
     }
 }

@@ -1,0 +1,220 @@
+@page "/admin/shipping"
+@using System.Globalization
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "admin")]
+
+<PageTitle>Gestione Spedizioni - Admin</PageTitle>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title">Metodi di Spedizione</h1>
+            <p class="admin-subtitle">Configura le opzioni di consegna disponibili nello store</p>
+        </div>
+        <button class="add-shipping-btn" @onclick="ShowCreateModal">
+            <span>➕</span>
+            <span>Nuova modalità</span>
+        </button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="admin-alert error">
+            <span>❌</span>
+            <span>@errorMessage</span>
+            <button class="alert-close" @onclick="() => errorMessage = null">×</button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="admin-alert success">
+            <span>✅</span>
+            <span>@successMessage</span>
+            <button class="alert-close" @onclick="() => successMessage = null">×</button>
+        </div>
+    }
+
+    @if (isLoading)
+    {
+        <div class="admin-loading">
+            <div class="admin-loading-spinner"></div>
+            <p>Caricamento modalità di spedizione...</p>
+        </div>
+    }
+    else if (!shippingOptions.Any())
+    {
+        <div class="admin-empty">
+            <div class="admin-empty-icon">🚚</div>
+            <h3 class="admin-empty-title">Nessuna modalità definita</h3>
+            <p class="admin-empty-description">
+                Crea la tua prima opzione per permettere ai clienti di scegliere come ricevere i quadri.
+            </p>
+            <button class="add-shipping-btn" @onclick="ShowCreateModal">
+                <span>➕</span>
+                <span>Crea modalità</span>
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="shipping-table-container">
+            <table class="shipping-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Costo</th>
+                        <th>Soglia gratuita</th>
+                        <th>Disponibilità</th>
+                        <th>Stato</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var option in shippingOptions)
+                    {
+                        <tr>
+                            <td>
+                                <div class="shipping-name">@option.Name</div>
+                                @if (!string.IsNullOrWhiteSpace(option.Description))
+                                {
+                                    <div class="shipping-description">@option.Description</div>
+                                }
+                            </td>
+                            <td>
+                                @(option.Cost == 0m
+                                    ? "Gratuita"
+                                    : option.Cost.ToString("C", CultureInfo.GetCultureInfo("it-IT")))
+                            </td>
+                            <td>
+                                @if (option.FreeShippingThreshold is decimal threshold)
+                                {
+                                    @threshold.ToString("C", CultureInfo.GetCultureInfo("it-IT"))
+                                }
+                                else
+                                {
+                                    <span class="threshold-none">-</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="availability-badges">
+                                    @if (option.IsPickup)
+                                    {
+                                        <span class="badge pickup">Ritiro a mano</span>
+                                    }
+                                    @if (option.SupportsItaly)
+                                    {
+                                        <span class="badge">Italia</span>
+                                    }
+                                    @if (option.SupportsInternational)
+                                    {
+                                        <span class="badge">Internazionale</span>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(option.EstimatedDelivery))
+                                {
+                                    <div class="shipping-estimate">@option.EstimatedDelivery</div>
+                                }
+                            </td>
+                            <td>
+                                <span class="status-dot @(option.IsActive ? "active" : "inactive")"></span>
+                                <span>@(option.IsActive ? "Attiva" : "Disattiva")</span>
+                            </td>
+                            <td class="actions">
+                                <button class="icon-btn" title="Modifica" @onclick="() => ShowEditModal(option)">✏️</button>
+                                <button class="icon-btn danger" title="Elimina" @onclick="() => ConfirmDelete(option)">🗑️</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (showEditor)
+    {
+        <div class="modal-overlay" @onclick="CloseEditor">
+            <div class="modal" @onclick:stopPropagation="true">
+                <div class="modal-header">
+                    <h2>@(isEditing ? "Modifica modalità" : "Nuova modalità di spedizione")</h2>
+                    <button class="modal-close" @onclick="CloseEditor">×</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome*</label>
+                            <InputText class="form-input" @bind-Value="form.Name" />
+                        </div>
+                        <div class="form-group">
+                            <label>Costo (IVA inclusa)</label>
+                            <InputNumber @bind-Value="form.Cost" class="form-input" disabled="@form.IsPickup" />
+                        </div>
+                        <div class="form-group">
+                            <label>Soglia spedizione gratuita</label>
+                            <InputNumber @bind-Value="form.FreeShippingThreshold" class="form-input" disabled="@form.IsPickup" />
+                        </div>
+                        <div class="form-group">
+                            <label>Consegna stimata</label>
+                            <InputText class="form-input" @bind-Value="form.EstimatedDelivery" />
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Descrizione</label>
+                            <InputTextArea class="form-textarea" @bind-Value="form.Description" rows="3" />
+                        </div>
+                    </div>
+
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item">
+                            <InputCheckbox @bind-Value="form.SupportsItaly" disabled="@form.IsPickup" />
+                            <span>Disponibile per spedizioni in Italia</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <InputCheckbox @bind-Value="form.SupportsInternational" disabled="@form.IsPickup" />
+                            <span>Disponibile per spedizioni internazionali</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <InputCheckbox @bind-Value="form.IsPickup" @onchange="OnPickupChanged" />
+                            <span>Ritiro a mano</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <InputCheckbox @bind-Value="form.IsActive" />
+                            <span>Modalità attiva</span>
+                        </label>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(formError))
+                    {
+                        <div class="form-error">@formError</div>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-secondary" @onclick="CloseEditor" disabled="@isSaving">Annulla</button>
+                    <button class="btn-primary" @onclick="SaveAsync" disabled="@isSaving">
+                        @(isSaving ? "Salvataggio..." : "Salva modifiche")
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (showDeleteConfirm && optionToDelete is not null)
+    {
+        <div class="modal-overlay" @onclick="CancelDelete">
+            <div class="modal" @onclick:stopPropagation="true">
+                <div class="modal-header">
+                    <h2>Elimina modalità</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Sei sicuro di voler eliminare la modalità <strong>@optionToDelete.Name</strong>?</p>
+                    <p class="modal-warning">Questa azione non può essere annullata.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" @onclick="CancelDelete" disabled="@isSaving">Annulla</button>
+                    <button class="btn-danger" @onclick="DeleteAsync" disabled="@isSaving">Elimina</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
