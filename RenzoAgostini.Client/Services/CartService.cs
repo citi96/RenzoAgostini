@@ -19,6 +19,7 @@ namespace RenzoAgostini.Client.Services
         private readonly SemaphoreSlim _initializationLock = new(1, 1);
 
         private bool _isInitialized;
+        private ShippingOptionDto? _selectedShippingOption;
 
         public CartService(IJSRuntime jsRuntime, ILogger<CartService> logger)
         {
@@ -120,6 +121,10 @@ namespace RenzoAgostini.Client.Services
             }
 
             _items.RemoveAt(index);
+            if (_items.Count == 0)
+            {
+                _selectedShippingOption = null;
+            }
             await PersistAsync(cancellationToken);
             OnChange?.Invoke();
         }
@@ -130,13 +135,29 @@ namespace RenzoAgostini.Client.Services
 
             if (_items.Count == 0)
             {
+                if (_selectedShippingOption is not null)
+                {
+                    _selectedShippingOption = null;
+                }
                 await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", cancellationToken, StorageKey);
                 OnChange?.Invoke();
                 return;
             }
 
             _items.Clear();
+            _selectedShippingOption = null;
             await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", cancellationToken, StorageKey);
+            OnChange?.Invoke();
+        }
+
+        public void SetShippingOption(ShippingOptionDto? option)
+        {
+            if (Equals(_selectedShippingOption, option))
+            {
+                return;
+            }
+
+            _selectedShippingOption = option;
             OnChange?.Invoke();
         }
 

@@ -19,5 +19,6 @@ namespace RenzoAgostini.Client.Services.Interfaces
         Task AddItemAsync(PaintingDto painting, CancellationToken cancellationToken = default);
         Task RemoveItemAsync(int paintingId, CancellationToken cancellationToken = default);
         Task ClearAsync(CancellationToken cancellationToken = default);
+        void SetShippingOption(ShippingOptionDto? option);
     }
 }
