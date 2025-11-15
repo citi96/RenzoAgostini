@@ -20,7 +20,16 @@ public partial class Home : ComponentBase
     protected bool IsLoading { get; private set; } = true;
     protected string? ErrorMessage { get; private set; }
     protected int GalleryColumns { get; private set; } = DefaultGalleryColumns;
-    protected string GalleryGridStyle => $"grid-template-columns: repeat({GalleryColumns}, minmax(0, 1fr));";
+    private int EffectiveGalleryColumns
+        => Math.Clamp(
+            Paintings?.Count is > 0
+                ? Math.Min(GalleryColumns, Paintings.Count)
+                : GalleryColumns,
+            MinGalleryColumns,
+            MaxGalleryColumns);
+
+    protected string GalleryGridStyle
+        => $"grid-template-columns: repeat({EffectiveGalleryColumns}, minmax(0, 1fr));";
 
     protected override async Task OnInitializedAsync()
     {
