@@ -11,6 +11,7 @@ if [ -f "$TEMPLATE" ]; then
   export KEYCLOAK__REDIRECT_URI="${KEYCLOAK__REDIRECT_URI:-https://www.renzoagostini.it/auth/callback}"
   export KEYCLOAK__POST_LOGOUT_REDIRECT_URI="${KEYCLOAK__POST_LOGOUT_REDIRECT_URI:-https://www.renzoagostini.it/}"
   export BASE_URL="${BASE_URL:-https://api.renzoagostini.it}"
+  export GALLERY__DEFAULT_COLUMNS="${GALLERY__DEFAULT_COLUMNS:-3}"
 
   envsubst < "$TEMPLATE" > "$TARGET"
 fi
