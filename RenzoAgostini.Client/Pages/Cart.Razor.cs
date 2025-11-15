@@ -25,9 +25,9 @@ namespace RenzoAgostini.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            // Subscribe to cart changes
             CartService.OnChange += HandleCartChanged;
 
+            await CartService.InitializeAsync();
             await LoadCartItems();
             await LoadRecommendedPaintings();
 
@@ -46,7 +46,7 @@ namespace RenzoAgostini.Client.Pages
                 isLoading = true;
                 StateHasChanged();
 
-                var items = CartService.Items;
+                var items = await CartService.GetItemsAsync();
                 cartItems = items.ToList();
 
                 Logger.LogInformation("Loaded {Count} items in cart", cartItems.Count);
@@ -224,7 +224,7 @@ namespace RenzoAgostini.Client.Pages
                 var item = cartItems.FirstOrDefault(i => i.Id == paintingId);
                 if (item == null) return;
 
-                CartService.RemoveItem(paintingId);
+                await CartService.RemoveItemAsync(paintingId);
                 await ShowSuccessToast($"'{item.Title}' rimosso dal carrello");
 
                 Logger.LogInformation("Removed painting {PaintingId} from cart", paintingId);
@@ -256,7 +256,7 @@ namespace RenzoAgostini.Client.Pages
                 isUpdating = true;
                 StateHasChanged();
 
-                CartService.Clear();
+                await CartService.ClearAsync();
                 await ShowSuccessToast("Carrello svuotato con successo");
 
                 Logger.LogInformation("Cart cleared by user");

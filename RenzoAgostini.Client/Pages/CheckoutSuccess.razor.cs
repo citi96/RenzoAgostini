@@ -27,7 +27,7 @@ namespace RenzoAgostini.Client.Pages
             try
             {
                 await CheckoutClient.ConfirmPaymentAsync(sessionId);
-                CartService.Clear();
+                await CartService.ClearAsync();
             }
             catch (Exception ex)
             {

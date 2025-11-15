@@ -60,7 +60,7 @@ namespace RenzoAgostini.Client.Pages
                 isAddingToCart = true;
                 StateHasChanged();
 
-                CartService.AddItem(painting);
+                await CartService.AddItemAsync(painting);
                 addedToCart = true;
                 StateHasChanged();
 
