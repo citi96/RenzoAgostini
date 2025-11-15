@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.DTOs;
@@ -26,12 +28,25 @@ namespace RenzoAgostini.Client.Components
         [Parameter] public PaintingDto? PaintingDto { get; set; }
         [Parameter] public bool IsLoading { get; set; } = false;
 
+        [Parameter(CaptureUnmatchedValues = true)]
+        public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
         protected string PrimaryImageUrl => ImageUrls.Count > 0 ? ImageUrls[0] : string.Empty;
+        protected string CssClass => cssClass;
+        protected IReadOnlyDictionary<string, object>? AdditionalAttributesWithoutClass => attributesWithoutClass;
 
         private bool showLightbox = false;
         private int lightboxIndex = 0;
         private bool isAddingToCart = false;
         private bool isFavorite = false; // TODO: Implementare con localStorage o servizio
+        private string cssClass = "painting-card";
+        private IReadOnlyDictionary<string, object>? attributesWithoutClass;
+
+        protected override void OnParametersSet()
+        {
+            cssClass = BuildCssClass();
+            attributesWithoutClass = FilterAdditionalAttributes();
+        }
 
         protected bool IsAddingToCart => isAddingToCart;
         protected bool IsFavorite => isFavorite;
@@ -201,6 +216,56 @@ namespace RenzoAgostini.Client.Components
             {
                 Logger.LogError(ex, "Error showing info toast");
             }
+        }
+
+        private string BuildCssClass()
+        {
+            var classes = new List<string> { "painting-card" };
+
+            if (IsAdminMode)
+            {
+                classes.Add("admin-mode");
+            }
+
+            if (IsLoading)
+            {
+                classes.Add("loading");
+            }
+
+            if (AdditionalAttributes is not null &&
+                AdditionalAttributes.TryGetValue("class", out var classValue))
+            {
+                var className = classValue?.ToString();
+
+                if (!string.IsNullOrWhiteSpace(className))
+                {
+                    classes.Add(className);
+                }
+            }
+
+            return string.Join(' ', classes);
+        }
+
+        private IReadOnlyDictionary<string, object>? FilterAdditionalAttributes()
+        {
+            if (AdditionalAttributes is null)
+            {
+                return null;
+            }
+
+            var filtered = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var attribute in AdditionalAttributes)
+            {
+                if (string.Equals(attribute.Key, "class", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                filtered[attribute.Key] = attribute.Value;
+            }
+
+            return filtered.Count > 0 ? filtered : null;
         }
     }
 }

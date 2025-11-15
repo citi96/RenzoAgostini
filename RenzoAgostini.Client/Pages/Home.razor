@@ -31,17 +31,16 @@
         <div class="gallery-grid" style="@GalleryGridStyle">
             @foreach (var painting in Paintings)
             {
-                <div class="gallery-item">
-                    <PaintingCard Title="@painting.Title"
-                                  Description="@painting.Description"
-                                  Year="@painting.Year"
-                                  Medium="@painting.Medium"
-                                  Price="@painting.Price"
-                                  IsForSale="@painting.IsForSale"
-                                  ImageUrls="@painting.ImageUrls"
-                                  PaintingDto="painting"
-                                  IsLoading="false" />
-                </div>
+                <PaintingCard class="gallery-item"
+                              Title="@painting.Title"
+                              Description="@painting.Description"
+                              Year="@painting.Year"
+                              Medium="@painting.Medium"
+                              Price="@painting.Price"
+                              IsForSale="@painting.IsForSale"
+                              ImageUrls="@painting.ImageUrls"
+                              PaintingDto="painting"
+                              IsLoading="false" />
             }
         </div>
     }
