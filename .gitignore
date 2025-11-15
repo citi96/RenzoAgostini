@@ -367,3 +367,4 @@ appsettings.json
 /RenzoAgostini.Server/appsettings.json
 /RenzoAgostini.Server/appsettings.Development.json
 /RenzoAgostini.Server/appsettings.Production.json
+/fly secrets set ConnectionStrings__Defau.go
