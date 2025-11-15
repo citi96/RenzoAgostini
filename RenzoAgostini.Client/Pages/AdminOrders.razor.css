@@ -1,4 +1,4 @@
-﻿/* ===== ADMIN ORDERS - FUNZIONALE E SOBRIO ===== */
+/* ===== ADMIN ORDERS - FUNZIONALE E SOBRIO ===== */
 
 .admin-container {
     max-width: 1400px;
@@ -60,6 +60,29 @@
         vertical-align: middle;
     }
 
+.shipping-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--neutral-700);
+}
+
+.shipping-cell-name {
+    font-weight: 600;
+    color: var(--neutral-900);
+}
+
+.shipping-cell-cost {
+    font-size: 0.75rem;
+    color: var(--neutral-500);
+}
+
+.shipping-cell-cost.free {
+    color: var(--accent-emerald);
+    font-weight: 600;
+}
+
     .orders-table tbody tr {
         transition: background-color var(--transition-fast);
         cursor: pointer;
@@ -76,7 +99,7 @@
 /* Status Badges */
 .status-badge {
     display: inline-flex;
-    align-items: center;
+    align-items: flex-start;
     padding: 0.25rem 0.75rem;
     border-radius: var(--radius-full);
     font-size: 0.75rem;
@@ -218,6 +241,10 @@
     color: var(--neutral-800);
     font-size: 0.875rem;
     text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-1);
 }
 
     .order-info-value a {
@@ -228,6 +255,11 @@
         .order-info-value a:hover {
             text-decoration: underline;
         }
+
+.order-info-subtext {
+    font-size: 0.75rem;
+    color: var(--neutral-500);
+}
 
 /* Order Items Table */
 .order-items-section {

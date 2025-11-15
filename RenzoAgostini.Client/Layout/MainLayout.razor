@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using RenzoAgostini.Client.Components
 @inherits LayoutComponentBase
 
@@ -25,6 +25,10 @@
                     <a class="nav-link" href="/admin/orders">
                         <span>📦</span>
                         <span>Ordini</span>
+                    </a>
+                    <a class="nav-link" href="/admin/shipping">
+                        <span>🚚</span>
+                        <span>Spedizioni</span>
                     </a>
                     <a class="nav-link" href="/admin/custom-orders">
                         <span>✨</span>
@@ -106,6 +110,10 @@
                     <a class="nav-mobile-link" href="/admin/orders" @onclick="CloseMobileMenu">
                         <span>📦</span>
                         <span>Ordini</span>
+                    </a>
+                    <a class="nav-mobile-link" href="/admin/shipping" @onclick="CloseMobileMenu">
+                        <span>🚚</span>
+                        <span>Spedizioni</span>
                     </a>
                     <a class="nav-mobile-link" href="/admin/custom-orders" @onclick="CloseMobileMenu">
                         <span>✨</span>

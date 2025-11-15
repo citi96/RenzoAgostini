@@ -10,6 +10,7 @@ namespace RenzoAgostini.Client.Services.Interfaces
         int ItemsCount { get; }
         decimal TotalAmount { get; }
         CheckoutDto? CheckoutData { get; set; }
+        ShippingOptionDto? SelectedShippingOption { get; }
 
         event Action? OnChange;
 

@@ -213,6 +213,156 @@
     margin-top: var(--spacing-1);
 }
 
+/* Shipping Options */
+.shipping-method-section {
+    background: var(--neutral-50);
+}
+
+.shipping-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--spacing-4);
+}
+
+.shipping-option-card {
+    border: 2px solid var(--neutral-200);
+    border-radius: var(--radius-xl);
+    background: white;
+    padding: var(--spacing-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    text-align: left;
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.shipping-option-card:hover {
+    border-color: var(--primary-300);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.shipping-option-card.selected {
+    border-color: var(--primary-600);
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+}
+
+.shipping-option-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.shipping-option-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--neutral-900);
+}
+
+.shipping-option-price {
+    font-weight: 600;
+    color: var(--neutral-800);
+}
+
+.shipping-option-price.free {
+    color: var(--accent-emerald);
+}
+
+.shipping-option-description {
+    font-size: 0.875rem;
+    color: var(--neutral-600);
+    margin: 0;
+}
+
+.shipping-option-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--neutral-500);
+}
+
+.shipping-option-estimate {
+    font-size: 0.75rem;
+    color: var(--neutral-500);
+}
+
+.shipping-badge {
+    background: var(--primary-100);
+    color: var(--primary-700);
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.shipping-badge.pickup {
+    background: var(--neutral-200);
+    color: var(--neutral-700);
+}
+
+.shipping-state {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--neutral-200);
+    background: white;
+}
+
+.shipping-state.loading {
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.shipping-state.loading p {
+    margin: 0;
+    color: var(--neutral-600);
+}
+
+.shipping-state.error {
+    border-color: var(--accent-rose);
+    color: var(--accent-rose);
+    background: rgba(244, 63, 94, 0.05);
+}
+
+.shipping-state.empty {
+    gap: var(--spacing-4);
+    color: var(--neutral-600);
+}
+
+.shipping-state.empty span:first-child {
+    font-size: 2rem;
+}
+
+.shipping-state-subtext {
+    font-size: 0.8125rem;
+    color: var(--neutral-500);
+    margin-top: var(--spacing-1);
+}
+
+.shipping-not-selected {
+    color: var(--neutral-500);
+    font-style: italic;
+}
+
+.shipping-summary {
+    align-items: flex-start;
+}
+
+.shipping-summary-value {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-1);
+}
+
 /* Payment Methods */
 .payment-methods {
     display: grid;

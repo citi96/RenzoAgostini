@@ -71,6 +71,8 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICustomOrderRepository, CustomOrderRepository>();
 builder.Services.AddScoped<ICustomOrderService, CustomOrderService>();
+builder.Services.AddScoped<IShippingOptionRepository, ShippingOptionRepository>();
+builder.Services.AddScoped<IShippingOptionService, ShippingOptionService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 

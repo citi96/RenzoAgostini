@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using RenzoAgostini.Client.Services;
@@ -21,6 +21,7 @@ namespace RenzoAgostini.Client.Pages
         protected List<PaintingDto>? recommendedPaintings;
         protected bool isLoading = true;
         protected bool isUpdating = false;
+        protected ShippingOptionDto? SelectedShippingOption => CartService.SelectedShippingOption;
 
         protected override async Task OnInitializedAsync()
         {
@@ -91,12 +92,50 @@ namespace RenzoAgostini.Client.Pages
 
         protected decimal GetShipping()
         {
-            return GetSubtotal() >= 200 ? 0 : 15;
+            if (SelectedShippingOption is null)
+            {
+                return 0;
+            }
+
+            var subtotal = GetSubtotal();
+
+            if (SelectedShippingOption.IsPickup)
+            {
+                return 0;
+            }
+
+            if (SelectedShippingOption.FreeShippingThreshold is decimal threshold && subtotal >= threshold)
+            {
+                return 0;
+            }
+
+            return SelectedShippingOption.Cost;
         }
 
         protected decimal GetTotal()
         {
             return GetSubtotal() + GetShipping();
+        }
+
+        protected bool ShouldShowFreeShippingBanner()
+        {
+            if (SelectedShippingOption?.FreeShippingThreshold is not decimal threshold)
+            {
+                return false;
+            }
+
+            return GetSubtotal() < threshold && !SelectedShippingOption.IsPickup;
+        }
+
+        protected decimal GetAmountForFreeShipping()
+        {
+            if (SelectedShippingOption?.FreeShippingThreshold is not decimal threshold)
+            {
+                return 0;
+            }
+
+            var subtotal = GetSubtotal();
+            return threshold > subtotal ? threshold - subtotal : 0;
         }
 
         // Toast notifications

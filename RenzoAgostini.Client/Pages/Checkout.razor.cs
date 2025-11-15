@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using RenzoAgostini.Client.Services;
@@ -16,6 +16,7 @@ namespace RenzoAgostini.Client.Pages
         [Inject] private ICartService CartService { get; set; } = default!;
         [Inject] private IOrderService OrderService { get; set; } = default!;
         [Inject] private ICheckoutService CheckoutService { get; set; } = default!;
+        [Inject] private IShippingClient ShippingClient { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
@@ -27,6 +28,28 @@ namespace RenzoAgostini.Client.Pages
         protected int currentStep = 1;
         protected bool isLoading = true;
         protected bool isProcessing = false;
+        protected List<ShippingOptionDto> shippingOptions = new();
+        protected ShippingOptionDto? selectedShippingOption;
+        protected bool isLoadingShipping = true;
+        protected string? shippingError;
+
+        protected string SelectedCountry
+        {
+            get => orderForm.Address.Country;
+            set
+            {
+                if (orderForm.Address.Country != value)
+                {
+                    orderForm.Address.Country = value;
+                    _ = ReloadShippingOptionsAsync(value);
+                }
+            }
+        }
+
+        private Task ReloadShippingOptionsAsync(string country)
+        {
+            return InvokeAsync(() => LoadShippingOptionsAsync(country));
+        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -74,6 +97,9 @@ namespace RenzoAgostini.Client.Pages
 
                 // Default country
                 orderForm.Address.Country = "Italy";
+                orderForm.ShippingOptionId = CartService.SelectedShippingOption?.Id;
+
+                await LoadShippingOptionsAsync(orderForm.Address.Country);
 
                 Logger.LogInformation("Checkout loaded with {Count} items for user {Email}",
                     cartItems.Count, orderForm.Email);
@@ -89,6 +115,67 @@ namespace RenzoAgostini.Client.Pages
                 isLoading = false;
                 StateHasChanged();
             }
+        }
+
+        private async Task LoadShippingOptionsAsync(string country)
+        {
+            try
+            {
+                isLoadingShipping = true;
+                shippingError = null;
+                StateHasChanged();
+
+                var options = await ShippingClient.GetOptionsAsync(country);
+                shippingOptions = [.. options];
+
+                if (shippingOptions.Count == 0)
+                {
+                    selectedShippingOption = null;
+                    orderForm.ShippingOptionId = null;
+                    CartService.SetShippingOption(null);
+                    return;
+                }
+
+                var preferredId = CartService.SelectedShippingOption?.Id ?? orderForm.ShippingOptionId;
+                selectedShippingOption = preferredId.HasValue
+                    ? shippingOptions.FirstOrDefault(o => o.Id == preferredId.Value)
+                    : null;
+
+                if (selectedShippingOption is null)
+                {
+                    selectedShippingOption = shippingOptions.First();
+                }
+
+                ApplyShippingSelection(selectedShippingOption);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error loading shipping options for {Country}", country);
+                shippingOptions = [];
+                selectedShippingOption = null;
+                orderForm.ShippingOptionId = null;
+                CartService.SetShippingOption(null);
+                shippingError = "Impossibile caricare le opzioni di spedizione per la destinazione selezionata.";
+            }
+            finally
+            {
+                isLoadingShipping = false;
+                StateHasChanged();
+            }
+        }
+
+        private void ApplyShippingSelection(ShippingOptionDto option)
+        {
+            selectedShippingOption = option;
+            orderForm.ShippingOptionId = option.Id;
+            shippingError = null;
+            CartService.SetShippingOption(option);
+        }
+
+        protected void SelectShippingOption(ShippingOptionDto option)
+        {
+            ApplyShippingSelection(option);
+            StateHasChanged();
         }
 
         private void HandleCartChanged()
@@ -143,6 +230,8 @@ namespace RenzoAgostini.Client.Pages
                    !string.IsNullOrWhiteSpace(orderForm.Address.City) &&
                    !string.IsNullOrWhiteSpace(orderForm.Address.PostalCode) &&
                    !string.IsNullOrWhiteSpace(orderForm.Address.Country) &&
+                   selectedShippingOption is not null &&
+                   shippingError is null &&
                    orderForm.AcceptTerms;
         }
 
@@ -172,12 +261,44 @@ namespace RenzoAgostini.Client.Pages
 
         protected decimal GetShipping()
         {
-            return GetSubtotal() >= 200 ? 0 : 15;
+            if (selectedShippingOption is null)
+            {
+                return 0;
+            }
+
+            if (selectedShippingOption.IsPickup)
+            {
+                return 0;
+            }
+
+            var subtotal = GetSubtotal();
+            if (selectedShippingOption.FreeShippingThreshold is decimal threshold && subtotal >= threshold)
+            {
+                return 0;
+            }
+
+            return selectedShippingOption.Cost;
         }
 
         protected decimal GetTotal()
         {
             return GetSubtotal() + GetShipping();
+        }
+
+        private decimal CalculateShippingCost(ShippingOptionDto option)
+        {
+            if (option.IsPickup)
+            {
+                return 0;
+            }
+
+            var subtotal = GetSubtotal();
+            if (option.FreeShippingThreshold is decimal threshold && subtotal >= threshold)
+            {
+                return 0;
+            }
+
+            return option.Cost;
         }
 
         // Toast notifications
@@ -227,6 +348,7 @@ namespace RenzoAgostini.Client.Pages
         [Required(ErrorMessage = "Devi accettare i termini e condizioni")]
         [Range(typeof(bool), "true", "true", ErrorMessage = "Devi accettare i termini e condizioni")]
         public bool AcceptTerms { get; set; }
+        public int? ShippingOptionId { get; set; }
 
         public CheckoutDto ToCheckoutDto(IEnumerable<int> paintingIds)
         {
@@ -240,7 +362,7 @@ namespace RenzoAgostini.Client.Pages
                 City = Address.City,
                 PostalCode = Address.PostalCode,
                 Country = Address.Country,
-                ShippingMethod = "Standard"
+                ShippingOptionId = ShippingOptionId
             };
         }
     }

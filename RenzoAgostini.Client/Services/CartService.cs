@@ -31,6 +31,7 @@ namespace RenzoAgostini.Client.Services
         public decimal TotalAmount => _items.Sum(p => p.Price ?? 0m);
 
         public CheckoutDto? CheckoutData { get; set; }
+        public ShippingOptionDto? SelectedShippingOption => _selectedShippingOption;
 
         public event Action? OnChange;
 

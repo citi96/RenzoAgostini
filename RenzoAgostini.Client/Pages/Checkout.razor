@@ -1,4 +1,4 @@
-﻿@page "/checkout"
+@page "/checkout"
 @using System.Globalization
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
@@ -118,7 +118,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label required">Paese</label>
-                                <InputSelect @bind-Value="orderForm.Address.Country" class="form-select">
+                                <InputSelect @bind-Value="SelectedCountry" class="form-select">
                                     <option value="">Seleziona paese</option>
                                     <option value="Italy">Italia</option>
                                     <option value="San Marino">San Marino</option>
@@ -127,6 +127,79 @@
                                 <ValidationMessage For="@(() => orderForm.Address.Country)" class="form-error" />
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Shipping Method -->
+                    <div class="form-section shipping-method-section">
+                        <h2 class="section-title">
+                            <div class="section-icon">🚚</div>
+                            <span>Metodo di Spedizione</span>
+                        </h2>
+
+                        @if (isLoadingShipping)
+                        {
+                            <div class="shipping-state loading">
+                                <div class="checkout-loading-spinner"></div>
+                                <p>Caricamento opzioni di spedizione...</p>
+                            </div>
+                        }
+                        else if (!string.IsNullOrEmpty(shippingError))
+                        {
+                            <div class="shipping-state error">
+                                <span>⚠️</span>
+                                <span>@shippingError</span>
+                            </div>
+                        }
+                        else if (!shippingOptions.Any())
+                        {
+                            <div class="shipping-state empty">
+                                <span>😕</span>
+                                <div>
+                                    <p>Nessuna modalità di spedizione disponibile per il paese selezionato.</p>
+                                    <p class="shipping-state-subtext">Contattaci per organizzare una consegna personalizzata.</p>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="shipping-options-grid">
+                                @foreach (var option in shippingOptions)
+                                {
+                                    var isSelected = selectedShippingOption?.Id == option.Id;
+                                    var optionCost = CalculateShippingCost(option);
+                                    <button type="button"
+                                            class="shipping-option-card @(isSelected ? "selected" : string.Empty)"
+                                            @onclick="() => SelectShippingOption(option)">
+                                        <div class="shipping-option-header">
+                                            <h3>@option.Name</h3>
+                                            <span class="shipping-option-price @(optionCost == 0 ? "free" : string.Empty)">
+                                                @(optionCost == 0
+                                                    ? "Gratuita"
+                                                    : optionCost.ToString("C", CultureInfo.GetCultureInfo("it-IT")))
+                                            </span>
+                                        </div>
+                                        @if (!string.IsNullOrWhiteSpace(option.Description))
+                                        {
+                                            <p class="shipping-option-description">@option.Description</p>
+                                        }
+                                        <div class="shipping-option-footer">
+                                            @if (option.IsPickup)
+                                            {
+                                                <span class="shipping-badge pickup">Ritiro a mano</span>
+                                            }
+                                            @if (option.FreeShippingThreshold is decimal threshold)
+                                            {
+                                                <span class="shipping-badge">Gratis da @threshold.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(option.EstimatedDelivery))
+                                            {
+                                                <span class="shipping-option-estimate">@option.EstimatedDelivery</span>
+                                            }
+                                        </div>
+                                    </button>
+                                }
+                            </div>
+                        }
                     </div>
 
                     <!-- Terms and Conditions -->
@@ -185,16 +258,21 @@
                                 <span class="summary-label">Subtotale (@GetTotalItems() articoli)</span>
                                 <span class="summary-value">@GetSubtotal().ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
                             </div>
-                            <div class="summary-row">
+                            <div class="summary-row shipping-summary">
                                 <span class="summary-label">Spedizione</span>
-                                <span class="summary-value @(GetShipping() == 0 ? "free" : "")">
-                                    @if (GetShipping() == 0)
+                                <span class="summary-value shipping-summary-value">
+                                    @if (selectedShippingOption is null)
                                     {
-                                        <span>Gratuita</span>
+                                        <span class="shipping-not-selected">Seleziona la modalità di spedizione</span>
                                     }
                                     else
                                     {
-                                        <span>@GetShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
+                                        <span class="shipping-option-name">@selectedShippingOption.Name</span>
+                                        <span class="shipping-option-price @(GetShipping() == 0 ? "free" : string.Empty)">
+                                            @(GetShipping() == 0
+                                                ? "Gratuita"
+                                                : GetShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT")))
+                                        </span>
                                     }
                                 </span>
                             </div>
