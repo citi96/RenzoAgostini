@@ -38,7 +38,7 @@ builder.Services.AddScoped<HttpClient, CustomHttpClient>();
 // Cache opzionale sul client
 builder.Services.AddMemoryCache();
 
-builder.Services.AddSingleton<ICartService, CartService>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddScoped<IPaintingService, PaintingService>();
 builder.Services.AddScoped<IUserService, UserService>();

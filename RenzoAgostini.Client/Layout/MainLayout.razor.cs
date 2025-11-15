@@ -16,8 +16,9 @@ namespace RenzoAgostini.Client.Layout
         private int cartCount = 0;
         private bool showMobileMenu = false;
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
+            await CartService.InitializeAsync();
             cartCount = CartService.ItemsCount;
             CartService.OnChange += HandleCartChanged;
         }

@@ -1,4 +1,6 @@
-﻿using RenzoAgostini.Shared.DTOs;
+using System.Threading;
+using System.Threading.Tasks;
+using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Services.Interfaces
 {
@@ -11,8 +13,10 @@ namespace RenzoAgostini.Client.Services.Interfaces
 
         event Action? OnChange;
 
-        void AddItem(PaintingDto painting);
-        void Clear();
-        void RemoveItem(int paintingId);
+        Task InitializeAsync(CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<PaintingDto>> GetItemsAsync(CancellationToken cancellationToken = default);
+        Task AddItemAsync(PaintingDto painting, CancellationToken cancellationToken = default);
+        Task RemoveItemAsync(int paintingId, CancellationToken cancellationToken = default);
+        Task ClearAsync(CancellationToken cancellationToken = default);
     }
 }

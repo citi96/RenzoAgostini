@@ -31,6 +31,7 @@ namespace RenzoAgostini.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             CartService.OnChange += HandleCartChanged;
+            await CartService.InitializeAsync();
             await LoadCheckoutData();
         }
 
@@ -47,7 +48,7 @@ namespace RenzoAgostini.Client.Pages
                 StateHasChanged();
 
                 // Load cart items
-                cartItems = [.. CartService.Items];
+                cartItems = [.. (await CartService.GetItemsAsync())];
 
                 if (cartItems.Count == 0)
                 {
@@ -94,7 +95,7 @@ namespace RenzoAgostini.Client.Pages
         {
             InvokeAsync(async () =>
             {
-                cartItems = [.. CartService.Items];
+                cartItems = [.. (await CartService.GetItemsAsync())];
                 if (cartItems.Count == 0)
                 {
                     Navigation.NavigateTo("/cart");

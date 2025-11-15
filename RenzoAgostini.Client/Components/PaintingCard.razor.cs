@@ -59,7 +59,7 @@ namespace RenzoAgostini.Client.Components
                 // Simula un piccolo delay per UX migliore
                 await Task.Delay(500);
 
-                CartService.AddItem(PaintingDto);
+                await CartService.AddItemAsync(PaintingDto);
 
                 // Mostra notifica di successo
                 await ShowSuccessToast("Quadro aggiunto al carrello!");
