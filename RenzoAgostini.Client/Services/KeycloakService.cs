@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using RenzoAgostini.Client.Services.Interfaces;
@@ -8,6 +10,7 @@ namespace RenzoAgostini.Client.Services
 {
     public class KeycloakService : IKeycloakService
     {
+        private const string PkceVerifierKey = "pkce_verifier";
         private readonly HttpClient _httpClient;
         private readonly ICookieService _cookieService;
         private readonly IConfiguration _configuration;
@@ -37,10 +40,13 @@ namespace RenzoAgostini.Client.Services
         {
             var state = Guid.NewGuid().ToString();
             var nonce = Guid.NewGuid().ToString();
+            var codeVerifier = GenerateCodeVerifier();
+            var codeChallenge = ComputeCodeChallenge(codeVerifier);
 
             // Salva state per verificarlo dopo il callback
             await _cookieService.PutAsync("auth_state", state);
             await _cookieService.PutAsync("auth_nonce", nonce);
+            await _cookieService.PutAsync(PkceVerifierKey, codeVerifier);
 
             var loginUrl = $"{_keycloakUrl}/realms/{_realm}/protocol/openid-connect/auth" +
                           $"?client_id={Uri.EscapeDataString(_clientId)}" +
@@ -48,7 +54,9 @@ namespace RenzoAgostini.Client.Services
                           $"&response_type=code" +
                           $"&scope=openid profile email" +
                           $"&state={state}" +
-                          $"&nonce={nonce}";
+                          $"&nonce={nonce}" +
+                          $"&code_challenge={Uri.EscapeDataString(codeChallenge)}" +
+                          $"&code_challenge_method=S256";
 
             return loginUrl;
         }
@@ -57,6 +65,12 @@ namespace RenzoAgostini.Client.Services
         {
             try
             {
+                var codeVerifier = await _cookieService.RemoveAsync<string>(PkceVerifierKey);
+                if (string.IsNullOrWhiteSpace(codeVerifier))
+                {
+                    return null;
+                }
+
                 // Scambia il codice con un token
                 var tokenEndpoint = $"{_keycloakUrl}/realms/{_realm}/protocol/openid-connect/token";
 
@@ -65,7 +79,8 @@ namespace RenzoAgostini.Client.Services
                     new KeyValuePair<string, string>("grant_type", "authorization_code"),
                     new KeyValuePair<string, string>("client_id", _clientId),
                     new KeyValuePair<string, string>("code", code),
-                    new KeyValuePair<string, string>("redirect_uri", _redirectUri)
+                    new KeyValuePair<string, string>("redirect_uri", _redirectUri),
+                    new KeyValuePair<string, string>("code_verifier", codeVerifier)
                 });
 
                 var tokenResponse = await _httpClient.PostAsync(tokenEndpoint, tokenRequest);
@@ -138,6 +153,28 @@ namespace RenzoAgostini.Client.Services
                            $"&post_logout_redirect_uri={Uri.EscapeDataString(_postLogoutRedirectUri)}";
 
             return logoutUrl;
+        }
+
+        private static string GenerateCodeVerifier()
+        {
+            var buffer = new byte[32];
+            RandomNumberGenerator.Fill(buffer);
+            return Base64UrlEncode(buffer);
+        }
+
+        private static string ComputeCodeChallenge(string codeVerifier)
+        {
+            using var sha256 = SHA256.Create();
+            var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier));
+            return Base64UrlEncode(hash);
+        }
+
+        private static string Base64UrlEncode(byte[] data)
+        {
+            return Convert.ToBase64String(data)
+                .Replace('+', '-')
+                .Replace('/', '_')
+                .TrimEnd('=');
         }
     }
 }

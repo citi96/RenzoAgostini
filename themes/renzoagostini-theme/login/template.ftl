@@ -1,6 +1,9 @@
 <#macro shell title subtitle="">
 <!DOCTYPE html>
-<html lang="${locale.currentLanguageTag}">
+<#-- Keycloak only exposes the locale object when internationalization is enabled. -->
+<#-- Guard access so realms without locales do not trigger a FreeMarker error. -->
+<#assign htmlLang = (locale.currentLanguageTag)!((realm.defaultLocale)!'en')>
+<html lang="${htmlLang}">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
