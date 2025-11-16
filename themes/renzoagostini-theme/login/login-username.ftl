@@ -3,7 +3,7 @@
     <form id="kc-username-form" class="kc-form" action="${url.loginAction}" method="post">
         <div class="kc-field">
             <label for="username">${msg("usernameOrEmail", msg("username"))}</label>
-            <input id="username" name="username" type="text" value="${(username!'')?html}" autocomplete="username" autofocus />
+            <input id="username" name="username" type="text" value="${username!''}" autocomplete="username" autofocus />
             <@layout.fieldError fieldName="username" />
         </div>
         <div class="kc-actions">

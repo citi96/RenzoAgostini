@@ -13,16 +13,16 @@
         <div class="kc-field <#if required>required</#if>">
             <label for="${fieldId}">${fieldLabel}<#if required>*</#if></label>
             <#if inputType == 'textarea'>
-                <textarea id="${fieldId}" name="${fieldName}" rows="3" <#if readOnly>readonly</#if>>${value?html}</textarea>
+                <textarea id="${fieldId}" name="${fieldName}" rows="3" <#if readOnly>readonly</#if>>${value}</textarea>
             <#elseif inputType == 'select' && options?has_content>
                 <select id="${fieldId}" name="${fieldName}" <#if readOnly>disabled</#if>>
                     <#list options?split(',') as option>
                         <#assign optionTrim = option?trim>
-                        <option value="${optionTrim?html}" <#if value?trim == optionTrim>selected</#if>>${optionTrim?html}</option>
+                        <option value="${optionTrim}" <#if value?trim == optionTrim>selected</#if>>${optionTrim}</option>
                     </#list>
                 </select>
             <#else>
-                <input id="${fieldId}" name="${fieldName}" type="${inputType}" value="${value?html}" <#if readOnly>readonly</#if> />
+                <input id="${fieldId}" name="${fieldName}" type="${inputType}" value="${value}" <#if readOnly>readonly</#if> />
             </#if>
             <@layout.fieldError fieldName=fieldName />
         </div>

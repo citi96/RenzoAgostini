@@ -4,23 +4,23 @@
         <#if !realm.registrationEmailAsUsername>
             <div class="kc-field">
                 <label for="username">${msg("username")}</label>
-                <input id="username" name="username" type="text" value="${(register.formData.username!'')?html}" autocomplete="username" autofocus />
+                <input id="username" name="username" type="text" value="${register.formData.username!''}" autocomplete="username" autofocus />
                 <@layout.fieldError fieldName="username" />
             </div>
         </#if>
         <div class="kc-field">
             <label for="firstName">${msg("firstName")}</label>
-            <input id="firstName" name="firstName" type="text" value="${(register.formData.firstName!'')?html}" autocomplete="given-name" />
+            <input id="firstName" name="firstName" type="text" value="${register.formData.firstName!''}" autocomplete="given-name" />
             <@layout.fieldError fieldName="firstName" />
         </div>
         <div class="kc-field">
             <label for="lastName">${msg("lastName")}</label>
-            <input id="lastName" name="lastName" type="text" value="${(register.formData.lastName!'')?html}" autocomplete="family-name" />
+            <input id="lastName" name="lastName" type="text" value="${register.formData.lastName!''}" autocomplete="family-name" />
             <@layout.fieldError fieldName="lastName" />
         </div>
         <div class="kc-field">
             <label for="email">${msg("email")}</label>
-            <input id="email" name="email" type="email" value="${(register.formData.email!'')?html}" autocomplete="email" />
+            <input id="email" name="email" type="email" value="${register.formData.email!''}" autocomplete="email" />
             <@layout.fieldError fieldName="email" />
         </div>
         <#if passwordRequired??>
