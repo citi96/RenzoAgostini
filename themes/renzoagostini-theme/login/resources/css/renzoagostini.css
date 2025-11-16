@@ -131,6 +131,57 @@ body.kc-body {
     border: 1px solid rgba(244, 63, 94, 0.25);
 }
 
+.kc-error-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+}
+
+.kc-error-intro {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--neutral-500);
+}
+
+.kc-error-card {
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-4);
+    border: 1px solid var(--neutral-100);
+    background: white;
+    box-shadow: 0 12px 30px rgba(17, 24, 39, 0.08);
+}
+
+.kc-error-card.primary {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.08), rgba(88, 28, 135, 0.15));
+    border-color: rgba(147, 51, 234, 0.25);
+}
+
+.kc-error-card.secondary {
+    background: rgba(244, 63, 94, 0.08);
+    border-color: rgba(244, 63, 94, 0.25);
+}
+
+.kc-error-card p {
+    margin: 0;
+    color: var(--neutral-800);
+    font-weight: 600;
+}
+
+.kc-error-label {
+    display: inline-block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--neutral-500);
+    margin-bottom: 0.35rem;
+}
+
+.kc-error-support {
+    font-size: 0.85rem;
+    color: var(--neutral-500);
+    margin: 0;
+}
+
 form.kc-form {
     display: flex;
     flex-direction: column;
