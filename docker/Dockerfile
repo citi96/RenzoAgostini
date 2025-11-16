@@ -7,7 +7,7 @@ RUN mkdir -p /opt/keycloak/data/h2 \
     && chown -R keycloak:keycloak /opt/keycloak/data
 
 # Copy any additional configuration or themes if needed in the future
-# COPY themes /opt/keycloak/themes
+COPY themes /opt/keycloak/themes
 
 # Explicitly start Keycloak in optimized mode when the container launches.
 # Without passing "start" the base entrypoint prints the CLI help and exits

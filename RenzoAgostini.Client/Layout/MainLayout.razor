@@ -51,10 +51,6 @@
         <div class="nav-user">
             <AuthorizeView>
                 <Authorized>
-                    <div class="nav-user-info">
-                        <span class="nav-welcome">Benvenuto</span>
-                        <span class="nav-username">@context.User.Identity?.Name</span>
-                    </div>
                     <button class="nav-logout-btn" @onclick="LogoutAsync">
                         <Icon Name="logout" />
                         <span>Esci</span>
