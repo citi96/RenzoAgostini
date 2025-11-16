@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.DTOs;
@@ -38,7 +36,6 @@ namespace RenzoAgostini.Client.Components
         private bool showLightbox = false;
         private int lightboxIndex = 0;
         private bool isAddingToCart = false;
-        private bool isFavorite = false; // TODO: Implementare con localStorage o servizio
         private string cssClass = "painting-card";
         private IReadOnlyDictionary<string, object>? attributesWithoutClass;
 
@@ -49,7 +46,6 @@ namespace RenzoAgostini.Client.Components
         }
 
         protected bool IsAddingToCart => isAddingToCart;
-        protected bool IsFavorite => isFavorite;
 
         protected void ShowLightbox(int index)
         {
@@ -89,35 +85,6 @@ namespace RenzoAgostini.Client.Components
             finally
             {
                 isAddingToCart = false;
-                StateHasChanged();
-            }
-        }
-
-        protected async Task ToggleFavorite()
-        {
-            try
-            {
-                isFavorite = !isFavorite;
-                StateHasChanged();
-
-                // TODO: Salvare lo stato dei preferiti in localStorage o servizio
-                if (isFavorite)
-                {
-                    await ShowInfoToast("Aggiunto ai preferiti");
-                }
-                else
-                {
-                    await ShowInfoToast("Rimosso dai preferiti");
-                }
-
-                Logger.LogInformation("Painting {PaintingId} favorite toggled to {IsFavorite}",
-                    PaintingDto?.Id, isFavorite);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Error toggling favorite for painting {PaintingId}", PaintingDto?.Id);
-                // Revert state
-                isFavorite = !isFavorite;
                 StateHasChanged();
             }
         }

@@ -1,43 +1,43 @@
 ﻿@using System.Globalization
 
 <div class="@CssClass"
-         @onclick="() => ShowLightbox(0)"
-         @attributes="AdditionalAttributesWithoutClass">
+	 @onclick="() => ShowLightbox(0)"
+	 @attributes="AdditionalAttributesWithoutClass">
 
 	<!-- Image Container -->
 	<div class="painting-card-image-container">
-                @if (!string.IsNullOrEmpty(PrimaryImageUrl))
-                {
-                        <img src="@($"{Configuration["BaseUrl"]}/{PrimaryImageUrl}")"
-                                 alt="@Title"
-                                 class="painting-card-image"
-                                 loading="lazy" />
-                }
-                else
-                {
-                        <div class="painting-card-image painting-card-placeholder">
-                                <Icon Name="empty" />
-                                <span>Immagine non disponibile</span>
-                        </div>
-                }
+		@if (!string.IsNullOrEmpty(PrimaryImageUrl))
+		{
+			<img src="@($"{Configuration["BaseUrl"]}/{PrimaryImageUrl}")"
+				 alt="@Title"
+				 class="painting-card-image"
+				 loading="lazy" />
+		}
+		else
+		{
+			<div class="painting-card-image painting-card-placeholder">
+				<Icon Name="empty" />
+				<span>Immagine non disponibile</span>
+			</div>
+		}
 
 		<!-- For Sale Badge -->
-                @if (IsForSale && Price.HasValue && !IsAdminMode)
-                {
-                        <div class="painting-card-for-sale-badge">
-                                <Icon Name="requests" />
-                                <span>In vendita</span>
-                        </div>
-                }
-                else if (!IsForSale && !IsAdminMode)
-                {
-                        <div class="painting-card-sold-badge">
-                                <Icon Name="check" />
-                                <span>Venduto</span>
-                        </div>
-                }
+		@if (IsForSale && Price.HasValue && !IsAdminMode)
+		{
+			<div class="painting-card-for-sale-badge">
+				<Icon Name="requests" />
+				<span>In vendita</span>
+			</div>
+		}
+		else if (!IsForSale && !IsAdminMode)
+		{
+			<div class="painting-card-sold-badge">
+				<Icon Name="check" />
+				<span>Venduto</span>
+			</div>
+		}
 
-                <div class="painting-card-overlay"></div>
+		<div class="painting-card-overlay"></div>
 	</div>
 
 	<!-- Card Body -->
@@ -50,78 +50,85 @@
 		}
 
 		<!-- Meta Information -->
-                <div class="painting-card-meta">
-                        @if (Year.HasValue)
-                        {
-                                <span class="painting-card-meta-item">
-                                        <Icon Name="calendar" />
-                                        <span>@Year</span>
-                                </span>
-                        }
-                        @if (!string.IsNullOrWhiteSpace(Medium))
-                        {
-                                <span class="painting-card-meta-item">
-                                        <Icon Name="palette" />
-                                        <span>@Medium</span>
-                                </span>
-                        }
-                        @if (ImageUrls.Count > 1)
-                        {
-                                <span class="painting-card-meta-item">
-                                        <Icon Name="images" />
-                                        <span>@ImageUrls.Count foto</span>
-                                </span>
-                        }
-                        @if (!IsAdminMode && Price.HasValue)
-                        {
-                                <span class="painting-card-meta-item">
-                                        <Icon Name="price" />
-                                        <span>@Price.Value.ToString("C0", CultureInfo.GetCultureInfo("it-IT"))</span>
-                                </span>
-                        }
-                </div>
+		<div class="painting-card-meta">
+			@if (Year.HasValue)
+			{
+				<span class="painting-card-meta-item">
+					<Icon Name="calendar" />
+					<span>@Year</span>
+				</span>
+			}
+			@if (!string.IsNullOrWhiteSpace(Medium))
+			{
+				<span class="painting-card-meta-item">
+					<Icon Name="palette" />
+					<span>@Medium</span>
+				</span>
+			}
+			@if (!string.IsNullOrWhiteSpace(PaintingDto?.Dimensions))
+			{
+				<span class="painting-card-meta-item">
+					<Icon Name="ruler" />
+					<span>@ImageUrls.Count foto</span>
+				</span>
+			}
+			@if (ImageUrls.Count > 1)
+			{
+				<span class="painting-card-meta-item">
+					<Icon Name="images" />
+					<span>@ImageUrls.Count foto</span>
+				</span>
+			}
+			@if (!IsAdminMode && Price.HasValue)
+			{
+				<span class="painting-card-meta-item">
+					<Icon Name="price" />
+					<span>@Price.Value.ToString("C0", CultureInfo.GetCultureInfo("it-IT"))</span>
+				</span>
+			}
+		</div>
 	</div>
 
 	@* Admin Actions *@
-        @if (IsAdminMode && PaintingDto != null)
-        {
-                <div class="painting-card-admin-actions">
-                        <button class="btn btn-secondary painting-card-admin-btn"
-                                        @onclick:stopPropagation="true"
-                                        @onclick="() => OnEdit.InvokeAsync(PaintingDto)">
-                                Modifica
-                        </button>
-                        <button class="btn btn-danger painting-card-admin-btn"
-                                        @onclick:stopPropagation="true"
-                                        @onclick="() => OnDelete.InvokeAsync(PaintingDto)">
-                                Elimina
-                        </button>
-                </div>
-        }
-        else if (IsForSale && Price.HasValue)
-        {
-                <div class="painting-card-price">
-                        <div class="painting-card-price-amount">
-                                <span class="painting-card-price-currency">€</span>
-                                <span>@Price.Value.ToString("N2", CultureInfo.GetCultureInfo("it-IT"))</span>
-                        </div>
-                        <button class="btn btn-primary painting-card-action @(IsAddingToCart ? "loading" : string.Empty)"
-                                        @onclick:stopPropagation="true"
-                                        @onclick="AddToCart"
-                                        disabled="@IsAddingToCart">
-                                @if (IsAddingToCart)
-                                {
-                                        <span class="painting-card-spinner"></span>
-                                        <span>Aggiunta...</span>
-                                }
-                                else
-                                {
-                                        <Icon Name="cart" />
-                                        <span>Aggiungi</span>
-                                }
-                        </button>
-                </div>
-        }
+	@if (IsAdminMode && PaintingDto != null)
+	{
+		<div class="painting-card-admin-actions">
+			<button class="btn btn-secondary painting-card-admin-btn"
+					@onclick:stopPropagation="true"
+					@onclick="() => OnEdit.InvokeAsync(PaintingDto)">
+				Modifica
+			</button>
+			<button class="btn btn-danger painting-card-admin-btn"
+					@onclick:stopPropagation="true"
+					@onclick="() => OnDelete.InvokeAsync(PaintingDto)">
+				Elimina
+			</button>
+		</div>
+	}
+	else if (IsForSale && Price.HasValue)
+	{
+		<div class="painting-card-price">
+			<div class="painting-card-price-amount">
+				<span class="painting-card-price-currency">€</span>
+				<span>@Price.Value.ToString("N2", CultureInfo.GetCultureInfo("it-IT"))</span>
+			</div>
+			<button class="btn btn-primary painting-card-action @(IsAddingToCart ? "loading" : string.Empty)"
+					@onclick:stopPropagation="true"
+					@onclick="AddToCart"
+					disabled="@IsAddingToCart">
+				@if (IsAddingToCart)
+				{
+					<span class="painting-card-spinner"></span>
+					<span>Aggiunta...</span>
+				}
+				else
+				{
+					<Icon Name="cart" />
+					<span>Aggiungi</span>
+				}
+			</button>
+		</div>
+	}
 	else if (!IsAdminMode)
 	{
 		<div class="painting-card-price">
