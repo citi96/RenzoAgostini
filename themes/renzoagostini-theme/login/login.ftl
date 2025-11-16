@@ -14,24 +14,24 @@
                 <@layout.fieldError fieldName="password" />
             </div>
         </#if>
-        <#if realm.rememberMe>
-            <div class="kc-checkbox">
-                <input tabindex="3" type="checkbox" id="rememberMe" name="rememberMe" <#if login.rememberMe?? && login.rememberMe>checked</#if> />
-                <label for="rememberMe">${msg("rememberMe")}</label>
-            </div>
-        </#if>
         <div class="kc-actions">
             <div class="kc-buttons">
-                <button tabindex="4" class="kc-btn primary" name="login" id="kc-login" type="submit">${msg("doLogIn")}</button>
+                <button tabindex="3" class="kc-btn primary" name="login" id="kc-login" type="submit">${msg("doLogIn")}</button>
                 <#if realm.resetPasswordAllowed>
-                    <a class="kc-btn-link" href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a>
+                    <a class="kc-btn ghost" href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a>
+                </#if>
+                <#if realm.registrationAllowed && !registrationDisabled??>
+                    <a class="kc-btn ghost" href="${url.registrationUrl}">${msg("doRegister")}</a>
                 </#if>
             </div>
-            <#if realm.registrationAllowed && !registrationDisabled??>
-                <p>${msg("noAccount")}
-                    <a href="${url.registrationUrl}">${msg("doRegister")}</a>
-                </p>
-            </#if>
+            <div class="kc-quick-links">
+                <#if realm.rememberMe>
+                    <label class="kc-checkbox">
+                        <input tabindex="4" type="checkbox" id="rememberMe" name="rememberMe" <#if login.rememberMe?? && login.rememberMe>checked</#if> />
+                        ${msg("rememberMe")}
+                    </label>
+                </#if>
+            </div>
         </div>
     </form>
     <#if identityProviders?? && identityProviders?has_content>

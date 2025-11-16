@@ -55,48 +55,39 @@ body.kc-body {
 }
 
 .kc-shell {
-    width: min(960px, 100%);
+    width: min(560px, 100%);
     background: white;
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-lg);
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
 }
 
 .kc-hero {
-    background: linear-gradient(160deg, var(--primary-700), var(--primary-900));
-    color: white;
-    padding: var(--spacing-6);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100%;
-}
-
-.kc-hero .kc-brand {
+    background: linear-gradient(120deg, var(--primary-700), var(--primary-900));
+    min-height: 72px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    padding: var(--spacing-2);
 }
 
-.kc-hero .kc-brand img {
-    width: 96px;
-    height: 96px;
+.kc-hero-brand {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.25);
 }
 
-.kc-hero h1 {
-    font-size: 1.9rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.kc-hero p {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.85);
-    margin: 0;
+.kc-hero-brand img {
+    width: 34px;
+    height: 34px;
 }
 
 .kc-panel {
@@ -104,6 +95,12 @@ body.kc-body {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-4);
+}
+
+.kc-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .kc-panel h2 {
@@ -229,7 +226,7 @@ form.kc-form {
 .kc-actions {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-2);
+    gap: var(--spacing-3);
 }
 
 .kc-actions .kc-buttons {
@@ -249,12 +246,14 @@ form.kc-form {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    text-decoration: none;
 }
 
 .kc-btn.primary {
     background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
     color: white;
     box-shadow: var(--shadow-soft);
+    flex: 1 1 100%;
 }
 
 .kc-btn.primary:hover {
@@ -266,6 +265,19 @@ form.kc-form {
     color: var(--primary-700);
 }
 
+.kc-btn.ghost {
+    border: 1px solid var(--neutral-200);
+    background: white;
+    color: var(--neutral-700);
+}
+
+.kc-quick-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    align-items: center;
+}
+
 .kc-btn-link,
 .kc-panel a {
     color: var(--primary-700);
@@ -274,15 +286,22 @@ form.kc-form {
 }
 
 .kc-checkbox {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     font-size: 0.9rem;
+    border-radius: var(--radius-xl);
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-50);
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .kc-checkbox input[type="checkbox"] {
     width: 1rem;
     height: 1rem;
+    accent-color: var(--primary-600);
 }
 
 .kc-social {
@@ -309,13 +328,6 @@ form.kc-form {
     color: var(--neutral-700);
 }
 
-.kc-footer {
-    margin-top: auto;
-    padding-top: var(--spacing-4);
-    font-size: 0.85rem;
-    color: var(--neutral-500);
-}
-
 .kc-badge-list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -335,5 +347,9 @@ form.kc-form {
 
     .kc-shell {
         border-radius: var(--radius-xl);
+    }
+
+    .kc-hero {
+        min-height: 56px;
     }
 }
