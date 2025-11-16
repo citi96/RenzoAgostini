@@ -105,21 +105,21 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn-small primary" @onclick="() => ShowDetails(order)">
+                                    <button class="btn btn-small primary" @onclick="() => ShowDetails(order)">
                                         👁️ Dettagli
                                     </button>
                                     @if (order.Status == CustomOrderStatus.Pending)
                                     {
-                                        <button class="btn-small success" @onclick="() => ShowAcceptModal(order)">
+                                        <button class="btn btn-small success" @onclick="() => ShowAcceptModal(order)">
                                             ✅ Accetta
                                         </button>
-                                        <button class="btn-small danger" @onclick="() => ShowRejectModal(order)">
+                                        <button class="btn btn-small danger" @onclick="() => ShowRejectModal(order)">
                                             ❌ Rifiuta
                                         </button>
                                     }
                                     @if (order.PaintingId.HasValue)
                                     {
-                                        <button class="btn-small secondary" @onclick="() => ViewPainting(order.PaintingId.Value)">
+                                        <button class="btn btn-small secondary" @onclick="() => ViewPainting(order.PaintingId.Value)">
                                             🎨 Vedi Quadro
                                         </button>
                                     }
