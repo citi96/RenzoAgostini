@@ -22,17 +22,14 @@
 </head>
 <body class="kc-body">
     <main class="kc-shell" role="main">
-        <section class="kc-hero" aria-label="${msg("appName", realm.displayName!realm.name)}">
-            <div class="kc-brand" aria-hidden="true">
+        <section class="kc-hero" aria-hidden="true">
+            <div class="kc-hero-brand" aria-hidden="true">
                 <img src="${url.resourcesPath}/img/logo.svg" alt="" />
             </div>
         </section>
         <section class="kc-panel">
-            <header>
+            <header class="kc-panel-header">
                 <h2>${title}</h2>
-                <#if subtitle?has_content>
-                    <p class="kc-description">${subtitle}</p>
-                </#if>
             </header>
             <#if message?has_content>
                 <div class="kc-message ${message.type}">
@@ -40,9 +37,6 @@
                 </div>
             </#if>
             <#nested>
-            <footer class="kc-footer">
-                ${msg("footerSupport", "Hai bisogno di aiuto? Contatta il supporto dedicato.")}
-            </footer>
         </section>
     </main>
 </body>
