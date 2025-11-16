@@ -99,6 +99,7 @@ body {
 }
 
 /* Buttons */
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -107,19 +108,20 @@ body {
     padding: var(--spacing-2) var(--spacing-4);
     border-radius: var(--radius-xl);
     border: 1px solid transparent;
-    background: var(--neutral-100);
-    color: var(--neutral-800);
+    background: var(--gradient-primary);
+    color: white;
     font-size: 0.95rem;
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
     transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
-    box-shadow: var(--shadow-xs);
+    box-shadow: var(--shadow-sm);
 }
 
     .btn:hover {
         transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
+        box-shadow: var(--shadow-colored);
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-800) 100%);
     }
 
     .btn:focus-visible {
@@ -146,28 +148,31 @@ body {
     box-shadow: var(--shadow-colored);
 }
 
+
 .btn-secondary {
-    background: white;
-    color: var(--neutral-700);
-    border-color: var(--neutral-200);
+    background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-600) 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover {
-    background: var(--neutral-50);
-    border-color: var(--neutral-300);
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+    border-color: transparent;
+    box-shadow: var(--shadow-colored);
 }
 
                         .btn-outline {
-                            background: transparent;
-                            color: var(--neutral-700);
-                            border-color: var(--neutral-300);
+                            background: rgba(147, 51, 234, 0.08);
+                            color: var(--primary-700);
+                            border-color: rgba(147, 51, 234, 0.35);
                             box-shadow: none;
                         }
 
                             .btn-outline:hover {
-                                color: var(--neutral-900);
-                                border-color: var(--neutral-400);
-                                background: rgba(255, 255, 255, 0.6);
+                                color: var(--primary-800);
+                                border-color: rgba(147, 51, 234, 0.55);
+                                background: rgba(147, 51, 234, 0.16);
                             }
 
                         .btn-success {
@@ -182,7 +187,7 @@ body {
 
                         .btn-ghost {
                             background: transparent;
-                            color: inherit;
+                            color: var(--primary-600);
                             border: none;
                             box-shadow: none;
                         }
@@ -216,14 +221,14 @@ body {
                                 }
 
                             .btn-muted {
-                                background: var(--neutral-100);
-                                color: var(--neutral-600);
-                                border-color: var(--neutral-200);
+                                background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-200) 100%);
+                                color: var(--primary-700);
+                                border-color: rgba(147, 51, 234, 0.2);
                             }
 
                                 .btn-muted:hover {
-                                    background: var(--neutral-200);
-                                    color: var(--neutral-700);
+                                    background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-300) 100%);
+                                    color: var(--primary-800);
                                 }
                             /* Icon wrapper */
                             .icon {
@@ -1044,10 +1049,12 @@ body {
                                 user-select: none;
                                 border: 1px solid transparent;
                                 border-radius: var(--btn-border-radius);
-                                background: none;
+                                background: var(--gradient-primary);
+                                color: white;
                                 transition: all var(--transition-base);
                                 outline: none;
                                 overflow: hidden;
+                                box-shadow: var(--shadow-sm);
                             }
 
                                 .btn::before {
@@ -1067,6 +1074,8 @@ body {
                                 /* Stati di Interazione */
                                 .btn:hover {
                                     transform: translateY(-1px);
+                                    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-800) 100%);
+                                    box-shadow: var(--shadow-colored);
                                 }
 
                                 .btn:active {
@@ -1102,22 +1111,22 @@ body {
 
 /* Secondary Button */
 .btn-secondary {
-    color: var(--neutral-700);
-    background: white;
-    border-color: var(--neutral-300);
+    color: white;
+    background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-600) 100%);
+    border-color: transparent;
     box-shadow: var(--shadow-sm);
 }
 
     .btn-secondary:hover {
-        color: var(--neutral-800);
-        background: var(--neutral-50);
-        border-color: var(--neutral-400);
-        box-shadow: var(--shadow-md);
+        color: white;
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+        border-color: transparent;
+        box-shadow: var(--shadow-colored);
     }
 
     .btn-secondary:focus {
-        border-color: var(--primary-300);
-        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        border-color: rgba(147, 51, 234, 0.5);
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.3);
     }
 
 /* Success Button */
@@ -1168,22 +1177,22 @@ body {
 
     .btn-ghost:hover {
         color: var(--primary-700);
-        background: var(--primary-50);
-        border-color: var(--primary-200);
+        background: rgba(147, 51, 234, 0.08);
+        border-color: transparent;
     }
 
 /* Outline Button */
 .btn-outline {
-    color: var(--primary-600);
-    background: transparent;
-    border-color: var(--primary-300);
+    color: var(--primary-700);
+    background: rgba(147, 51, 234, 0.08);
+    border-color: rgba(147, 51, 234, 0.35);
 }
 
     .btn-outline:hover {
-        color: white;
-        background: var(--gradient-primary);
-        border-color: var(--primary-600);
-        box-shadow: var(--shadow-colored);
+        color: var(--primary-800);
+        background: rgba(147, 51, 234, 0.16);
+        border-color: rgba(147, 51, 234, 0.55);
+        box-shadow: none;
     }
 
 /* Size Variants */

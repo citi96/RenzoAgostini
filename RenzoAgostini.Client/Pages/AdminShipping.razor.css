@@ -371,8 +371,8 @@
 }
 
 .btn-secondary {
-    background: var(--neutral-100);
-    color: var(--neutral-700);
+    background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-600) 100%);
+    color: white;
 }
 
 .btn-danger {

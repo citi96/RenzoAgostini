@@ -208,21 +208,23 @@
     }
 
 .nav-logout-btn {
-    background: var(--neutral-100);
-    color: var(--neutral-700);
-    border: 1px solid var(--neutral-300);
+    background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-600) 100%);
+    color: white;
+    border: none;
     padding: var(--spacing-2) var(--spacing-4);
     border-radius: var(--radius-lg);
     font-size: 0.75rem;
     font-weight: 500;
     cursor: pointer;
     transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
 }
 
     .nav-logout-btn:hover {
-        background: var(--neutral-200);
-        color: var(--neutral-800);
-        border-color: var(--neutral-400);
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-colored);
     }
 
 .nav-login-btn,
