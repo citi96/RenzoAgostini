@@ -69,7 +69,13 @@
 
 .gallery-error-icon,
 .gallery-empty-icon {
-    font-size: 2rem;
+    font-size: 0;
+}
+
+.gallery-error-icon .icon svg,
+.gallery-empty-icon .icon svg {
+    width: 2.5rem;
+    height: 2.5rem;
 }
 
 @keyframes gallery-spin {

@@ -42,6 +42,23 @@
     transform: scale(1.05);
 }
 
+.painting-card-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    color: var(--neutral-500);
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+    .painting-card-placeholder .icon svg {
+        width: 2.5rem;
+        height: 2.5rem;
+        color: var(--primary-300);
+    }
+
 /* Image Overlay */
 .painting-card-overlay {
     position: absolute;
@@ -52,42 +69,12 @@
     background: linear-gradient( to bottom, transparent 0%, transparent 60%, rgba(0, 0, 0, 0.8) 100% );
     opacity: 0;
     transition: opacity var(--transition-base);
-    display: flex;
-    align-items: flex-end;
-    padding: var(--spacing-4);
+    pointer-events: none;
 }
 
 .painting-card:hover .painting-card-overlay {
     opacity: 1;
 }
-
-.painting-card-quick-actions {
-    display: flex;
-    gap: var(--spacing-2);
-    margin-left: auto;
-}
-
-.painting-card-quick-action {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(8px);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-    transition: all var(--transition-fast);
-    color: var(--neutral-700);
-}
-
-    .painting-card-quick-action:hover {
-        background: white;
-        color: var(--primary-600);
-        transform: scale(1.1);
-    }
 
 /* Card Body */
 .painting-card-body {
@@ -137,16 +124,17 @@
 .painting-card-meta-item {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--spacing-1);
     background: var(--neutral-100);
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--radius-md);
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-lg);
     font-weight: 500;
+    color: var(--neutral-600);
 }
 
-    .painting-card-meta-item.year {
-        color: var(--primary-600);
-        background: var(--primary-50);
+    .painting-card-meta-item .icon svg {
+        width: 0.875rem;
+        height: 0.875rem;
     }
 
 /* Price Section */
@@ -154,6 +142,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--spacing-3);
     padding: var(--spacing-4) var(--spacing-5);
     background: var(--neutral-50);
     border-top: 1px solid var(--neutral-100);
@@ -175,34 +164,31 @@
     color: var(--primary-500);
 }
 
-/* Add to Cart Button */
-.painting-card-add-to-cart {
-    background: var(--gradient-primary);
-    color: white;
-    border: none;
-    padding: var(--spacing-2) var(--spacing-4);
-    border-radius: var(--radius-lg);
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-base);
-    display: flex;
+.painting-card-action {
+    display: inline-flex;
     align-items: center;
     gap: var(--spacing-2);
-    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
 }
 
-    .painting-card-add-to-cart:hover {
-        background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-900) 100%);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-colored);
-    }
+.painting-card-action.loading {
+    cursor: progress;
+}
 
-    .painting-card-add-to-cart:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
+.painting-card-spinner {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: white;
+    animation: painting-card-spin 0.75s linear infinite;
+}
+
+@keyframes painting-card-spin {
+    to {
+        transform: rotate(360deg);
     }
+}
 
 /* Not Available State */
 .painting-card-unavailable {
@@ -231,46 +217,18 @@
     display: flex;
     gap: var(--spacing-2);
     padding: var(--spacing-4) var(--spacing-5);
-    background: var(--primary-50);
-    border-top: 1px solid var(--primary-100);
+    background: var(--neutral-50);
+    border-top: 1px solid var(--neutral-200);
 }
 
 .painting-card-admin-btn {
     flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-1);
-    padding: var(--spacing-2) var(--spacing-3);
-    border-radius: var(--radius-md);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-    cursor: pointer;
-    transition: all var(--transition-base);
-    border: none;
 }
 
-    .painting-card-admin-btn.edit {
-        background: var(--accent-blue);
-        color: white;
-    }
-
-        .painting-card-admin-btn.edit:hover {
-            background: #2563eb;
-            transform: translateY(-1px);
-        }
-
-    .painting-card-admin-btn.delete {
-        background: var(--accent-rose);
-        color: white;
-    }
-
-        .painting-card-admin-btn.delete:hover {
-            background: #dc2626;
-            transform: translateY(-1px);
-        }
+.painting-card-admin-actions .btn {
+    justify-content: center;
+    width: 100%;
+}
 
 /* For Sale Badge */
 .painting-card-for-sale-badge {
@@ -279,14 +237,15 @@
     left: var(--spacing-3);
     background: var(--gradient-primary);
     color: white;
-    padding: 0.25rem 0.75rem;
+    padding: 0.35rem 0.85rem;
     border-radius: var(--radius-full);
     font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
     z-index: 10;
     box-shadow: var(--shadow-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
 }
 
 /* Sold Badge */
@@ -296,13 +255,14 @@
     left: var(--spacing-3);
     background: var(--neutral-600);
     color: white;
-    padding: 0.25rem 0.75rem;
+    padding: 0.35rem 0.85rem;
     border-radius: var(--radius-full);
     font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
     z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
 }
 
 /* Loading State */
@@ -326,34 +286,6 @@
         align-items: center;
         justify-content: center;
         z-index: 20;
-    }
-
-/* Favorite Button */
-.painting-card-favorite {
-    position: absolute;
-    top: var(--spacing-3);
-    right: var(--spacing-3);
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(8px);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.125rem;
-    transition: all var(--transition-base);
-    color: var(--neutral-600);
-    z-index: 10;
-}
-
-    .painting-card-favorite:hover,
-    .painting-card-favorite.active {
-        background: var(--accent-rose);
-        color: white;
-        transform: scale(1.1);
     }
 
 /* Grid Layout Adjustments */
@@ -382,7 +314,7 @@
 }
 
     .painting-card.featured::before {
-        content: '⭐ In Evidenza';
+        content: 'In evidenza';
         position: absolute;
         top: 0;
         left: 0;

@@ -1,0 +1,108 @@
+@if (IconContent is { } icon)
+{
+    <span class="icon @CssClass" aria-hidden="true" role="presentation">
+        @icon
+    </span>
+}
+
+@code {
+    [Parameter]
+    public string Name { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    private string NormalizedName => (Name ?? string.Empty).Trim().ToLowerInvariant();
+
+    private RenderFragment? IconContent => NormalizedName switch
+    {
+        "home" => builder => builder.AddMarkupContent(0, HomeSvg),
+        "gallery" => builder => builder.AddMarkupContent(0, GallerySvg),
+        "orders" => builder => builder.AddMarkupContent(0, OrdersSvg),
+        "shipping" => builder => builder.AddMarkupContent(0, ShippingSvg),
+        "requests" => builder => builder.AddMarkupContent(0, RequestsSvg),
+        "custom" => builder => builder.AddMarkupContent(0, CustomSvg),
+        "cart" => builder => builder.AddMarkupContent(0, CartSvg),
+        "login" => builder => builder.AddMarkupContent(0, LoginSvg),
+        "logout" => builder => builder.AddMarkupContent(0, LogoutSvg),
+        "menu" => builder => builder.AddMarkupContent(0, MenuSvg),
+        "close" => builder => builder.AddMarkupContent(0, CloseSvg),
+        "info" => builder => builder.AddMarkupContent(0, InfoSvg),
+        "zoom-in" => builder => builder.AddMarkupContent(0, ZoomInSvg),
+        "zoom-out" => builder => builder.AddMarkupContent(0, ZoomOutSvg),
+        "chevron-left" => builder => builder.AddMarkupContent(0, ChevronLeftSvg),
+        "chevron-right" => builder => builder.AddMarkupContent(0, ChevronRightSvg),
+        "fullscreen" => builder => builder.AddMarkupContent(0, FullscreenSvg),
+        "exit-fullscreen" => builder => builder.AddMarkupContent(0, ExitFullscreenSvg),
+        "slideshow" => builder => builder.AddMarkupContent(0, SlideshowSvg),
+        "pause" => builder => builder.AddMarkupContent(0, PauseSvg),
+        "check" => builder => builder.AddMarkupContent(0, CheckSvg),
+        "error" => builder => builder.AddMarkupContent(0, ErrorSvg),
+        "empty" => builder => builder.AddMarkupContent(0, EmptySvg),
+        "calendar" => builder => builder.AddMarkupContent(0, CalendarSvg),
+        "palette" => builder => builder.AddMarkupContent(0, PaletteSvg),
+        "images" => builder => builder.AddMarkupContent(0, ImagesSvg),
+        "price" => builder => builder.AddMarkupContent(0, PriceSvg),
+        "share" => builder => builder.AddMarkupContent(0, ShareSvg),
+        "brand" => builder => builder.AddMarkupContent(0, BrandSvg),
+        "ruler" => builder => builder.AddMarkupContent(0, RulerSvg),
+        "upload" => builder => builder.AddMarkupContent(0, UploadSvg),
+        "trash" => builder => builder.AddMarkupContent(0, TrashSvg),
+        "save" => builder => builder.AddMarkupContent(0, SaveSvg),
+        "star" => builder => builder.AddMarkupContent(0, StarSvg),
+        "paperclip" => builder => builder.AddMarkupContent(0, PaperclipSvg),
+        "pin" => builder => builder.AddMarkupContent(0, PinSvg),
+        "clock" => builder => builder.AddMarkupContent(0, ClockSvg),
+        "note" => builder => builder.AddMarkupContent(0, NoteSvg),
+        "eye" => builder => builder.AddMarkupContent(0, EyeSvg),
+        "lock" => builder => builder.AddMarkupContent(0, LockSvg),
+        "mail" => builder => builder.AddMarkupContent(0, MailSvg),
+        "user" => builder => builder.AddMarkupContent(0, UserSvg),
+        _ => null
+    };
+
+    private const string IconAttributes = "viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'";
+
+    private const string HomeSvg = $"<svg {IconAttributes}><path d='M3 10.5 12 4l9 6.5' /><path d='M5 21h14a1 1 0 0 0 1-1v-8.5L12 6 4 11.5V20a1 1 0 0 0 1 1z' /><path d='M9 21v-6h6v6' /></svg>";
+    private const string GallerySvg = $"<svg {IconAttributes}><rect x='4' y='5' width='16' height='15' rx='2' /><path d='M8 9.5h8' /><path d='M8 14.5l2.5-2.5 3 3 2.5-2' /></svg>";
+    private const string OrdersSvg = $"<svg {IconAttributes}><path d='M5 8h14' /><path d='M5 16h14' /><rect x='4' y='4' width='16' height='16' rx='2' /></svg>";
+    private const string ShippingSvg = $"<svg {IconAttributes}><path d='M3 7h11v10H3z' /><path d='M14 9h4l3 3v5h-7V9z' /><circle cx='7' cy='18' r='1.5' /><circle cx='17' cy='18' r='1.5' /></svg>";
+    private const string RequestsSvg = $"<svg {IconAttributes}><path d='M12 3v4' /><path d='M18.4 6.6 15.6 9.4' /><path d='M21 15h-4' /><path d='M18.4 21.4 15.6 18.6' /><path d='M12 21v-4' /><path d='M8.4 18.6 5.6 21.4' /><path d='M3 15h4' /><path d='M5.6 9.4 8.4 6.6' /></svg>";
+    private const string CustomSvg = $"<svg {IconAttributes}><path d='M12 3 4 9v11h16V9z' /><path d='M12 3v6' /><path d='M9 13h6' /><path d='M9 17h6' /></svg>";
+    private const string CartSvg = $"<svg {IconAttributes}><path d='M4 5h2l1.5 9h9.5l2-7H6' /><circle cx='9' cy='19' r='1.5' /><circle cx='17' cy='19' r='1.5' /></svg>";
+    private const string LoginSvg = $"<svg {IconAttributes}><path d='M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4' /><path d='M10 17l5-5-5-5' /><path d='M15 12H3' /></svg>";
+    private const string LogoutSvg = $"<svg {IconAttributes}><path d='M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4' /><path d='M14 17l5-5-5-5' /><path d='M19 12H7' /></svg>";
+    private const string MenuSvg = $"<svg {IconAttributes}><path d='M4 6h16' /><path d='M4 12h16' /><path d='M4 18h16' /></svg>";
+    private const string CloseSvg = $"<svg {IconAttributes}><path d='M18 6 6 18' /><path d='M6 6l12 12' /></svg>";
+    private const string InfoSvg = $"<svg {IconAttributes}><circle cx='12' cy='12' r='9' /><path d='M12 10v6' /><path d='M12 7h.01' /></svg>";
+    private const string ZoomInSvg = $"<svg {IconAttributes}><circle cx='11' cy='11' r='6' /><path d='M11 8v6' /><path d='M8 11h6' /><path d='m17 17 4 4' /></svg>";
+    private const string ZoomOutSvg = $"<svg {IconAttributes}><circle cx='11' cy='11' r='6' /><path d='M8 11h6' /><path d='m17 17 4 4' /></svg>";
+    private const string ChevronLeftSvg = $"<svg {IconAttributes}><path d='m15 6-6 6 6 6' /></svg>";
+    private const string ChevronRightSvg = $"<svg {IconAttributes}><path d='m9 6 6 6-6 6' /></svg>";
+    private const string FullscreenSvg = $"<svg {IconAttributes}><path d='M21 9V3h-6' /><path d='M3 9V3h6' /><path d='M21 15v6h-6' /><path d='M3 15v6h6' /></svg>";
+    private const string ExitFullscreenSvg = $"<svg {IconAttributes}><path d='M9 3H3v6' /><path d='M15 3h6v6' /><path d='M21 15v6h-6' /><path d='M3 15v6h6' /></svg>";
+    private const string SlideshowSvg = $"<svg {IconAttributes}><rect x='3' y='5' width='18' height='14' rx='2' /><path d='m10 9 4 3-4 3z' /></svg>";
+    private const string PauseSvg = $"<svg {IconAttributes}><rect x='4' y='3' width='4' height='18' rx='1' /><rect x='16' y='3' width='4' height='18' rx='1' /></svg>";
+    private const string CheckSvg = $"<svg {IconAttributes}><path d='M20 6 9 17l-5-5' /></svg>";
+    private const string ErrorSvg = $"<svg {IconAttributes}><circle cx='12' cy='12' r='9' /><path d='M12 8v4' /><path d='M12 16h.01' /></svg>";
+    private const string EmptySvg = $"<svg {IconAttributes}><rect x='3' y='5' width='18' height='14' rx='3' /><path d='M3 11h18' /><path d='M7 15h.01' /><path d='M11 15h.01' /><path d='M15 15h.01' /></svg>";
+    private const string CalendarSvg = $"<svg {IconAttributes}><rect x='4' y='5' width='16' height='15' rx='2' /><path d='M16 3v4' /><path d='M8 3v4' /><path d='M4 11h16' /></svg>";
+    private const string PaletteSvg = $"<svg {IconAttributes}><path d='M12 4a8 8 0 1 0 5.3 14.3 1.7 1.7 0 0 0 2.7-1.3 3 3 0 0 0-3-3h-1.5a1.5 1.5 0 0 1-1.3-2.2A3 3 0 0 0 12 4z' /><circle cx='7.5' cy='10.5' r='1' /><circle cx='12' cy='7.5' r='1' /><circle cx='16.5' cy='10.5' r='1' /><circle cx='9' cy='15' r='1' /></svg>";
+    private const string ImagesSvg = $"<svg {IconAttributes}><rect x='3' y='7' width='14' height='12' rx='2' /><path d='M17 9h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H7' /><path d='m10 13 2.5 2.5L15 12l3 3' /></svg>";
+    private const string PriceSvg = $"<svg {IconAttributes}><circle cx='12' cy='12' r='8' /><path d='M15 9.5a3 3 0 0 0-3-1.5c-1.7 0-3 1-3 2.5s1 2.5 3 2.5 3 1 3 2.5-1.3 2.5-3 2.5a3.4 3.4 0 0 1-3-1.5' /><path d='M12 6v12' /></svg>";
+    private const string ShareSvg = $"<svg {IconAttributes}><path d='M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7' /><path d='M12 3v12' /><path d='m16 8-4-4-4 4' /></svg>";
+    private const string BrandSvg = $"<svg {IconAttributes}><path d='M12 4c2.5 0 5 1.3 5 4.1 0 2-1.7 3.5-4 3.5h-1c-2.3 0-4 1.5-4 3.5S9.5 19 12 19s5-1.3 5-4.1' /><path d='M12 4v15' /><path d='M8.5 7.5c1.5 1.5 5.5 1.5 7 0' /></svg>";
+    private const string RulerSvg = $"<svg {IconAttributes}><rect x='3' y='7' width='18' height='10' rx='2' /><path d='M7 7v3' /><path d='M11 7v3' /><path d='M15 7v3' /><path d='M7 14v3' /><path d='M11 14v3' /><path d='M15 14v3' /></svg>";
+    private const string UploadSvg = $"<svg {IconAttributes}><path d='M4 20h16' /><path d='M12 4v10' /><path d='m8 8 4-4 4 4' /><path d='M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6' /></svg>";
+    private const string TrashSvg = $"<svg {IconAttributes}><path d='M3 6h18' /><path d='M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2' /><path d='M19 6v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6' /><path d='M10 11v6' /><path d='M14 11v6' /></svg>";
+    private const string SaveSvg = $"<svg {IconAttributes}><path d='M5 3h11l3 3v15H5z' /><path d='M5 3v15h14' /><path d='M9 3v6h6V3' /><path d='M9 21v-6h6v6' /></svg>";
+    private const string StarSvg = $"<svg {IconAttributes}><path d='m12 3 2.7 5.5 6.1.9-4.4 4.2 1 6.1L12 16.9 6.6 19.7l1-6.1-4.4-4.2 6.1-.9z' /></svg>";
+    private const string PaperclipSvg = $"<svg {IconAttributes}><path d='M18.5 12.5 12 19a4.2 4.2 0 0 1-6-6l7.5-7.5a3 3 0 1 1 4.2 4.2L10 17' /></svg>";
+    private const string PinSvg = $"<svg {IconAttributes}><path d='M12 21s-6-4.5-6-10a6 6 0 1 1 12 0c0 5.5-6 10-6 10z' /><circle cx='12' cy='11' r='2' /></svg>";
+    private const string ClockSvg = $"<svg {IconAttributes}><circle cx='12' cy='12' r='9' /><path d='M12 7v5l3 3' /></svg>";
+    private const string NoteSvg = $"<svg {IconAttributes}><path d='M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z' /><path d='M14 2v5h5' /><path d='M8 13h8' /><path d='M8 17h5' /></svg>";
+    private const string EyeSvg = $"<svg {IconAttributes}><path d='M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z' /><circle cx='12' cy='12' r='3' /></svg>";
+    private const string LockSvg = $"<svg {IconAttributes}><rect x='5' y='11' width='14' height='10' rx='2' /><path d='M7 11V7a5 5 0 0 1 10 0v4' /><path d='M12 16v2' /></svg>";
+    private const string MailSvg = $"<svg {IconAttributes}><rect x='3' y='5' width='18' height='14' rx='2' /><path d='m3 7 9 6 9-6' /></svg>";
+    private const string UserSvg = $"<svg {IconAttributes}><circle cx='12' cy='8' r='4' /><path d='M5.5 21a7 7 0 0 1 13 0' /></svg>";
+}
