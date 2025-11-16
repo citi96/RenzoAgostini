@@ -2,7 +2,14 @@
 <!DOCTYPE html>
 <#-- Keycloak only exposes the locale object when internationalization is enabled. -->
 <#-- Guard access so realms without locales do not trigger a FreeMarker error. -->
-<#assign htmlLang = (locale.currentLanguageTag)!((realm.defaultLocale)!'en')>
+<#-- Default html lang to English unless locale/realm provide overrides. -->
+<#if locale?? && locale.currentLanguageTag?has_content>
+    <#assign htmlLang = locale.currentLanguageTag>
+<#elseif realm?? && realm.defaultLocale?has_content>
+    <#assign htmlLang = realm.defaultLocale>
+<#else>
+    <#assign htmlLang = 'en'>
+</#if>
 <html lang="${htmlLang}">
 <head>
     <meta charset="utf-8" />
