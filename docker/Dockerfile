@@ -6,8 +6,11 @@ ENV KC_DB=dev-file
 RUN mkdir -p /opt/keycloak/data/h2 \
     && chown -R keycloak:keycloak /opt/keycloak/data
 
-# Copy any additional configuration or themes if needed in the future
-COPY themes /opt/keycloak/themes
+# Copy custom themes ensuring they end up directly under /opt/keycloak/themes
+COPY --chown=keycloak:keycloak themes/ /opt/keycloak/themes/
+
+# Pre-build the Quarkus distribution so the optimized runtime picks up the copied themes
+RUN /opt/keycloak/bin/kc.sh build
 
 # Explicitly start Keycloak in optimized mode when the container launches.
 # Without passing "start" the base entrypoint prints the CLI help and exits
