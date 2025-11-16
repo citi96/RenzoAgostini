@@ -3,7 +3,7 @@
     <form id="kc-reset-password-form" class="kc-form" action="${url.loginAction}" method="post">
         <div class="kc-field">
             <label for="username">${msg("emailOrUsername")}</label>
-            <input type="text" id="username" name="username" value="${(auth.attemptedUsername!'')?html}" autocomplete="username" autofocus />
+            <input type="text" id="username" name="username" value="${auth.attemptedUsername!''}" autocomplete="username" autofocus />
             <@layout.fieldError fieldName="username" />
         </div>
         <div class="kc-actions">
