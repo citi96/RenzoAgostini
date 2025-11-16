@@ -5,9 +5,8 @@
 <nav class="nav">
     <div class="nav-container">
         <!-- Brand Logo -->
-        <a class="nav-brand" href="/">
-            <Icon Name="brand" CssClass="nav-brand-icon" />
-            <span>Galleria Agostini</span>
+        <a class="nav-brand" href="/" aria-label="Galleria Agostini">
+            <img src="assets/logo.png" alt="Logo Galleria Agostini" class="nav-brand-logo" />
         </a>
 
         <!-- Desktop Navigation Links -->
@@ -81,9 +80,8 @@
 <div class="nav-mobile @(showMobileMenu ? "active" : "")" @onclick="CloseMobileMenu">
     <div class="nav-mobile-content" @onclick:stopPropagation="true">
         <div class="nav-mobile-header">
-            <a class="nav-brand" href="/" @onclick="CloseMobileMenu">
-                <Icon Name="brand" CssClass="nav-brand-icon" />
-                <span>Galleria</span>
+            <a class="nav-brand" href="/" aria-label="Galleria Agostini" @onclick="CloseMobileMenu">
+                <img src="assets/logo.png" alt="Logo Galleria Agostini" class="nav-brand-logo" />
             </a>
             <button class="nav-mobile-close" @onclick="CloseMobileMenu">
                 <Icon Name="close" />
