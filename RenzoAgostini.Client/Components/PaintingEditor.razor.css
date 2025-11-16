@@ -217,8 +217,17 @@
     }
 
 .editor-file-icon {
-    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
 }
+
+    .editor-file-icon .icon svg {
+        width: 1.75rem;
+        height: 1.75rem;
+        color: var(--primary-500);
+    }
 
 .editor-file-text {
     font-size: 0.875rem;
@@ -282,6 +291,9 @@
     transition: all var(--transition-fast);
     text-transform: uppercase;
     letter-spacing: 0.025em;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
 }
 
     .editor-image-btn.primary {
@@ -308,12 +320,15 @@
     left: var(--spacing-2);
     background: var(--primary-600);
     color: white;
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem 0.6rem;
     border-radius: var(--radius-md);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.025em;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
 }
 
 /* Footer */

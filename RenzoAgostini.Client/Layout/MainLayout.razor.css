@@ -42,11 +42,15 @@
     }
 
 .nav-brand-icon {
-    font-size: 2rem;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+}
+
+.nav-brand-icon svg {
+    width: 2rem;
+    height: 2rem;
 }
 
 /* Navigation Links */
@@ -75,6 +79,11 @@
     .nav-link:hover {
         color: var(--primary-600);
         background: var(--primary-50);
+    }
+
+    .nav-link .icon svg {
+        width: 1rem;
+        height: 1rem;
     }
 
     .nav-link.active {
@@ -123,6 +132,11 @@
         border-color: var(--primary-300);
         transform: translateY(-1px);
         box-shadow: var(--shadow-md);
+    }
+
+    .nav-cart .icon svg {
+        width: 1.1rem;
+        height: 1.1rem;
     }
 
 .nav-cart-count {
@@ -217,6 +231,13 @@
         border-color: var(--neutral-400);
     }
 
+.nav-login-btn,
+.nav-logout-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
 /* Mobile Menu Toggle */
 .nav-mobile-toggle {
     display: none;
@@ -234,6 +255,11 @@
         background: var(--neutral-100);
         color: var(--neutral-800);
         border-color: var(--neutral-400);
+    }
+
+    .nav-mobile-toggle .icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
     }
 
 /* Mobile Navigation */
@@ -283,20 +309,28 @@
     border-bottom: 1px solid var(--neutral-200);
 }
 
+
 .nav-mobile-close {
     background: none;
     border: none;
-    font-size: 1.5rem;
     color: var(--neutral-500);
     cursor: pointer;
     padding: var(--spacing-1);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
     .nav-mobile-close:hover {
         background: var(--neutral-100);
         color: var(--neutral-700);
+    }
+
+    .nav-mobile-close .icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
     }
 
 .nav-mobile-links {

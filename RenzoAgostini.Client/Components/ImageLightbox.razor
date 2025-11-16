@@ -11,7 +11,7 @@
                     <div class="lightbox-counter">@(CurrentIndex + 1) di @Images.Count</div>
                 }
                 <button class="lightbox-close" @onclick="Close" title="Chiudi (Esc)">
-                    ✕
+                    <Icon Name="close" />
                 </button>
             </div>
 
@@ -19,7 +19,7 @@
             <div class="lightbox-content">
                 <!-- Info Toggle Button -->
                 <button class="lightbox-info-toggle" @onclick="ToggleInfo" title="Mostra/Nascondi Info (I)">
-                    ℹ️
+                    <Icon Name="info" />
                 </button>
 
                 <!-- Image Container -->
@@ -51,33 +51,47 @@
                             @onclick="PreviousImage"
                             disabled="@(CurrentIndex == 0 && !isLooping)"
                             title="Immagine Precedente (←)">
-                        ‹
+                        <Icon Name="chevron-left" />
                     </button>
                     <button class="lightbox-nav lightbox-nav-next"
                             @onclick="NextImage"
                             disabled="@(CurrentIndex == Images.Count - 1 && !isLooping)"
                             title="Immagine Successiva (→)">
-                        ›
+                        <Icon Name="chevron-right" />
                     </button>
                 }
 
                 <!-- Zoom Controls -->
                 <div class="lightbox-controls">
                     <button class="lightbox-control" @onclick="ToggleZoom" title="Zoom (Z)">
-                        @(isZoomed ? "🔍-" : "🔍+")
+                        @if (isZoomed)
+                        {
+                            <Icon Name="zoom-out" />
+                        }
+                        else
+                        {
+                            <Icon Name="zoom-in" />
+                        }
                     </button>
                     <button class="lightbox-control" @onclick="ToggleFullscreen" title="Schermo Intero (F)">
-                        @(isFullscreen ? "⤓" : "⤢")
+                        @if (isFullscreen)
+                        {
+                            <Icon Name="exit-fullscreen" />
+                        }
+                        else
+                        {
+                            <Icon Name="fullscreen" />
+                        }
                     </button>
                     @if (Images.Count > 1)
                     {
                         <button class="lightbox-control" @onclick="StartSlideshow" title="Slideshow (S)" disabled="@isSlideshowActive">
-                            ▶️
+                            <Icon Name="slideshow" />
                         </button>
                         @if (isSlideshowActive)
                         {
                             <button class="lightbox-control" @onclick="StopSlideshow" title="Ferma Slideshow">
-                                ⏸️
+                                <Icon Name="pause" />
                             </button>
                         }
                     }
@@ -92,18 +106,30 @@
                             var meta = ImageMetadata[CurrentIndex];
                             @if (!string.IsNullOrEmpty(meta.Year))
                             {
-                                <span>📅 @meta.Year</span>
+                                <span class="lightbox-info-badge">
+                                    <Icon Name="calendar" />
+                                    <span>@meta.Year</span>
+                                </span>
                             }
                             @if (!string.IsNullOrEmpty(meta.Medium))
                             {
-                                <span>🎨 @meta.Medium</span>
+                                <span class="lightbox-info-badge">
+                                    <Icon Name="palette" />
+                                    <span>@meta.Medium</span>
+                                </span>
                             }
                             @if (!string.IsNullOrEmpty(meta.Dimensions))
                             {
-                                <span>📏 @meta.Dimensions</span>
+                                <span class="lightbox-info-badge">
+                                    <Icon Name="ruler" />
+                                    <span>@meta.Dimensions</span>
+                                </span>
                             }
                         }
-                        <span>🖼️ @(CurrentIndex + 1) di @Images.Count</span>
+                        <span class="lightbox-info-badge">
+                            <Icon Name="images" />
+                            <span>@(CurrentIndex + 1) di @Images.Count</span>
+                        </span>
                     </div>
                 </div>
 

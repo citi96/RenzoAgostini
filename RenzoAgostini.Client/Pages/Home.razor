@@ -20,7 +20,7 @@
     else if (!string.IsNullOrEmpty(ErrorMessage))
     {
         <div class="gallery-error">
-            <div class="gallery-error-icon">⚠️</div>
+            <div class="gallery-error-icon"><Icon Name="error" /></div>
             <h2>Impossibile mostrare la galleria</h2>
             <p>@ErrorMessage</p>
             <button class="btn btn-primary" @onclick="ReloadPaintings">Riprova</button>
@@ -47,7 +47,7 @@
     else
     {
         <div class="gallery-empty">
-            <div class="gallery-empty-icon">🎨</div>
+            <div class="gallery-empty-icon"><Icon Name="empty" /></div>
             <h2>Nessuna opera disponibile</h2>
             <p>La galleria verrà aggiornata appena nuove opere saranno disponibili.</p>
             <button class="btn btn-secondary" @onclick="ReloadPaintings">Aggiorna</button>

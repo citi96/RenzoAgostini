@@ -86,7 +86,7 @@
                                    accept="image/*"
                                    class="editor-file-input" />
                         <label class="editor-file-label">
-                            <div class="editor-file-icon">📁</div>
+                            <div class="editor-file-icon"><Icon Name="upload" /></div>
                             <div class="editor-file-text">
                                 Clicca per selezionare immagini
                             </div>
@@ -112,10 +112,13 @@
                                 var index = i;
                                 var image = form.Images[i];
                                 <div class="editor-image-item @(image.IsPrimary ? "primary" : "")">
-                                    @if (image.IsPrimary)
-                                    {
-                                        <div class="editor-primary-badge">⭐ Principale</div>
-                                    }
+                                @if (image.IsPrimary)
+                                {
+                                        <div class="editor-primary-badge">
+                                            <Icon Name="star" />
+                                            <span>Principale</span>
+                                        </div>
+                                }
                                     <img src="@image.Url" alt="Anteprima" class="editor-image" />
                                     <div class="editor-image-overlay">
                                         @if (!image.IsPrimary)
@@ -123,13 +126,14 @@
                                             <button type="button"
                                                     class="editor-image-btn primary"
                                                     @onclick="() => SetPrimary(index)">
-                                                ⭐ Principale
+                                                <Icon Name="star" />
+                                                <span>Principale</span>
                                             </button>
                                         }
                                         <button type="button"
                                                 class="editor-image-btn danger"
                                                 @onclick="() => RemoveImage(index)">
-                                            🗑️
+                                            <Icon Name="trash" />
                                         </button>
                                     </div>
                                 </div>
@@ -153,7 +157,7 @@
                         }
                         else
                         {
-                            <span>💾</span>
+                            <Icon Name="save" />
                             <span>@(IsEditing ? "Salva Modifiche" : "Crea Quadro")</span>
                         }
                     </button>
