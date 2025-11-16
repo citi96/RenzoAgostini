@@ -4,7 +4,7 @@
         <input type="hidden" name="credentialId" value="${credentialId!}" />
         <div class="kc-field">
             <label for="username">${msg("usernameOrEmail", msg("username"))}</label>
-            <input tabindex="1" id="username" name="username" value="${(login.username!'')?html}" type="text" autofocus autocomplete="username" />
+            <input tabindex="1" id="username" name="username" value="${login.username!''}" type="text" autofocus autocomplete="username" />
             <@layout.fieldError fieldName="username" />
         </div>
         <#if realm.password>
