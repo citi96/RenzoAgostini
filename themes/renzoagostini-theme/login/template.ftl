@@ -22,27 +22,9 @@
 </head>
 <body class="kc-body">
     <main class="kc-shell" role="main">
-        <section class="kc-hero">
-            <div class="kc-brand">
-                <img src="${url.resourcesPath}/img/logo.svg" alt="${msg("appName", "Renzo Agostini")}" />
-                <div>
-                    <strong>${msg("appName", realm.displayName!realm.name)}</strong>
-                    <p>${msg("brandSubtitle", "Identità protetta")}</p>
-                </div>
-            </div>
-            <div>
-                <h1>${msg("heroTitle", "Accesso sicuro")}</h1>
-                <p>${msg("heroBody", "Controlla le tue identità con un flusso essenziale")}</p>
-            </div>
-            <div class="kc-badge-list">
-                <div class="kc-badge">
-                    <strong>${msg("badgeReliability", "Affidabilità costante")}</strong>
-                    <p>${msg("badgeReliabilityDesc", "Procedure lineari, nessun superfluo.")}</p>
-                </div>
-                <div class="kc-badge">
-                    <strong>${msg("badgeSecurity", "Sicurezza attiva")}</strong>
-                    <p>${msg("badgeSecurityDesc", "MFA e controlli sempre disponibili.")}</p>
-                </div>
+        <section class="kc-hero" aria-label="${msg("appName", realm.displayName!realm.name)}">
+            <div class="kc-brand" aria-hidden="true">
+                <img src="${url.resourcesPath}/img/logo.svg" alt="" />
             </div>
         </section>
         <section class="kc-panel">
