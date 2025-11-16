@@ -375,19 +375,21 @@
 }
 
 .order-btn-secondary {
-    background: var(--neutral-100);
-    color: var(--neutral-700);
-    border: 1px solid var(--neutral-300);
+    background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-600) 100%);
+    color: white;
+    border: none;
     padding: var(--spacing-3) var(--spacing-5);
     border-radius: var(--radius-lg);
     font-weight: 500;
     cursor: pointer;
     transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
 }
 
     .order-btn-secondary:hover {
-        background: var(--neutral-200);
-        border-color: var(--neutral-400);
+        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+        box-shadow: var(--shadow-colored);
+        transform: translateY(-1px);
     }
 
 .order-btn-primary {
