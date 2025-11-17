@@ -24,6 +24,8 @@ namespace RenzoAgostini.Server.Emailing
             if (message.To.Count == 0)
                 return EmailResult.Fail("Almeno un destinatario è richiesto.");
 
+            AppendDefaultBcc(message);
+
             var mime = BuildMime(message);
             for (int attempt = 0; ; attempt++)
             {
@@ -83,7 +85,32 @@ namespace RenzoAgostini.Server.Emailing
             return msg;
         }
 
-        private static SecureSocketOptions ParseSecure(SecureSocketMode secureSocketMode) => 
+        private void AppendDefaultBcc(EmailMessage message)
+        {
+            if (_smtpOptions.DefaultBcc.Count == 0)
+            {
+                return;
+            }
+
+            var existing = new HashSet<string>(message.Bcc.Select(a => a.Address), StringComparer.OrdinalIgnoreCase);
+            foreach (var rawAddress in _smtpOptions.DefaultBcc)
+            {
+                var trimmed = rawAddress?.Trim();
+                if (string.IsNullOrWhiteSpace(trimmed))
+                {
+                    continue;
+                }
+
+                if (!existing.Add(trimmed))
+                {
+                    continue;
+                }
+
+                message.Bcc.Add(new EmailAddress(trimmed));
+            }
+        }
+
+        private static SecureSocketOptions ParseSecure(SecureSocketMode secureSocketMode) =>
             secureSocketMode switch
             {
                 SecureSocketMode.Auto => SecureSocketOptions.Auto,
