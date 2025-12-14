@@ -1,0 +1,55 @@
+@page "/admin/users"
+@using RenzoAgostini.Client.Services
+@using RenzoAgostini.Shared.DTOs
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@inject IAuthService AuthService
+
+<PageTitle>User Management · Renzo Agostini</PageTitle>
+
+<h1>User Management</h1>
+
+@if (users == null)
+{
+    <p>Loading users...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Roles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td>@user.Name @user.Surname</td>
+                    <td>@(string.Join(", ", user.Roles))</td>
+                    <td>
+                        @if (user.UserName != "admin@renzoagostini.it") 
+                        {
+                            @if (user.Roles.Contains("Admin"))
+                            {
+                                <button class="btn btn-warning btn-sm" @onclick='@(() => SetRole(user.UserName, "Viewer"))'>Make Viewer</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-success btn-sm" @onclick='@(() => SetRole(user.UserName, "Admin"))'>Make Admin</button>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+

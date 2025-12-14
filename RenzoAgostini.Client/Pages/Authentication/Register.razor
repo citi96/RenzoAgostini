@@ -1,0 +1,54 @@
+@page "/authentication/register"
+@layout LoginLayout
+@using RenzoAgostini.Client.Services
+@using RenzoAgostini.Shared.DTOs
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Register · Renzo Agostini</PageTitle>
+
+<EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+
+    <div class="kc-form-group">
+        <label for="firstName" class="kc-label">First Name</label>
+        <InputText id="firstName" class="kc-input" @bind-Value="registerModel.Firstname" />
+    </div>
+
+    <div class="kc-form-group">
+        <label for="lastName" class="kc-label">Last Name</label>
+        <InputText id="lastName" class="kc-input" @bind-Value="registerModel.Lastname" />
+    </div>
+
+    <div class="kc-form-group">
+        <label for="email" class="kc-label">Email</label>
+        <InputText id="email" class="kc-input" @bind-Value="registerModel.Email" />
+        <ValidationMessage For="@(() => registerModel.Email)" class="kc-field-error" />
+    </div>
+
+    <div class="kc-form-group">
+        <label for="password" class="kc-label">Password</label>
+        <InputText type="password" id="password" class="kc-input" @bind-Value="registerModel.Password" />
+        <ValidationMessage For="@(() => registerModel.Password)" class="kc-field-error" />
+    </div>
+
+    <div class="kc-form-group kc-form-actions">
+        <button type="submit" class="kc-button kc-button-primary kc-button-block kc-button-large">
+            Register
+        </button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="kc-message error">
+            @errorMessage
+        </div>
+    }
+
+    <div class="kc-form-group kc-text-center">
+        <span>Already have an account? <a href="authentication/login">Sign In</a></span>
+    </div>
+
+</EditForm>
+
+

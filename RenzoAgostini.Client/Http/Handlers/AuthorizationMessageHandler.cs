@@ -1,18 +1,35 @@
 ﻿using System.Net.Http.Headers;
-using RenzoAgostini.Client.Services;
-using RenzoAgostini.Client.Services.Interfaces;
+using Blazored.LocalStorage;
+using RenzoAgostini.Shared.DTOs;
 
-namespace RenzoAgostini.Client.Http.Handlers
+namespace RenzoAgostini.Client.Http.Handlers;
+
+public class AuthorizationMessageHandler : DelegatingHandler
 {
-    public class AuthorizationMessageHandler(ICookieService cookieService) : DelegatingHandler()
-    {
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var token = await cookieService.GetAsync<string>("access_token");
-            if (!string.IsNullOrEmpty(token) && request.Headers.Authorization == null)
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    private readonly ILocalStorageService _localStorage;
 
+    public AuthorizationMessageHandler(ILocalStorageService localStorage)
+    {
+        _localStorage = localStorage;
+    }
+
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        if (request.RequestUri?.AbsolutePath.Contains("/api/auth/") == true)
+        {
             return await base.SendAsync(request, cancellationToken);
         }
+
+        try
+        {
+            var tokenDto = await _localStorage.GetItemAsync<TokenDto>("authToken", cancellationToken);
+            if (tokenDto != null && !string.IsNullOrWhiteSpace(tokenDto.AccessToken))
+            {
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenDto.AccessToken);
+            }
+        }
+        catch { /* LocalStorage might fail if not available/prerendering */ }
+
+        return await base.SendAsync(request, cancellationToken);
     }
 }

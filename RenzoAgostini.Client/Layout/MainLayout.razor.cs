@@ -9,7 +9,7 @@ namespace RenzoAgostini.Client.Layout
     public partial class MainLayout : IDisposable
     {
         [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
-        [Inject] private IKeycloakService KeycloakService { get; set; } = default!;
+        [Inject] private NavigationManager NavigationManager { get; set; } = default!;
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
         [Inject] private ICartService CartService { get; set; } = default!;
 
@@ -47,19 +47,9 @@ namespace RenzoAgostini.Client.Layout
             CartService.OnChange -= HandleCartChanged;
         }
 
-        private async void ShowLoginModal()
+        private void ShowLoginModal()
         {
-            try
-            {
-                var loginUrl = await KeycloakService.GetLoginUrlAsync();
-                await JSRuntime.InvokeVoidAsync("open", loginUrl, "_self");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Errore Keycloak login: {ex}");
-                // Qui potresti mostrare un toast di errore
-                await ShowToast("Errore durante il login", "error");
-            }
+            NavigationManager.NavigateTo("authentication/login");
         }
 
         private async Task LogoutAsync()
@@ -68,11 +58,10 @@ namespace RenzoAgostini.Client.Layout
             {
                 if (AuthProvider is CustomAuthenticationStateProvider customProvider)
                 {
-                    await customProvider.LogoutAsync();
+                    await customProvider.Logout();
                 }
 
-                var logoutUrl = KeycloakService.GetLogoutUrl();
-                await JSRuntime.InvokeVoidAsync("open", logoutUrl, "_self");
+                NavigationManager.NavigateTo("/", forceLoad: true);
             }
             catch (Exception ex)
             {

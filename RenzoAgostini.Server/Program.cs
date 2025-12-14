@@ -17,6 +17,7 @@ using RenzoAgostini.Server.Services.Interfaces;
 using RenzoAgostini.Shared.Contracts;
 using Stripe;
 using System.Security.Claims;
+using System.Text;
 using IOrderService = RenzoAgostini.Server.Services.Interfaces.IOrderService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,7 +26,7 @@ var builder = WebApplication.CreateBuilder(args);
 var allowAnyCorsInDev = "_allowAnyCorsInDev";
 var allowConfiguredCors = "_allowConfiguredCors";
 
-var keycloakOptions = builder.Configuration.GetSection("Keycloak").Get<KeycloakOptions>() ?? new();
+var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? new();
 var storageOptions = builder.Configuration.GetSection("Storage").Get<StorageOptions>() ?? new();
 var configuredOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
@@ -35,7 +36,7 @@ var configuredOrigins = builder.Configuration
     .Distinct(StringComparer.OrdinalIgnoreCase)
     .ToArray() ?? Array.Empty<string>();
 
-builder.Services.Configure<KeycloakOptions>(builder.Configuration.GetSection("Keycloak"));
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection("Storage"));
 
 // Services
@@ -52,11 +53,18 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.User.AllowedUserNameCharacters = string.Empty;
     options.User.RequireUniqueEmail = true;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
 })
     .AddEntityFrameworkStores<RenzoAgostiniDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddEmailing(builder.Configuration);
+
+builder.Services.AddSingleton<ITokenService, RenzoAgostini.Server.Services.TokenService>();
 
 builder.Services.AddScoped<IPaintingRepository, PaintingRepository>();
 builder.Services.AddScoped<PaintingService>();
@@ -104,14 +112,29 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSwaggerGen(o =>
 {
-    o.AddSecurityDefinition("oauth2",
+    o.AddSecurityDefinition("Bearer",
         new OpenApiSecurityScheme
         {
             Name = "Authorization",
-            Description = "JWT Authorization header.",
+            Description = "JWT Authorization header using the Bearer scheme.",
             In = ParameterLocation.Header,
-            Type = SecuritySchemeType.ApiKey,
+            Type = SecuritySchemeType.Http,
+            Scheme = "Bearer"
         });
+    o.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 builder.Services.AddAuthentication(o =>
@@ -122,55 +145,18 @@ builder.Services.AddAuthentication(o =>
 })
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
     {
-        var authority = keycloakOptions.Authority?.TrimEnd('/');
-        var audiences = keycloakOptions.Audiences
-            .Where(a => !string.IsNullOrWhiteSpace(a))
-            .ToList();
-
-        if (!audiences.Any() && !string.IsNullOrWhiteSpace(keycloakOptions.ClientId))
-        {
-            audiences.Add(keycloakOptions.ClientId);
-        }
-
-        if (!string.IsNullOrWhiteSpace(authority))
-        {
-            o.Authority = authority;
-            o.MetadataAddress = $"{authority}/.well-known/openid-configuration";
-        }
-
-        o.RequireHttpsMetadata = keycloakOptions.RequireHttpsMetadata;
-
+        o.SaveToken = true;
+        o.RequireHttpsMetadata = false; // Set to true in production
         o.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = !string.IsNullOrWhiteSpace(authority),
-            ValidIssuer = authority,
-            ValidateAudience = audiences.Any(),
-            ValidAudiences = audiences,
-            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromSeconds(30)
-        };
-
-        o.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = ctx =>
-            {
-                var id = (ClaimsIdentity)ctx.Principal!.Identity!;
-
-                var res = ctx.Principal.FindFirst("resource_access")?.Value;
-                var clientId = keycloakOptions.ClientId;
-
-                if (!string.IsNullOrEmpty(res) && !string.IsNullOrWhiteSpace(clientId))
-                {
-                    var obj = System.Text.Json.JsonDocument.Parse(res);
-                    if (obj.RootElement.TryGetProperty(clientId, out var client)
-                        && client.TryGetProperty("roles", out var arr2))
-                        foreach (var r in arr2.EnumerateArray())
-                            id.AddClaim(new Claim(ClaimTypes.Role, r.GetString()!));
-                }
-
-                return Task.CompletedTask;
-            }
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidAudience = jwtOptions.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
+            ClockSkew = TimeSpan.Zero
         };
     });
 
@@ -189,6 +175,31 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<RenzoAgostiniDbContext>();
     db.Database.Migrate();
+
+    // Seed Roles and Admin
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    if (!await roleManager.RoleExistsAsync("Admin")) await roleManager.CreateAsync(new IdentityRole("Admin"));
+    if (!await roleManager.RoleExistsAsync("Viewer")) await roleManager.CreateAsync(new IdentityRole("Viewer"));
+
+    var adminEmail = "fchiti071@gmail.com"; // Default admin email
+    if (await userManager.FindByEmailAsync(adminEmail) == null)
+    {
+        var admin = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            Name = "Admin",
+            Surname = "User",
+            SecurityStamp = Guid.NewGuid().ToString()
+        };
+        var result = await userManager.CreateAsync(admin, "Admin123!");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(admin, "Admin");
+        }
+    }
 }
 
 var uploadsRoot = ResolvePath(storageOptions.UploadsPath, builder.Environment);
@@ -207,11 +218,9 @@ if (!string.IsNullOrWhiteSpace(customOrdersRoot))
 // Pipeline
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseCors(allowAnyCorsInDev);
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
     app.UseCors(allowAnyCorsInDev);
 }
 else if (configuredOrigins.Length > 0)

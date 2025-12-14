@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+
+<div class="kc-body">
+    <main class="kc-shell" role="main">
+        <section class="kc-hero" aria-hidden="true">
+            <div class="kc-hero-brand" aria-hidden="true">
+                <img src="/img/logo.svg" alt="Renzo Agostini" />
+            </div>
+        </section>
+        <section class="kc-panel">
+            <header class="kc-panel-header">
+                <h2>Welcome</h2>
+            </header>
+            <div class="kc-content">
+                @Body
+            </div>
+        </section>
+    </main>
+</div>
+
+<link rel="stylesheet" href="/css/renzoagostini.css" />
+<style>
+    /* Ensure component styles don't conflict, simplistic adaptation */
+    .kc-body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+</style>

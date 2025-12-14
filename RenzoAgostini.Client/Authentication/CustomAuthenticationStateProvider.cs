@@ -1,95 +1,60 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text.Json;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
-using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.DTOs;
 
-namespace RenzoAgostini.Client.Authentication
+namespace RenzoAgostini.Client.Authentication;
+
+public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
-    public class CustomAuthenticationStateProvider(ICookieService cookieService, IConfiguration configuration) : AuthenticationStateProvider, IDisposable
+    private readonly ILocalStorageService _localStorage;
+    private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
+
+    public CustomAuthenticationStateProvider(ILocalStorageService localStorage)
     {
-        public UserDto? CurrentUser { get; set; }
+        _localStorage = localStorage;
+    }
 
-        public void Dispose()
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+    {
+        try
         {
-            AuthenticationStateChanged -= OnAuthenticationStateChangedAsync;
-            GC.SuppressFinalize(this);
-        }
+            var tokenDto = await _localStorage.GetItemAsync<TokenDto>("authToken");
 
-        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
-        {
-            var token = await cookieService.GetAsync<string>("access_token");
-            if (string.IsNullOrWhiteSpace(token))
-                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-
-            var principal = CreatePrincipalFromKeycloakToken(token);
-            CurrentUser = UserDto.FromClaimsPrincipal(principal);
-
-            return new AuthenticationState(principal);
-        }
-
-        private ClaimsPrincipal CreatePrincipalFromKeycloakToken(string jwt)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(jwt);
-
-            var claims = new List<Claim>();
-
-            claims.AddRange(token.Claims);
-                        
-            if (token.Payload.TryGetValue("resource_access", out var res))
+            if (tokenDto == null || string.IsNullOrWhiteSpace(tokenDto.AccessToken))
             {
-                using var doc = JsonDocument.Parse(res.ToString()!);
-                if (doc.RootElement.TryGetProperty(configuration["Keycloak:ClientId"] ?? string.Empty, out var client) &&
-                    client.TryGetProperty("roles", out var arr2))
-                    foreach (var r in arr2.EnumerateArray())
-                        claims.Add(new Claim(ClaimTypes.Role, r.GetString()!));
+                return await Task.FromResult(new AuthenticationState(_anonymous));
             }
 
-            var identity = new ClaimsIdentity(claims, "jwt");
-            return new ClaimsPrincipal(identity);
+            var claimsPrincipal = GetClaimsPrincipalFromToken(tokenDto.AccessToken);
+            return await Task.FromResult(new AuthenticationState(claimsPrincipal));
         }
-
-
-        public async Task LogoutAsync()
+        catch
         {
-            CurrentUser = null;
-            await cookieService.ClearAsync("access_token");
-            await cookieService.ClearAsync("auth_state");
-            await cookieService.ClearAsync("auth_nonce");
-
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal())));
+            return await Task.FromResult(new AuthenticationState(_anonymous));
         }
+    }
 
-        public void UpdateCurrentUser(string token)
-        {
-            var principal = CreatePrincipalFromKeycloakToken(token);
-            CurrentUser = UserDto.FromClaimsPrincipal(principal);
+    public async Task Login(TokenDto tokenDto)
+    {
+        await _localStorage.SetItemAsync("authToken", tokenDto);
+        var authState = Task.FromResult(new AuthenticationState(GetClaimsPrincipalFromToken(tokenDto.AccessToken)));
+        NotifyAuthenticationStateChanged(authState);
+    }
 
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(principal)));
-        }
+    public async Task Logout()
+    {
+        await _localStorage.RemoveItemAsync("authToken");
+        var authState = Task.FromResult(new AuthenticationState(_anonymous));
+        NotifyAuthenticationStateChanged(authState);
+    }
 
-        private async void OnAuthenticationStateChangedAsync(Task<AuthenticationState> task)
-        {
-            try
-            {
-                var authenticationState = await task;
-                if (authenticationState?.User?.Identity?.IsAuthenticated == true)
-                {
-                    CurrentUser = UserDto.FromClaimsPrincipal(authenticationState.User);
-                }
-                else
-                {
-                    CurrentUser = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Errore nel cambio stato di autenticazione: {ex.Message}");
-                CurrentUser = null;
-            }
-        }
+    private ClaimsPrincipal GetClaimsPrincipalFromToken(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        var identity = new ClaimsIdentity(jwtToken.Claims, "JwtAuth");
+        return new ClaimsPrincipal(identity);
     }
 }

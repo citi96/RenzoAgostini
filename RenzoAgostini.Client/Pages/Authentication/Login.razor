@@ -1,0 +1,47 @@
+@page "/authentication/login"
+@layout LoginLayout
+@using RenzoAgostini.Client.Services
+@using RenzoAgostini.Shared.DTOs
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject RenzoAgostini.Client.Authentication.CustomAuthenticationStateProvider CustomAuthStateProvider
+
+<PageTitle>Login · Renzo Agostini</PageTitle>
+
+<EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+
+    <div class="kc-form-group">
+        <label for="username" class="kc-label">Email</label>
+        <InputText id="username" class="kc-input" @bind-Value="loginModel.Email" />
+        <ValidationMessage For="@(() => loginModel.Email)" class="kc-field-error" />
+    </div>
+
+    <div class="kc-form-group">
+        <label for="password" class="kc-label">Password</label>
+        <InputText type="password" id="password" class="kc-input" @bind-Value="loginModel.Password" />
+        <ValidationMessage For="@(() => loginModel.Password)" class="kc-field-error" />
+    </div>
+
+    <div class="kc-form-group kc-form-actions">
+        <button type="submit" class="kc-button kc-button-primary kc-button-block kc-button-large">
+            Sign In
+        </button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+            <div class="kc-message error">
+            @errorMessage
+            </div>
+    }
+
+    <div class="kc-form-group kc-text-center">
+         <span>New here? <a href="authentication/register">Create an account</a></span>
+    </div>
+
+</EditForm>
+
+

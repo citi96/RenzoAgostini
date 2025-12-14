@@ -8,6 +8,8 @@ namespace RenzoAgostini.Server.Entities
         public string? PictureUri { get; set; }
         public string? Name { get; set; }
         public string? Surname { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiryTime { get; set; }
 
         public static ApplicationUser? FromGoogleJwt(string token)
         {
