@@ -10,14 +10,12 @@
 
 <PageTitle>Login · Renzo Agostini</PageTitle>
 
-<p class="kc-description">Accedi al tuo account per gestire ordini, preferiti e impostazioni.</p>
-
-<EditForm class="kc-form" Model="loginModel" OnValidSubmit="HandleLogin">
+<EditForm id="kc-form-login" class="kc-form" Model="loginModel" OnValidSubmit="HandleLogin">
     <DataAnnotationsValidator />
 
     <div class="kc-field">
         <label for="username" class="kc-label">Email</label>
-        <InputText id="username" class="kc-input" @bind-Value="loginModel.Email" autocomplete="username" />
+        <InputText id="username" class="kc-input" @bind-Value="loginModel.Email" autocomplete="username" autofocus />
         <ValidationMessage For="@(() => loginModel.Email)" class="kc-field-error" />
     </div>
 
@@ -37,9 +35,9 @@
     <div class="kc-actions">
         <div class="kc-buttons">
             <button type="submit" class="kc-btn primary">
-                Sign In
+                Accedi
             </button>
-            <a class="kc-btn ghost" href="authentication/register">Create an account</a>
+            <a class="kc-btn ghost" href="authentication/register">Registrati</a>
         </div>
     </div>
 </EditForm>

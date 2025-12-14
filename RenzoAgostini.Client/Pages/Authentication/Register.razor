@@ -7,18 +7,16 @@
 
 <PageTitle>Register · Renzo Agostini</PageTitle>
 
-<p class="kc-description">Crea un profilo per seguire ordini, preferiti e novità dalla galleria.</p>
-
-<EditForm class="kc-form" Model="registerModel" OnValidSubmit="HandleRegister">
+<EditForm id="kc-register-form" class="kc-form" Model="registerModel" OnValidSubmit="HandleRegister">
     <DataAnnotationsValidator />
 
     <div class="kc-field">
-        <label for="firstName" class="kc-label">First Name</label>
+        <label for="firstName" class="kc-label">Nome</label>
         <InputText id="firstName" class="kc-input" @bind-Value="registerModel.Firstname" autocomplete="given-name" />
     </div>
 
     <div class="kc-field">
-        <label for="lastName" class="kc-label">Last Name</label>
+        <label for="lastName" class="kc-label">Cognome</label>
         <InputText id="lastName" class="kc-input" @bind-Value="registerModel.Lastname" autocomplete="family-name" />
     </div>
 
@@ -44,9 +42,9 @@
     <div class="kc-actions">
         <div class="kc-buttons">
             <button type="submit" class="kc-btn primary">
-                Create account
+                Registrati
             </button>
-            <a class="kc-btn ghost" href="authentication/login">Sign In</a>
+            <a class="kc-btn-link" href="authentication/login">Torna al login</a>
         </div>
     </div>
 </EditForm>
