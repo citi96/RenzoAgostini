@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Linq;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using RenzoAgostini.Shared.DTOs;
@@ -54,7 +55,19 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         var handler = new JwtSecurityTokenHandler();
         var jwtToken = handler.ReadJwtToken(token);
-        var identity = new ClaimsIdentity(jwtToken.Claims, "JwtAuth");
+
+        var normalizedClaims = jwtToken.Claims
+            .Select(claim => claim.Type.Equals("role", StringComparison.OrdinalIgnoreCase)
+                ? new Claim("role", claim.Value.ToLowerInvariant())
+                : claim)
+            .ToList();
+
+        var identity = new ClaimsIdentity(
+            normalizedClaims,
+            authenticationType: "JwtAuth",
+            nameType: ClaimTypes.Name,
+            roleType: "role");
+
         return new ClaimsPrincipal(identity);
     }
 }
