@@ -11,6 +11,8 @@ public interface IAuthService
     Task<TokenDto?> RefreshTokenAsync(TokenDto tokenDto);
     Task<List<UserDto>> GetUsersAsync();
     Task<bool> AssignRoleAsync(string username, string role);
+    Task<bool> RequestPasswordResetAsync(string email);
+    Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
 }
 
 public class AuthService : IAuthService
@@ -61,6 +63,18 @@ public class AuthService : IAuthService
     public async Task<bool> AssignRoleAsync(string username, string role)
     {
         var response = await _httpClient.PostAsJsonAsync("api/auth/roles", new SetRoleDto { UserName = username, Role = role });
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> RequestPasswordResetAsync(string email)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/auth/forgot-password", new ForgotPasswordDto { Email = email });
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/auth/reset-password", resetPasswordDto);
         return response.IsSuccessStatusCode;
     }
 }

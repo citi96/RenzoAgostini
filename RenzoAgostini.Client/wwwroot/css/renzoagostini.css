@@ -102,6 +102,8 @@ body.kc-body,
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+    gap: 0.35rem;
 }
 
 .kc-panel h2 {

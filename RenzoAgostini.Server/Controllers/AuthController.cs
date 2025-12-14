@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using RenzoAgostini.Server.Emailing.Interfaces;
+using RenzoAgostini.Server.Emailing.Models;
 using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Server.Services;
 using RenzoAgostini.Shared.DTOs;
 using System.Security.Claims;
+using System.Text;
 
 namespace RenzoAgostini.Server.Controllers;
 
@@ -14,7 +18,9 @@ namespace RenzoAgostini.Server.Controllers;
 public class AuthController(
     UserManager<ApplicationUser> userManager,
     RoleManager<IdentityRole> roleManager,
-    ITokenService tokenService) : ControllerBase
+    ITokenService tokenService,
+    ICustomEmailSender emailSender,
+    IConfiguration configuration) : ControllerBase
 {
     [HttpPost("login")]
     public async Task<ActionResult<TokenDto>> Login([FromBody] LoginDto loginDto)
@@ -136,5 +142,69 @@ public class AuthController(
         await userManager.AddToRoleAsync(user, setRoleDto.Role);
 
         return Ok($"Role {setRoleDto.Role} assigned to user {setRoleDto.UserName}");
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var user = await userManager.FindByEmailAsync(dto.Email);
+        if (user is null)
+        {
+            return Ok();
+        }
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+        var clientBaseUrl = configuration["ClientBaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
+        var resetUrl = $"{clientBaseUrl}/authentication/reset-password?token={encodedToken}&email={Uri.EscapeDataString(user.Email!)}";
+
+        var emailResult = await emailSender.SendAsync(new EmailMessage(
+            From: null,
+            ReplyTo: null,
+            TextBody: $"Reimposta la tua password usando questo link: {resetUrl}",
+            HtmlBody: $"<p>Ciao {user.Name ?? user.Email},</p><p>Per reimpostare la password clicca il pulsante qui sotto.</p><p><a href=\"{resetUrl}\" style=\"padding:12px 18px;border-radius:12px;background:#7c3aed;color:white;text-decoration:none;font-weight:600;\">Reimposta password</a></p>"
+        )
+        {
+            To = [new EmailAddress(user.Email!, user.Name ?? user.Email)]
+        });
+
+        if (!emailResult.Success)
+        {
+            return Problem(emailResult.Error ?? "Impossibile inviare l'email di reset.");
+        }
+
+        return Ok();
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var user = await userManager.FindByEmailAsync(dto.Email);
+        if (user is null)
+        {
+            return BadRequest("Utente non trovato");
+        }
+
+        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(dto.Token));
+        var result = await userManager.ResetPasswordAsync(user, decodedToken, dto.Password);
+
+        if (result.Succeeded)
+        {
+            return Ok();
+        }
+
+        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+        return BadRequest(errors);
     }
 }

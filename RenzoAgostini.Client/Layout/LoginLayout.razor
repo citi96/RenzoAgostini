@@ -12,12 +12,16 @@
     <main class="kc-shell" role="main">
         <section class="kc-hero" aria-hidden="true">
             <div class="kc-hero-brand" aria-hidden="true">
-                <img src="/img/logo.svg" alt="Renzo Agostini" />
+                <img src="img/logo.svg" alt="Renzo Agostini" />
             </div>
         </section>
         <section class="kc-panel">
             <header class="kc-panel-header">
                 <h2>@HeaderTitle</h2>
+                @if (!string.IsNullOrEmpty(HeaderSubtitle))
+                {
+                    <p class="kc-description">@HeaderSubtitle</p>
+                }
             </header>
             @Body
         </section>
@@ -31,7 +35,21 @@
     [Inject]
     private IJSRuntime JsRuntime { get; set; } = default!;
 
-    private string HeaderTitle => IsRegisterRoute ? "Registrati" : "Accedi";
+    private string HeaderTitle => NavigationManager.Uri switch
+    {
+        var uri when uri.Contains("/authentication/register", System.StringComparison.OrdinalIgnoreCase) => "Registrati",
+        var uri when uri.Contains("/authentication/forgot-password", System.StringComparison.OrdinalIgnoreCase) => "Password dimenticata",
+        var uri when uri.Contains("/authentication/reset-password", System.StringComparison.OrdinalIgnoreCase) => "Reimposta password",
+        _ => "Accedi"
+    };
+
+    private string HeaderSubtitle => NavigationManager.Uri switch
+    {
+        var uri when uri.Contains("/authentication/register", System.StringComparison.OrdinalIgnoreCase) => "Crea il tuo profilo per i servizi Renzo Agostini",
+        var uri when uri.Contains("/authentication/forgot-password", System.StringComparison.OrdinalIgnoreCase) => "Inserisci la mail per ricevere le istruzioni",
+        var uri when uri.Contains("/authentication/reset-password", System.StringComparison.OrdinalIgnoreCase) => "Imposta una nuova password e recupera l'accesso",
+        _ => "Accedi con le tue credenziali aziendali"
+    };
 
     private bool IsRegisterRoute => NavigationManager.Uri.Contains("/authentication/register", System.StringComparison.OrdinalIgnoreCase);
 
