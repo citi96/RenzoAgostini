@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@implements IAsyncDisposable
 
 <HeadContent>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -27,7 +28,23 @@
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
 
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
+
     private string HeaderTitle => IsRegisterRoute ? "Registrati" : "Accedi";
 
     private bool IsRegisterRoute => NavigationManager.Uri.Contains("/authentication/register", System.StringComparison.OrdinalIgnoreCase);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("document.body.classList.add", "kc-body");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("document.body.classList.remove", "kc-body");
+    }
 }
