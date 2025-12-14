@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RenzoAgostini.Server.Auth;
 using RenzoAgostini.Server.Config;
 using RenzoAgostini.Server.Data;
 using RenzoAgostini.Server.Emailing.Extensions;
@@ -64,6 +66,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddDefaultTokenProviders();
 
 builder.Services.AddEmailing(builder.Configuration);
+
+builder.Services.AddSingleton<IClaimsTransformation, LowercaseRoleClaimsTransformation>();
 
 builder.Services.AddSingleton<ITokenService, RenzoAgostini.Server.Services.TokenService>();
 
