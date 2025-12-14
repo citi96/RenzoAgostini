@@ -7,35 +7,31 @@
 
 <PageTitle>Register · Renzo Agostini</PageTitle>
 
-<EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+<p class="kc-description">Crea un profilo per seguire ordini, preferiti e novità dalla galleria.</p>
+
+<EditForm class="kc-form" Model="registerModel" OnValidSubmit="HandleRegister">
     <DataAnnotationsValidator />
 
-    <div class="kc-form-group">
+    <div class="kc-field">
         <label for="firstName" class="kc-label">First Name</label>
-        <InputText id="firstName" class="kc-input" @bind-Value="registerModel.Firstname" />
+        <InputText id="firstName" class="kc-input" @bind-Value="registerModel.Firstname" autocomplete="given-name" />
     </div>
 
-    <div class="kc-form-group">
+    <div class="kc-field">
         <label for="lastName" class="kc-label">Last Name</label>
-        <InputText id="lastName" class="kc-input" @bind-Value="registerModel.Lastname" />
+        <InputText id="lastName" class="kc-input" @bind-Value="registerModel.Lastname" autocomplete="family-name" />
     </div>
 
-    <div class="kc-form-group">
+    <div class="kc-field">
         <label for="email" class="kc-label">Email</label>
-        <InputText id="email" class="kc-input" @bind-Value="registerModel.Email" />
+        <InputText id="email" class="kc-input" @bind-Value="registerModel.Email" autocomplete="email" />
         <ValidationMessage For="@(() => registerModel.Email)" class="kc-field-error" />
     </div>
 
-    <div class="kc-form-group">
+    <div class="kc-field">
         <label for="password" class="kc-label">Password</label>
-        <InputText type="password" id="password" class="kc-input" @bind-Value="registerModel.Password" />
+        <InputText type="password" id="password" class="kc-input" @bind-Value="registerModel.Password" autocomplete="new-password" />
         <ValidationMessage For="@(() => registerModel.Password)" class="kc-field-error" />
-    </div>
-
-    <div class="kc-form-group kc-form-actions">
-        <button type="submit" class="kc-button kc-button-primary kc-button-block kc-button-large">
-            Register
-        </button>
     </div>
 
     @if (!string.IsNullOrEmpty(errorMessage))
@@ -45,10 +41,14 @@
         </div>
     }
 
-    <div class="kc-form-group kc-text-center">
-        <span>Already have an account? <a href="authentication/login">Sign In</a></span>
+    <div class="kc-actions">
+        <div class="kc-buttons">
+            <button type="submit" class="kc-btn primary">
+                Create account
+            </button>
+            <a class="kc-btn ghost" href="authentication/login">Sign In</a>
+        </div>
     </div>
-
 </EditForm>
 
 

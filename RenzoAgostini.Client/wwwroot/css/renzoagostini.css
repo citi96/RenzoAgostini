@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 :root {
     --primary-50: #faf5ff;
     --primary-100: #f3e8ff;
@@ -109,6 +111,12 @@
     margin: 0;
 }
 
+.kc-panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
 .kc-description {
     color: var(--neutral-500);
     font-size: 0.95rem;
@@ -194,7 +202,8 @@ form.kc-form {
     gap: 0.4rem;
 }
 
-.kc-field label {
+.kc-field label,
+.kc-label {
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--neutral-700);
@@ -202,7 +211,10 @@ form.kc-form {
 
 .kc-field input,
 .kc-field select,
-.kc-field textarea {
+.kc-field textarea,
+.kc-input,
+.kc-select,
+.kc-textarea {
     border: 1px solid var(--neutral-200);
     border-radius: var(--radius-lg);
     padding: 0.75rem 1rem;
@@ -212,7 +224,10 @@ form.kc-form {
 
 .kc-field input:focus,
 .kc-field select:focus,
-.kc-field textarea:focus {
+.kc-field textarea:focus,
+.kc-input:focus,
+.kc-select:focus,
+.kc-textarea:focus {
     outline: none;
     border-color: var(--primary-500);
     box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.15);

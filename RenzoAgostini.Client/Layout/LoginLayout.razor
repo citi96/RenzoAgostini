@@ -1,5 +1,12 @@
 @inherits LayoutComponentBase
 
+<HeadContent>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" />
+    <link rel="stylesheet" href="/css/renzoagostini.css" />
+</HeadContent>
+
 <div class="kc-body">
     <main class="kc-shell" role="main">
         <section class="kc-hero" aria-hidden="true">
@@ -9,21 +16,14 @@
         </section>
         <section class="kc-panel">
             <header class="kc-panel-header">
-                <h2>Welcome</h2>
+                <div>
+                    <h2>Welcome</h2>
+                    <p class="kc-description">Accedi o crea il tuo account per continuare.</p>
+                </div>
             </header>
-            <div class="kc-content">
+            <div class="kc-panel-content">
                 @Body
             </div>
         </section>
     </main>
 </div>
-
-<link rel="stylesheet" href="/css/renzoagostini.css" />
-<style>
-    /* Ensure component styles don't conflict, simplistic adaptation */
-    .kc-body {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
-</style>
