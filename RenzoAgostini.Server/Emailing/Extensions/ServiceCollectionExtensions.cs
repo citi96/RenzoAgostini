@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using RenzoAgostini.Server.Config;
 using RenzoAgostini.Server.Emailing.Interfaces;
+using Resend;
 
 namespace RenzoAgostini.Server.Emailing.Extensions
 {
@@ -8,13 +10,14 @@ namespace RenzoAgostini.Server.Emailing.Extensions
     {
         public static IServiceCollection AddEmailing(this IServiceCollection services, IConfiguration config)
         {
-            services.AddOptions<SmtpOptions>()
-                .Bind(config.GetSection("Email:Smtp"))
-                .ValidateDataAnnotations()
-                .Validate(o => !string.IsNullOrWhiteSpace(o.Host), "Host richiesto");
+            services.AddOptions<ResendClientOptions>()
+                .Configure(o => o.ApiToken = config["Resend:ApiToken"]!);
 
-            services.AddSingleton<ICustomEmailSender, SmtpEmailSender>();
-            services.AddHealthChecks().AddCheck<SmtpHealthCheck>("smtp", HealthStatus.Degraded);
+            services.AddHttpClient<ResendClient>();
+            services.AddTransient<IResend, ResendClient>();
+
+            services.AddTransient<ICustomEmailSender, ResendEmailSender>();
+
             return services;
         }
     }
