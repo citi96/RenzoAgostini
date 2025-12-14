@@ -16,12 +16,13 @@
         </section>
         <section class="kc-panel">
             <header class="kc-panel-header">
-                <div class="kc-panel-content">
-                    <h2>@HeaderTitle</h2>
-                    <p class="kc-description">@HeaderSubtitle</p>
-                </div>
+                <h2>@HeaderTitle</h2>
             </header>
             <section class="kc-panel-content">
+                @if (!string.IsNullOrWhiteSpace(HeaderSubtitle))
+                {
+                    <p class="kc-description">@HeaderSubtitle</p>
+                }
                 @Body
             </section>
         </section>

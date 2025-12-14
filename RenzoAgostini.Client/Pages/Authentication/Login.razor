@@ -14,14 +14,14 @@
     <DataAnnotationsValidator />
 
     <div class="kc-field">
-        <label for="username" class="kc-label">Email</label>
-        <InputText id="username" class="kc-input" @bind-Value="loginModel.Email" autocomplete="username" autofocus />
+        <label for="username">Email</label>
+        <InputText id="username" @bind-Value="loginModel.Email" autocomplete="username" autofocus />
         <ValidationMessage For="@(() => loginModel.Email)" class="kc-field-error" />
     </div>
 
     <div class="kc-field">
-        <label for="password" class="kc-label">Password</label>
-        <InputText type="password" id="password" class="kc-input" @bind-Value="loginModel.Password" autocomplete="current-password" />
+        <label for="password">Password</label>
+        <InputText type="password" id="password" @bind-Value="loginModel.Password" autocomplete="current-password" />
         <ValidationMessage For="@(() => loginModel.Password)" class="kc-field-error" />
     </div>
 

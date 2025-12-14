@@ -11,24 +11,26 @@
     <DataAnnotationsValidator />
 
     <div class="kc-field">
-        <label for="firstName" class="kc-label">Nome</label>
-        <InputText id="firstName" class="kc-input" @bind-Value="registerModel.Firstname" autocomplete="given-name" />
+        <label for="firstName">Nome</label>
+        <InputText id="firstName" @bind-Value="registerModel.Firstname" autocomplete="given-name" />
+        <ValidationMessage For="@(() => registerModel.Firstname)" class="kc-field-error" />
     </div>
 
     <div class="kc-field">
-        <label for="lastName" class="kc-label">Cognome</label>
-        <InputText id="lastName" class="kc-input" @bind-Value="registerModel.Lastname" autocomplete="family-name" />
+        <label for="lastName">Cognome</label>
+        <InputText id="lastName" @bind-Value="registerModel.Lastname" autocomplete="family-name" />
+        <ValidationMessage For="@(() => registerModel.Lastname)" class="kc-field-error" />
     </div>
 
     <div class="kc-field">
-        <label for="email" class="kc-label">Email</label>
-        <InputText id="email" class="kc-input" @bind-Value="registerModel.Email" autocomplete="email" />
+        <label for="email">Email</label>
+        <InputText id="email" @bind-Value="registerModel.Email" autocomplete="email" />
         <ValidationMessage For="@(() => registerModel.Email)" class="kc-field-error" />
     </div>
 
     <div class="kc-field">
-        <label for="password" class="kc-label">Password</label>
-        <InputText type="password" id="password" class="kc-input" @bind-Value="registerModel.Password" autocomplete="new-password" />
+        <label for="password">Password</label>
+        <InputText type="password" id="password" @bind-Value="registerModel.Password" autocomplete="new-password" />
         <ValidationMessage For="@(() => registerModel.Password)" class="kc-field-error" />
     </div>
 
