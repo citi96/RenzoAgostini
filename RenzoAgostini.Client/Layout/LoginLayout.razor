@@ -18,13 +18,7 @@
             <header class="kc-panel-header">
                 <h2>@HeaderTitle</h2>
             </header>
-            <section class="kc-panel-content">
-                @if (!string.IsNullOrWhiteSpace(HeaderSubtitle))
-                {
-                    <p class="kc-description">@HeaderSubtitle</p>
-                }
-                @Body
-            </section>
+            @Body
         </section>
     </main>
 </div>
@@ -34,10 +28,6 @@
     private NavigationManager NavigationManager { get; set; } = default!;
 
     private string HeaderTitle => IsRegisterRoute ? "Registrati" : "Accedi";
-
-    private string HeaderSubtitle => IsRegisterRoute
-        ? "Crea il tuo profilo per i servizi Renzo Agostini"
-        : "Accedi con le tue credenziali aziendali";
 
     private bool IsRegisterRoute => NavigationManager.Uri.Contains("/authentication/register", System.StringComparison.OrdinalIgnoreCase);
 }

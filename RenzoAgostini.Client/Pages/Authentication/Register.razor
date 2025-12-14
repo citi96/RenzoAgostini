@@ -7,6 +7,13 @@
 
 <PageTitle>Register · Renzo Agostini</PageTitle>
 
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="kc-message error">
+        @errorMessage
+    </div>
+}
+
 <EditForm id="kc-register-form" class="kc-form" Model="registerModel" OnValidSubmit="HandleRegister">
     <DataAnnotationsValidator />
 
@@ -33,13 +40,6 @@
         <InputText type="password" id="password" @bind-Value="registerModel.Password" autocomplete="new-password" />
         <ValidationMessage For="@(() => registerModel.Password)" class="kc-field-error" />
     </div>
-
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div class="kc-message error">
-            @errorMessage
-        </div>
-    }
 
     <div class="kc-actions">
         <div class="kc-buttons">

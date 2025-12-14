@@ -10,11 +10,18 @@
 
 <PageTitle>Login · Renzo Agostini</PageTitle>
 
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="kc-message error">
+        @errorMessage
+    </div>
+}
+
 <EditForm id="kc-form-login" class="kc-form" Model="loginModel" OnValidSubmit="HandleLogin">
     <DataAnnotationsValidator />
 
     <div class="kc-field">
-        <label for="username">Email</label>
+        <label for="username">Username o email</label>
         <InputText id="username" @bind-Value="loginModel.Email" autocomplete="username" autofocus />
         <ValidationMessage For="@(() => loginModel.Email)" class="kc-field-error" />
     </div>
@@ -24,13 +31,6 @@
         <InputText type="password" id="password" @bind-Value="loginModel.Password" autocomplete="current-password" />
         <ValidationMessage For="@(() => loginModel.Password)" class="kc-field-error" />
     </div>
-
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div class="kc-message error">
-            @errorMessage
-        </div>
-    }
 
     <div class="kc-actions">
         <div class="kc-buttons">
