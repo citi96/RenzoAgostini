@@ -1,5 +1,6 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using RenzoAgostini.Client.Components
+@using RenzoAgostini.Shared.Constants
 @inherits LayoutComponentBase
 
 <nav class="nav">
@@ -11,7 +12,7 @@
 
         <!-- Desktop Navigation Links -->
         <div class="nav-links">            
-            <AuthorizeView Roles="Admin">
+            <AuthorizeView Roles="@RoleNames.Admin">
                 <Authorized>
                     <a class="nav-link" href="/admin/paintings">
                         <Icon Name="gallery" />
@@ -93,7 +94,7 @@
                 <Icon Name="custom" />
                 <span>Quadro Personalizzato</span>
             </a>
-            <AuthorizeView Roles="Admin">
+            <AuthorizeView Roles="@RoleNames.Admin">
                 <Authorized>
                     <a class="nav-mobile-link" href="/admin/paintings" @onclick="CloseMobileMenu">
                         <Icon Name="gallery" />

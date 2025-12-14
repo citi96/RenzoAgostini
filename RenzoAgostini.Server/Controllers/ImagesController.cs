@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RenzoAgostini.Shared.Constants;
 
 namespace RenzoAgostini.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = RoleNames.Admin)]
     public class ImagesController(IWebHostEnvironment environment, ILogger<ImagesController> logger) : ControllerBase
     {
         private readonly string _uploadsPath = Path.Combine(environment.WebRootPath, "uploads");

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RenzoAgostini.Server.Services.Interfaces;
+using RenzoAgostini.Shared.Constants;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
 
@@ -30,7 +32,7 @@ namespace RenzoAgostini.Server.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<ActionResult<PaintingDto>> Create(CreatePaintingDto dto)
         {
             var created = await paintingService.CreatePaintingAsync(dto);
@@ -38,7 +40,7 @@ namespace RenzoAgostini.Server.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<ActionResult<PaintingDto>> Update(int id, CreatePaintingDto dto)
         {
             var updated = await paintingService.UpdatePaintingAsync(id, dto);
@@ -46,7 +48,7 @@ namespace RenzoAgostini.Server.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<IActionResult> Delete(int id)
         {
             await paintingService.DeletePaintingAsync(id);

@@ -1,9 +1,10 @@
 ﻿@page "/admin/custom-orders"
 @using System.Globalization
 @using Microsoft.AspNetCore.Authorization
+@using RenzoAgostini.Shared.Constants
 @using RenzoAgostini.Shared.DTOs
 @using RenzoAgostini.Shared.Data
-@attribute [Authorize(Roles = "admin")]
+@attribute [Authorize(Roles = RoleNames.Admin)]
 
 <PageTitle>Gestione Richieste Personalizzate - Admin</PageTitle>
 

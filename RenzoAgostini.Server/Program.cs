@@ -14,6 +14,7 @@ using RenzoAgostini.Server.Repositories;
 using RenzoAgostini.Server.Repositories.Interfaces;
 using RenzoAgostini.Server.Services;
 using RenzoAgostini.Server.Services.Interfaces;
+using RenzoAgostini.Shared.Constants;
 using RenzoAgostini.Shared.Contracts;
 using Stripe;
 using System.Security.Claims;
@@ -180,8 +181,8 @@ using (var scope = app.Services.CreateScope())
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-    if (!await roleManager.RoleExistsAsync("Admin")) await roleManager.CreateAsync(new IdentityRole("Admin"));
-    if (!await roleManager.RoleExistsAsync("Viewer")) await roleManager.CreateAsync(new IdentityRole("Viewer"));
+    if (!await roleManager.RoleExistsAsync(RoleNames.Admin)) await roleManager.CreateAsync(new IdentityRole(RoleNames.Admin));
+    if (!await roleManager.RoleExistsAsync(RoleNames.Viewer)) await roleManager.CreateAsync(new IdentityRole(RoleNames.Viewer));
 
     var adminEmail = "fchiti071@gmail.com"; // Default admin email
     if (await userManager.FindByEmailAsync(adminEmail) == null)
@@ -197,7 +198,7 @@ using (var scope = app.Services.CreateScope())
         var result = await userManager.CreateAsync(admin, "Admin123!");
         if (result.Succeeded)
         {
-            await userManager.AddToRoleAsync(admin, "Admin");
+            await userManager.AddToRoleAsync(admin, RoleNames.Admin);
         }
     }
 }

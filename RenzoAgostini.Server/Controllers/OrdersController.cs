@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RenzoAgostini.Server.Services.Interfaces;
+using RenzoAgostini.Shared.Constants;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = RoleNames.Admin)]
     public class OrdersController(IOrderService orderService, ILogger<OrdersController> logger) : ControllerBase
     {
         [HttpGet]

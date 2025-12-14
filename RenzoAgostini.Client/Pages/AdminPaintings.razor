@@ -1,6 +1,7 @@
 ﻿@page "/admin/paintings"
 @using Microsoft.AspNetCore.Authorization
-@attribute [Authorize(Roles = "admin")]
+@using RenzoAgostini.Shared.Constants
+@attribute [Authorize(Roles = RoleNames.Admin)]
 
 <PageTitle>Gestione Quadri - Admin</PageTitle>
 

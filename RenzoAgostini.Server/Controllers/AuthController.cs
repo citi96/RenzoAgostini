@@ -7,6 +7,7 @@ using RenzoAgostini.Server.Emailing.Interfaces;
 using RenzoAgostini.Server.Emailing.Models;
 using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Server.Services;
+using RenzoAgostini.Shared.Constants;
 using RenzoAgostini.Shared.DTOs;
 using System.Security.Claims;
 using System.Text;
@@ -31,7 +32,9 @@ public class AuthController(
             return Unauthorized("Invalid Authentication");
         }
 
-        var roles = await userManager.GetRolesAsync(user);
+        var roles = (await userManager.GetRolesAsync(user))
+            .Select(static role => role.ToLowerInvariant())
+            .ToList();
         var accessToken = tokenService.GenerateAccessToken(user, roles);
         var refreshToken = tokenService.GenerateRefreshToken();
 
@@ -62,10 +65,10 @@ public class AuthController(
         if (!result.Succeeded)
             return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
-        if (!await roleManager.RoleExistsAsync("Viewer"))
-            await roleManager.CreateAsync(new IdentityRole("Viewer"));
+        if (!await roleManager.RoleExistsAsync(RoleNames.Viewer))
+            await roleManager.CreateAsync(new IdentityRole(RoleNames.Viewer));
 
-        await userManager.AddToRoleAsync(user, "Viewer");
+        await userManager.AddToRoleAsync(user, RoleNames.Viewer);
 
         return Ok(new { Status = "Success", Message = "User created successfully!" });
     }
@@ -86,7 +89,11 @@ public class AuthController(
         if (user == null || user.RefreshToken != tokenDto.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             return BadRequest("Invalid access token or refresh token");
 
-        var newAccessToken = tokenService.GenerateAccessToken(user, await userManager.GetRolesAsync(user));
+        var userRoles = (await userManager.GetRolesAsync(user))
+            .Select(static role => role.ToLowerInvariant())
+            .ToList();
+
+        var newAccessToken = tokenService.GenerateAccessToken(user, userRoles);
         var newRefreshToken = tokenService.GenerateRefreshToken();
 
         user.RefreshToken = newRefreshToken;
@@ -95,7 +102,7 @@ public class AuthController(
         return Ok(new TokenDto { AccessToken = newAccessToken, RefreshToken = newRefreshToken });
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = RoleNames.Admin)]
     [HttpGet("users")]
     public async Task<ActionResult<List<UserDto>>> GetUsers()
     {
@@ -104,20 +111,22 @@ public class AuthController(
 
         foreach (var user in users)
         {
-            var roles = await userManager.GetRolesAsync(user);
+            var roles = (await userManager.GetRolesAsync(user))
+                .Select(static role => role.ToLowerInvariant())
+                .ToList();
             userDtos.Add(new UserDto
             {
                 Email = user.Email ?? "",
                 UserName = user.UserName ?? "",
                 Name = user.Name ?? "",
                 Surname = user.Surname ?? "",
-                Roles = roles.ToList() // Assuming UserDto has Roles property, detailed check needed
+                Roles = roles // Assuming UserDto has Roles property, detailed check needed
             });
         }
         return Ok(userDtos);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = RoleNames.Admin)]
     [HttpPost("roles")]
     public async Task<IActionResult> AssignRole([FromBody] SetRoleDto setRoleDto)
     {
@@ -125,7 +134,9 @@ public class AuthController(
         if (user == null)
             return NotFound("User not found");
 
-        var roleExists = await roleManager.RoleExistsAsync(setRoleDto.Role);
+        var normalizedRole = setRoleDto.Role.ToLowerInvariant();
+
+        var roleExists = await roleManager.RoleExistsAsync(normalizedRole);
         if (!roleExists)
             return BadRequest("Role does not exist");
 
@@ -139,9 +150,9 @@ public class AuthController(
         // Safe bet: Remove from all other roles, add to this one.
         var currentRoles = await userManager.GetRolesAsync(user);
         await userManager.RemoveFromRolesAsync(user, currentRoles);
-        await userManager.AddToRoleAsync(user, setRoleDto.Role);
+        await userManager.AddToRoleAsync(user, normalizedRole);
 
-        return Ok($"Role {setRoleDto.Role} assigned to user {setRoleDto.UserName}");
+        return Ok($"Role {normalizedRole} assigned to user {setRoleDto.UserName}");
     }
 
     [HttpPost("forgot-password")]

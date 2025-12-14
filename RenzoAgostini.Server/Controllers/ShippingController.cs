@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RenzoAgostini.Server.Services.Interfaces;
+using RenzoAgostini.Shared.Constants;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Server.Controllers
@@ -21,7 +22,7 @@ namespace RenzoAgostini.Server.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<ActionResult<IReadOnlyList<ShippingOptionDto>>> GetAll()
         {
             var options = await shippingService.GetAllAsync();
@@ -29,7 +30,7 @@ namespace RenzoAgostini.Server.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<ActionResult<ShippingOptionDto>> Create([FromBody] CreateShippingOptionDto dto)
         {
             var created = await shippingService.CreateAsync(dto);
@@ -38,7 +39,7 @@ namespace RenzoAgostini.Server.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<ActionResult<ShippingOptionDto>> Update(int id, [FromBody] UpdateShippingOptionDto dto)
         {
             var updated = await shippingService.UpdateAsync(id, dto);
@@ -47,7 +48,7 @@ namespace RenzoAgostini.Server.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<IActionResult> Delete(int id)
         {
             await shippingService.DeleteAsync(id);

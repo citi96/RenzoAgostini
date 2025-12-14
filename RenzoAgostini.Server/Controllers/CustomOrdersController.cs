@@ -1,6 +1,8 @@
-﻿// RenzoAgostini.Server/Controllers/CustomOrdersController.cs
+// RenzoAgostini.Server/Controllers/CustomOrdersController.cs
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RenzoAgostini.Server.Services.Interfaces;
+using RenzoAgostini.Shared.Constants;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
 
@@ -25,7 +27,7 @@ namespace RenzoAgostini.Server.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<ActionResult<IEnumerable<CustomOrderDto>>> GetAllCustomOrders()
         {
             var customOrders = await customOrderService.GetAllCustomOrdersAsync();
@@ -33,7 +35,7 @@ namespace RenzoAgostini.Server.Controllers
         }
 
         [HttpPost("{id}/accept")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<ActionResult<CustomOrderDto>> AcceptCustomOrder(int id, [FromBody] AcceptCustomOrderDto dto)
         {
             var result = await customOrderService.AcceptCustomOrderAsync(id, dto);
@@ -41,7 +43,7 @@ namespace RenzoAgostini.Server.Controllers
         }
 
         [HttpPost("{id}/reject")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<ActionResult<CustomOrderDto>> RejectCustomOrder(int id, [FromBody] string? reason)
         {
             var result = await customOrderService.RejectCustomOrderAsync(id, reason);

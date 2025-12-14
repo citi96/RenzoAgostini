@@ -1,8 +1,9 @@
 @page "/admin/users"
 @using RenzoAgostini.Client.Services
+@using RenzoAgostini.Shared.Constants
 @using RenzoAgostini.Shared.DTOs
 @using Microsoft.AspNetCore.Authorization
-@attribute [Authorize(Roles = "Admin")]
+@attribute [Authorize(Roles = RoleNames.Admin)]
 @inject IAuthService AuthService
 
 <PageTitle>User Management · Renzo Agostini</PageTitle>
@@ -34,15 +35,15 @@ else
                     <td>@user.Name @user.Surname</td>
                     <td>@(string.Join(", ", user.Roles))</td>
                     <td>
-                        @if (user.UserName != "admin@renzoagostini.it") 
+                        @if (user.UserName != "admin@renzoagostini.it")
                         {
-                            @if (user.Roles.Contains("Admin"))
+                            @if (user.Roles.Any(role => string.Equals(role, RoleNames.Admin, StringComparison.OrdinalIgnoreCase)))
                             {
-                                <button class="btn btn-warning btn-sm" @onclick='@(() => SetRole(user.UserName, "Viewer"))'>Make Viewer</button>
+                                <button class="btn btn-warning btn-sm" @onclick='@(() => SetRole(user.UserName, RoleNames.Viewer))'>Make Viewer</button>
                             }
                             else
                             {
-                                <button class="btn btn-success btn-sm" @onclick='@(() => SetRole(user.UserName, "Admin"))'>Make Admin</button>
+                                <button class="btn btn-success btn-sm" @onclick='@(() => SetRole(user.UserName, RoleNames.Admin))'>MakeAdmin</button>
                             }
                         }
                     </td>
@@ -51,5 +52,4 @@ else
         </tbody>
     </table>
 }
-
 

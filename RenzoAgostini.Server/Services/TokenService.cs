@@ -25,6 +25,12 @@ public class TokenService(IOptions<JwtOptions> jwtOptions) : ITokenService
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_options.Key);
 
+        var normalizedRoles = roles
+            .Where(static role => !string.IsNullOrWhiteSpace(role))
+            .Select(static role => role.ToLowerInvariant())
+            .Distinct()
+            .ToList();
+
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.Id),
@@ -34,7 +40,7 @@ public class TokenService(IOptions<JwtOptions> jwtOptions) : ITokenService
             new(ClaimTypes.Name, user.UserName ?? "")
         };
 
-        foreach (var role in roles)
+        foreach (var role in normalizedRoles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
