@@ -221,7 +221,11 @@ if (!string.IsNullOrWhiteSpace(customOrdersRoot))
     Directory.CreateDirectory(customOrdersRoot);
 }
 
-// Pipeline
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+});
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -235,7 +239,6 @@ else if (configuredOrigins.Length > 0)
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

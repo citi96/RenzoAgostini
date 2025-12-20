@@ -1,17 +1,13 @@
 ﻿@using System.Globalization
 
-<div class="@CssClass"
-	 @onclick="() => ShowLightbox(0)"
-	 @attributes="AdditionalAttributesWithoutClass">
+<div class="@CssClass" @onclick="() => ShowLightbox(0)" @attributes="AdditionalAttributesWithoutClass">
 
 	<!-- Image Container -->
 	<div class="painting-card-image-container">
 		@if (!string.IsNullOrEmpty(PrimaryImageUrl))
 		{
-			<img src="@($"{Configuration["BaseUrl"]}/{PrimaryImageUrl}")"
-				 alt="@Title"
-				 class="painting-card-image"
-				 loading="lazy" />
+			<img src="@($"{Configuration["BaseUrl"]}{PrimaryImageUrl}")" alt="@Title" class="painting-card-image"
+				loading="lazy" />
 		}
 		else
 		{
@@ -93,14 +89,12 @@
 	@if (IsAdminMode && PaintingDto != null)
 	{
 		<div class="painting-card-admin-actions">
-			<button class="btn btn-secondary painting-card-admin-btn"
-					@onclick:stopPropagation="true"
-					@onclick="() => OnEdit.InvokeAsync(PaintingDto)">
+			<button class="btn btn-secondary painting-card-admin-btn" @onclick:stopPropagation="true"
+			@onclick="() => OnEdit.InvokeAsync(PaintingDto)">
 				Modifica
 			</button>
-			<button class="btn btn-danger painting-card-admin-btn"
-					@onclick:stopPropagation="true"
-					@onclick="() => OnDelete.InvokeAsync(PaintingDto)">
+			<button class="btn btn-danger painting-card-admin-btn" @onclick:stopPropagation="true"
+			@onclick="() => OnDelete.InvokeAsync(PaintingDto)">
 				Elimina
 			</button>
 		</div>
@@ -113,9 +107,7 @@
 				<span>@Price.Value.ToString("N2", CultureInfo.GetCultureInfo("it-IT"))</span>
 			</div>
 			<button class="btn btn-primary painting-card-action @(IsAddingToCart ? "loading" : string.Empty)"
-					@onclick:stopPropagation="true"
-					@onclick="AddToCart"
-					disabled="@IsAddingToCart">
+			@onclick:stopPropagation="true" @onclick="AddToCart" disabled="@IsAddingToCart">
 				@if (IsAddingToCart)
 				{
 					<span class="painting-card-spinner"></span>
@@ -140,9 +132,6 @@
 <!-- Lightbox Component -->
 @if (ImageUrls.Any())
 {
-	<ImageLightbox IsVisible="showLightbox"
-				   Images="ImageUrls"
-				   InitialIndex="lightboxIndex"
-				   Title="@Title"
-				   OnClose="HideLightbox" />
+	<ImageLightbox IsVisible="showLightbox" Images="ImageUrls" InitialIndex="lightboxIndex" Title="@Title"
+		OnClose="HideLightbox" />
 }

@@ -10,7 +10,8 @@
         <p class="cart-subtitle">
             @if (cartItems?.Any() == true)
             {
-                <span>@cartItems.Count articolo@(cartItems.Count > 1 ? "i" : "") selezionato@(cartItems.Count > 1 ? "i" : "")</span>
+                <span>@cartItems.Count articolo@(cartItems.Count > 1 ? "i" : "") selezionato@(cartItems.Count > 1 ? "i" :
+                "")</span>
             }
             else
             {
@@ -64,13 +65,13 @@
                             <div>
                                 @if (item.ImageUrls.Any())
                                 {
-                                    <img src="@($"{Configuration["BaseUrl"]}/{item.ImageUrls[0]}")"
-                                         alt="@item.Title"
-                                         class="cart-item-image" />
+                                    <img src="@($"{Configuration["BaseUrl"]}{item.ImageUrls[0]}")" alt="@item.Title"
+                                        class="cart-item-image" />
                                 }
                                 else
                                 {
-                                    <div class="cart-item-image" style="background: var(--neutral-200); display: flex; align-items: center; justify-content: center; color: var(--neutral-500);">
+                                    <div class="cart-item-image"
+                                        style="background: var(--neutral-200); display: flex; align-items: center; justify-content: center; color: var(--neutral-500);">
                                         🎨
                                     </div>
                                 }
@@ -92,13 +93,11 @@
                                 <div class="cart-item-price">
                                     @item.Price?.ToString("C", CultureInfo.GetCultureInfo("it-IT"))
                                 </div>
-                            </div>                            
+                            </div>
 
                             <!-- Remove Button -->
-                            <button class="remove-item-btn"
-                                    @onclick="() => RemoveItem(item.Id)"
-                                    disabled="@isUpdating"
-                                    title="Rimuovi dal carrello">
+                            <button class="remove-item-btn" @onclick="() => RemoveItem(item.Id)" disabled="@isUpdating"
+                                title="Rimuovi dal carrello">
                                 🗑️
                             </button>
                         </div>
@@ -116,7 +115,8 @@
                     <div class="summary-body">
                         <div class="summary-row">
                             <span class="summary-label">Subtotale (@GetTotalItems() articoli)</span>
-                            <span class="summary-value">@GetSubtotal().ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
+                            <span class="summary-value">@GetSubtotal().ToString("C",
+                            CultureInfo.GetCultureInfo("it-IT"))</span>
                         </div>
                         <div class="summary-row shipping-row">
                             <span class="summary-label">Spedizione</span>
@@ -143,19 +143,19 @@
                         @if (ShouldShowFreeShippingBanner())
                         {
                             <div class="summary-row shipping-incentive">
-                                <span>🚚 Aggiungi @GetAmountForFreeShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT")) per ottenere la spedizione gratuita con @SelectedShippingOption!.Name.</span>
+                                <span>🚚 Aggiungi @GetAmountForFreeShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT"))
+                                    per ottenere la spedizione gratuita con @SelectedShippingOption!.Name.</span>
                             </div>
                         }
                         <div class="summary-row">
                             <span class="summary-label">Totale stimato</span>
-                            <span class="summary-value">@GetTotal().ToString("C", CultureInfo.GetCultureInfo("it-IT"))</span>
+                            <span class="summary-value">@GetTotal().ToString("C",
+                            CultureInfo.GetCultureInfo("it-IT"))</span>
                         </div>
                     </div>
 
                     <div class="summary-actions">
-                        <button class="checkout-btn"
-                                @onclick="GoToCheckout"
-                                disabled="@(!cartItems.Any() || isUpdating)">
+                        <button class="checkout-btn" @onclick="GoToCheckout" disabled="@(!cartItems.Any() || isUpdating)">
                             @if (isUpdating)
                             {
                                 <span class="animate-spin">⏳</span>
@@ -181,7 +181,8 @@
                     <div class="free-shipping-banner">
                         <div class="free-shipping-title">🚚 Spedizione Gratuita</div>
                         <div class="free-shipping-text">
-                            Ti mancano @GetAmountForFreeShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT")) per ottenere la spedizione gratuita con @SelectedShippingOption!.Name.
+                            Ti mancano @GetAmountForFreeShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT")) per
+                            ottenere la spedizione gratuita con @SelectedShippingOption!.Name.
                         </div>
                     </div>
                 }
@@ -209,14 +210,9 @@
                 <div class="recommended-grid">
                     @foreach (var painting in recommendedPaintings.Take(3))
                     {
-                        <PaintingCard Title="@painting.Title"
-                                      Description="@painting.Description"
-                                      Year="@painting.Year"
-                                      Medium="@painting.Medium"
-                                      Price="@painting.Price"
-                                      IsForSale="@painting.IsForSale"
-                                      ImageUrls="@painting.ImageUrls"
-                                      PaintingDto="painting" />
+                        <PaintingCard Title="@painting.Title" Description="@painting.Description" Year="@painting.Year"
+                            Medium="@painting.Medium" Price="@painting.Price" IsForSale="@painting.IsForSale"
+                            ImageUrls="@painting.ImageUrls" PaintingDto="painting" />
                     }
                 </div>
             }
