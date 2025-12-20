@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using RenzoAgostini.Server.Emailing.Interfaces;
 using RenzoAgostini.Server.Emailing.Models;
+using RenzoAgostini.Server.Emailing;
 using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Server.Services;
 using RenzoAgostini.Shared.Constants;
@@ -69,6 +70,25 @@ public class AuthController(
             await roleManager.CreateAsync(new IdentityRole(RoleNames.Viewer));
 
         await userManager.AddToRoleAsync(user, RoleNames.Viewer);
+
+        // Send Welcome Email
+        try
+        {
+            await emailSender.SendAsync(new EmailMessage(
+                From: null,
+                ReplyTo: null,
+                TextBody: $"Ciao {user.Name}, grazie per esserti registrato alla Galleria Renzo Agostini!",
+                HtmlBody: EmailTemplates.GetWelcomeEmail(user.Name ?? user.UserName ?? "Utente")
+            )
+            {
+                To = [new EmailAddress(user.Email!, user.Name ?? user.UserName ?? "Utente")]
+            });
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't fail registration
+            Console.WriteLine($"Error sending welcome email: {ex.Message}");
+        }
 
         return Ok(new { Status = "Success", Message = "User created successfully!" });
     }
@@ -179,7 +199,7 @@ public class AuthController(
             From: null,
             ReplyTo: null,
             TextBody: $"Reimposta la tua password usando questo link: {resetUrl}",
-            HtmlBody: $"<p>Ciao {user.Name ?? user.Email},</p><p>Per reimpostare la password clicca il pulsante qui sotto.</p><p><a href=\"{resetUrl}\" style=\"padding:12px 18px;border-radius:12px;background:#7c3aed;color:white;text-decoration:none;font-weight:600;\">Reimposta password</a></p>"
+            HtmlBody: EmailTemplates.GetResetPasswordEmail(user.Name ?? user.Email ?? "Utente", resetUrl)
         )
         {
             To = [new EmailAddress(user.Email!, user.Name ?? user.Email)]
