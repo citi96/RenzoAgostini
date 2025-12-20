@@ -57,6 +57,9 @@
             <div class="nav-user">
                 <AuthorizeView>
                     <Authorized>
+                        <a href="/profile" class="btn btn-ghost btn-sm" title="Il tuo profilo">
+                            <Icon Name="user" />
+                        </a>
                         <button class="nav-logout-btn" @onclick="LogoutAsync">
                             <Icon Name="logout" />
                             <span>Esci</span>

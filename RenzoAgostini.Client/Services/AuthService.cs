@@ -4,16 +4,7 @@ using RenzoAgostini.Client.Services.Interfaces;
 
 namespace RenzoAgostini.Client.Services;
 
-public interface IAuthService
-{
-    Task<TokenDto?> LoginAsync(LoginDto loginDto);
-    Task<bool> RegisterAsync(RegisterDto registerDto);
-    Task<TokenDto?> RefreshTokenAsync(TokenDto tokenDto);
-    Task<List<UserDto>> GetUsersAsync();
-    Task<bool> AssignRoleAsync(string username, string role);
-    Task<bool> RequestPasswordResetAsync(string email);
-    Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
-}
+
 
 public class AuthService : IAuthService
 {
@@ -82,5 +73,38 @@ public class AuthService : IAuthService
     {
         var response = await _anonClient.PostAsJsonAsync("api/auth/reset-password", resetPasswordDto);
         return response.IsSuccessStatusCode;
+    }
+
+    public async Task<UserProfileDto?> GetProfileAsync()
+    {
+        var salesClient = _httpClientFactory.CreateClient("ApiClient");
+        var response = await salesClient.GetAsync("api/auth/profile");
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<UserProfileDto>();
+        }
+        return null;
+    }
+
+    public async Task<AuthResponseDto> UpdateProfileAsync(UserProfileDto dto)
+    {
+        var salesClient = _httpClientFactory.CreateClient("ApiClient");
+        var response = await salesClient.PostAsJsonAsync("api/auth/profile", dto);
+
+        // Try to read generic status message
+        try
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                return new AuthResponseDto { IsSuccess = true };
+            }
+            // Read error message
+            var error = await response.Content.ReadAsStringAsync();
+            return new AuthResponseDto { IsSuccess = false, ErrorMessage = error };
+        }
+        catch
+        {
+            return new AuthResponseDto { IsSuccess = false, ErrorMessage = "Errore durante l'aggiornamento." };
+        }
     }
 }

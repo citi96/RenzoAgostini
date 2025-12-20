@@ -13,6 +13,7 @@ using RenzoAgostini.Shared.DTOs;
 using System.Security.Claims;
 using System.Text;
 
+
 namespace RenzoAgostini.Server.Controllers;
 
 [Route("api/[controller]")]
@@ -237,5 +238,64 @@ public class AuthController(
 
         var errors = string.Join(", ", result.Errors.Select(e => e.Description));
         return BadRequest(errors);
+    }
+
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<ActionResult<UserProfileDto>> GetProfile()
+    {
+        var username = User.Identity?.Name;
+        if (username == null) return Unauthorized();
+
+        var user = await userManager.FindByNameAsync(username);
+        if (user == null) return NotFound("User not found");
+
+        return Ok(new UserProfileDto
+        {
+            Name = user.Name ?? "",
+            Surname = user.Surname ?? "",
+            Email = user.Email ?? ""
+        });
+    }
+
+    [Authorize]
+    [HttpPost("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UserProfileDto dto)
+    {
+        var username = User.Identity?.Name;
+        if (username == null) return Unauthorized();
+
+        var user = await userManager.FindByNameAsync(username);
+        if (user == null) return NotFound("User not found");
+
+        // 1. Verify Current Password
+        if (!await userManager.CheckPasswordAsync(user, dto.CurrentPassword))
+        {
+            return BadRequest("Password attuale non corretta.");
+        }
+
+        // 2. Update Basic Info
+        user.Name = dto.Name;
+        user.Surname = dto.Surname;
+
+        var updateResult = await userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            return BadRequest(string.Join(", ", updateResult.Errors.Select(e => e.Description)));
+        }
+
+        // 3. Update Password if provided
+        if (!string.IsNullOrWhiteSpace(dto.NewPassword))
+        {
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var passwordResult = await userManager.ResetPasswordAsync(user, token, dto.NewPassword);
+
+            if (!passwordResult.Succeeded)
+            {
+                return BadRequest(string.Join(", ", passwordResult.Errors.Select(e => e.Description)));
+            }
+        }
+
+        return Ok(new { Status = "Success", Message = "Profilo aggiornato con successo." });
     }
 }

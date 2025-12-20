@@ -1,12 +1,14 @@
 @page "/authentication/login"
 @layout LoginLayout
+@using RenzoAgostini.Client.Authentication
 @using RenzoAgostini.Client.Services
+@using RenzoAgostini.Client.Services.Interfaces
 @using RenzoAgostini.Shared.DTOs
 @using Microsoft.AspNetCore.Components.Authorization
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
-@inject RenzoAgostini.Client.Authentication.CustomAuthenticationStateProvider CustomAuthStateProvider
+@inject CustomAuthenticationStateProvider CustomAuthStateProvider
 
 <PageTitle>Login · Renzo Agostini</PageTitle>
 
