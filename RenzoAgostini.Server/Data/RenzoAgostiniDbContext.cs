@@ -11,6 +11,7 @@ namespace RenzoAgostini.Server.Data
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<CustomOrder> CustomOrders => Set<CustomOrder>();
         public DbSet<ShippingOption> ShippingOptions => Set<ShippingOption>();
+        public DbSet<StoredFile> StoredFiles => Set<StoredFile>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -143,11 +144,18 @@ namespace RenzoAgostini.Server.Data
                 entity.Property(co => co.ArtistNotes)
                     .HasMaxLength(1000);
 
-                // Relazione opzionale con Painting
                 entity.HasOne(co => co.Painting)
                     .WithMany()
                     .HasForeignKey(co => co.PaintingId)
                     .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configurazione StoredFile
+            modelBuilder.Entity<StoredFile>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+                entity.HasIndex(f => f.FileName).IsUnique();
+                entity.Property(f => f.Content).IsRequired(); // BLOB
             });
 
             // Seed data per development
@@ -229,16 +237,16 @@ namespace RenzoAgostini.Server.Data
                     IsForSale = false,
                     Images = [
                         new PaintingImage {
-                            Url = "/img/q2a.jpg", 
-                            Width = 800, 
-                            Height = 600, 
+                            Url = "/img/q2a.jpg",
+                            Width = 800,
+                            Height = 600,
                             IsPrimary = true
                         },
                         new PaintingImage {
-                            Url = "/img/q2b.jpg", 
-                            Width = 800, 
-                            Height = 600, 
-                            IsPrimary = false 
+                            Url = "/img/q2b.jpg",
+                            Width = 800,
+                            Height = 600,
+                            IsPrimary = false
                         }
                     ]
                 },

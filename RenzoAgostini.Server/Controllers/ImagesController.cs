@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RenzoAgostini.Server.Services.Interfaces;
 using RenzoAgostini.Shared.Constants;
 
 namespace RenzoAgostini.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = RoleNames.Admin)]
-    public class ImagesController(IWebHostEnvironment environment, ILogger<ImagesController> logger) : ControllerBase
+    public class ImagesController(IFileStorageService fileStorage, ILogger<ImagesController> logger) : ControllerBase
     {
-        private readonly string _uploadsPath = Path.Combine(environment.WebRootPath, "uploads");
-
         [HttpPost]
+        [Authorize(Roles = RoleNames.Admin)]
         public async Task<IActionResult> Upload(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -21,22 +20,18 @@ namespace RenzoAgostini.Server.Controllers
             if (!allowedTypes.Contains(file.ContentType))
                 return BadRequest("Tipo di file non supportato");
 
-            const long maxSize = 5 * 1024 * 1024; // 5MB
+            const long maxSize = 10 * 1024 * 1024; // Increased to 10MB for DB storage if needed
             if (file.Length > maxSize)
-                return BadRequest("File troppo grande (max 5MB)");
+                return BadRequest("File troppo grande (max 10MB)");
 
             try
             {
-                Directory.CreateDirectory(_uploadsPath);
-
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-                var filePath = Path.Combine(_uploadsPath, fileName);
 
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await file.CopyToAsync(stream);
+                using var stream = file.OpenReadStream();
+                var url = await fileStorage.SaveFileAsync(fileName, stream, file.ContentType);
 
-                var url = $"/uploads/{fileName}";
-                logger.LogInformation("Image uploaded: {FileName} -> {Url}", file.FileName, url);
+                logger.LogInformation("Image uploaded to DB: {FileName} -> {Url}", file.FileName, url);
 
                 return Ok(url);
             }
@@ -47,22 +42,36 @@ namespace RenzoAgostini.Server.Controllers
             }
         }
 
-        [HttpDelete]
-        public IActionResult Delete(string url)
+        [HttpGet("{fileName}")]
+        [AllowAnonymous] // Public access to images
+        public async Task<IActionResult> GetImage(string fileName)
         {
             try
             {
-                if (string.IsNullOrEmpty(url) || !url.StartsWith("/uploads/"))
+                var result = await fileStorage.GetFileAsync(fileName);
+                if (result == null)
+                    return NotFound();
+
+                return File(result.Value.Content, result.Value.ContentType);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error retrieving image {FileName}", fileName);
+                return StatusCode(500, "Errore durante il recupero dell'immagine");
+            }
+        }
+
+        [HttpDelete]
+        [Authorize(Roles = RoleNames.Admin)]
+        public async Task<IActionResult> Delete(string url)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(url))
                     return BadRequest("URL non valido");
 
                 var fileName = Path.GetFileName(url);
-                var filePath = Path.Combine(_uploadsPath, fileName);
-
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                    logger.LogInformation("Image deleted: {Url}", url);
-                }
+                await fileStorage.DeleteFileAsync(fileName);
 
                 return Ok();
             }

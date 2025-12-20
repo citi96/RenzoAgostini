@@ -236,10 +236,17 @@ window.initializeLayout = () => {
 
 // Navbar Scroll Effect
 function initializeNavbarScroll() {
-    const navbar = document.querySelector('.nav');
+    let navbar = document.querySelector('.nav');
     let lastScrollY = window.scrollY;
 
     window.addEventListener('scroll', () => {
+        // Re-attempt to find navbar if not found (Blazor hydration timing)
+        if (!navbar) {
+            navbar = document.querySelector('.nav');
+        }
+
+        if (!navbar) return;
+
         const currentScrollY = window.scrollY;
 
         if (currentScrollY > 100) {

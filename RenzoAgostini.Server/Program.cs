@@ -88,6 +88,7 @@ builder.Services.AddScoped<IShippingOptionRepository, ShippingOptionRepository>(
 builder.Services.AddScoped<IShippingOptionService, ShippingOptionService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IFileStorageService, DatabaseFileStorageService>();
 
 builder.Services.Configure<StripeOptions>(builder.Configuration.GetSection("Stripe"));
 var stripeApiKey = builder.Configuration["Stripe:SecretKey"];
@@ -240,14 +241,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseStaticFiles();
-if (!string.IsNullOrWhiteSpace(uploadsRoot))
-{
-    app.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider(uploadsRoot),
-        RequestPath = "/uploads",
-    });
-}
 
 app.Run();
 
