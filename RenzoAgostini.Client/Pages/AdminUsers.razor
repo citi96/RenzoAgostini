@@ -35,21 +35,32 @@ else
                     <td>@user.Name @user.Surname</td>
                     <td>@(string.Join(", ", user.Roles))</td>
                     <td>
-                        @if (user.UserName != "admin@renzoagostini.it")
+                        @if (user.UserName == "fchiti071@gmail.com")
                         {
-                            @if (user.Roles.Any(role => string.Equals(role, RoleNames.Admin, StringComparison.OrdinalIgnoreCase)))
-                            {
-                                <button class="btn btn-warning btn-sm" @onclick='@(() => SetRole(user.UserName, RoleNames.Viewer))'>Make Viewer</button>
-                            }
-                            else
-                            {
-                                <button class="btn btn-success btn-sm" @onclick='@(() => SetRole(user.UserName, RoleNames.Admin))'>MakeAdmin</button>
-                            }
+                            <span class="badge bg-secondary">Super Admin</span>
+                        }
+                        else if (user.Roles.Any(role => string.Equals(role, RoleNames.Admin,
+                        StringComparison.OrdinalIgnoreCase)))
+                        {
+                            <button class="btn btn-warning btn-sm" @onclick='@(() => SetRole(user.UserName, RoleNames.Viewer))'>Make
+                                Viewer</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-success btn-sm"
+                            @onclick='@(() => SetRole(user.UserName, RoleNames.Admin))'>MakeAdmin</button>
                         }
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+
+    @if (users.Count == 0)
+    {
+        <div class="alert alert-info mt-3">
+            Nessun utente trovato. Se sei sicuro che ci siano utenti, potrebbe esserci un errore di caricamento.
+        </div>
+    }
 }
 

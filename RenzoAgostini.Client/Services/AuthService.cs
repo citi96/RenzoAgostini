@@ -17,16 +17,18 @@ public interface IAuthService
 
 public class AuthService : IAuthService
 {
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly HttpClient _anonClient;
 
-    public AuthService(HttpClient httpClient)
+    public AuthService(IHttpClientFactory httpClientFactory)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
+        _anonClient = _httpClientFactory.CreateClient("AuthClient");
     }
 
     public async Task<TokenDto?> LoginAsync(LoginDto loginDto)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/login", loginDto);
+        var response = await _anonClient.PostAsJsonAsync("api/auth/login", loginDto);
         if (response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<TokenDto>();
@@ -36,13 +38,13 @@ public class AuthService : IAuthService
 
     public async Task<bool> RegisterAsync(RegisterDto registerDto)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/register", registerDto);
+        var response = await _anonClient.PostAsJsonAsync("api/auth/register", registerDto);
         return response.IsSuccessStatusCode;
     }
 
     public async Task<TokenDto?> RefreshTokenAsync(TokenDto tokenDto)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/refresh", tokenDto);
+        var response = await _anonClient.PostAsJsonAsync("api/auth/refresh", tokenDto);
         if (response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<TokenDto>();
@@ -52,7 +54,9 @@ public class AuthService : IAuthService
 
     public async Task<List<UserDto>> GetUsersAsync()
     {
-        var response = await _httpClient.GetAsync("api/auth/users");
+        // Use authenticated client
+        var salesClient = _httpClientFactory.CreateClient("ApiClient");
+        var response = await salesClient.GetAsync("api/auth/users");
         if (response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<List<UserDto>>() ?? new List<UserDto>();
@@ -62,19 +66,21 @@ public class AuthService : IAuthService
 
     public async Task<bool> AssignRoleAsync(string username, string role)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/roles", new SetRoleDto { UserName = username, Role = role });
+        // Use authenticated client
+        var salesClient = _httpClientFactory.CreateClient("ApiClient");
+        var response = await salesClient.PostAsJsonAsync("api/auth/roles", new SetRoleDto { UserName = username, Role = role });
         return response.IsSuccessStatusCode;
     }
 
     public async Task<bool> RequestPasswordResetAsync(string email)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/forgot-password", new ForgotPasswordDto { Email = email });
+        var response = await _anonClient.PostAsJsonAsync("api/auth/forgot-password", new ForgotPasswordDto { Email = email });
         return response.IsSuccessStatusCode;
     }
 
     public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/reset-password", resetPasswordDto);
+        var response = await _anonClient.PostAsJsonAsync("api/auth/reset-password", resetPasswordDto);
         return response.IsSuccessStatusCode;
     }
 }

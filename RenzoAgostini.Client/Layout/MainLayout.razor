@@ -5,13 +5,15 @@
 
 <nav class="nav">
     <div class="nav-container">
-        <!-- Brand Logo -->
-        <a class="nav-brand" href="/" aria-label="Galleria Agostini">
-            <img src="/assets/logo.png" alt="Logo Galleria Agostini" class="nav-brand-logo" />
-        </a>
+        <!-- Left: Brand Logo -->
+        <div class="nav-start">
+            <a class="nav-brand" href="/" aria-label="Galleria Agostini">
+                <img src="/assets/logo.png" alt="Logo Galleria Agostini" class="nav-brand-logo" />
+            </a>
+        </div>
 
-        <!-- Desktop Navigation Links -->
-        <div class="nav-links">            
+        <!-- Center: Desktop Navigation Links -->
+        <div class="nav-links">
             <AuthorizeView Roles="@RoleNames.Admin">
                 <Authorized>
                     <a class="nav-link" href="/admin/paintings">
@@ -30,6 +32,10 @@
                         <Icon Name="requests" />
                         <span>Richieste</span>
                     </a>
+                    <a class="nav-link" href="/admin/users">
+                        <Icon Name="user" />
+                        <span>Utenti</span>
+                    </a>
                 </Authorized>
             </AuthorizeView>
             <a class="nav-link" href="/richiedi-quadro">
@@ -38,38 +44,38 @@
             </a>
         </div>
 
-        <!-- Spacer -->
-        <div class="nav-spacer"></div>
+        <!-- Right: Actions -->
+        <div class="nav-end">
+            <!-- Cart Button -->
+            <a class="nav-cart" href="/cart">
+                <Icon Name="cart" />
+                <span>Carrello</span>
+                <span class="nav-cart-count @(cartCount > 0 ? "animate-bounce" : "")">@cartCount</span>
+            </a>
 
-        <!-- Cart Button -->
-        <a class="nav-cart" href="/cart">
-            <Icon Name="cart" />
-            <span>Carrello</span>
-            <span class="nav-cart-count @(cartCount > 0 ? "animate-bounce" : "")">@cartCount</span>
-        </a>
+            <!-- User Section -->
+            <div class="nav-user">
+                <AuthorizeView>
+                    <Authorized>
+                        <button class="nav-logout-btn" @onclick="LogoutAsync">
+                            <Icon Name="logout" />
+                            <span>Esci</span>
+                        </button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <button class="nav-login-btn" @onclick="ShowLoginModal">
+                            <Icon Name="login" />
+                            <span>Accedi</span>
+                        </button>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
 
-        <!-- User Section -->
-        <div class="nav-user">
-            <AuthorizeView>
-                <Authorized>
-                    <button class="nav-logout-btn" @onclick="LogoutAsync">
-                        <Icon Name="logout" />
-                        <span>Esci</span>
-                    </button>
-                </Authorized>
-                <NotAuthorized>
-                    <button class="nav-login-btn" @onclick="ShowLoginModal">
-                        <Icon Name="login" />
-                        <span>Accedi</span>
-                    </button>
-                </NotAuthorized>
-            </AuthorizeView>
+            <!-- Mobile Menu Toggle -->
+            <button class="nav-mobile-toggle" @onclick="ToggleMobileMenu">
+                <Icon Name="menu" />
+            </button>
         </div>
-
-        <!-- Mobile Menu Toggle -->
-        <button class="nav-mobile-toggle" @onclick="ToggleMobileMenu">
-            <Icon Name="menu" />
-        </button>
     </div>
 </nav>
 
@@ -111,6 +117,10 @@
                     <a class="nav-mobile-link" href="/admin/custom-orders" @onclick="CloseMobileMenu">
                         <Icon Name="requests" />
                         <span>Richieste Personalizzate</span>
+                    </a>
+                    <a class="nav-mobile-link" href="/admin/users" @onclick="CloseMobileMenu">
+                        <Icon Name="user" />
+                        <span>Utenti</span>
                     </a>
                 </Authorized>
             </AuthorizeView>

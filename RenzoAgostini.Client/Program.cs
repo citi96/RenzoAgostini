@@ -52,9 +52,8 @@ builder.Services.AddScoped<ICheckoutService, CheckoutClient>();
 builder.Services.AddScoped<IShippingClient, ShippingClient>();
 builder.Services.AddScoped<ICustomOrderService, CustomOrderService>();
 
-// 5. Register AuthService specifically with AuthClient
-builder.Services.AddScoped<IAuthService>(sp =>
-    new AuthService(sp.GetRequiredService<IHttpClientFactory>().CreateClient("AuthClient")));
+// 5. Register AuthService
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
