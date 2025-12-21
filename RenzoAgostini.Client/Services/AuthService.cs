@@ -107,4 +107,11 @@ public class AuthService : IAuthService
             return new AuthResponseDto { IsSuccess = false, ErrorMessage = "Errore durante l'aggiornamento." };
         }
     }
+
+    public async Task<bool> DeleteAccountAsync()
+    {
+        var salesClient = _httpClientFactory.CreateClient("ApiClient");
+        var response = await salesClient.DeleteAsync("api/auth/me");
+        return response.IsSuccessStatusCode;
+    }
 }

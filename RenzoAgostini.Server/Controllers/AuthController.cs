@@ -297,4 +297,22 @@ public class AuthController(
 
         return Ok(new { Status = "Success", Message = "Profilo aggiornato con successo." });
     }
+    [Authorize]
+    [HttpDelete("me")]
+    public async Task<IActionResult> DeleteAccount()
+    {
+        var username = User.Identity?.Name;
+        if (username == null) return Unauthorized();
+
+        var user = await userManager.FindByNameAsync(username);
+        if (user == null) return NotFound("User not found");
+
+        var result = await userManager.DeleteAsync(user);
+        if (!result.Succeeded)
+        {
+            return BadRequest(string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
+        return Ok(new { Status = "Success", Message = "Account eliminato con successo." });
+    }
 }

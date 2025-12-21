@@ -41,7 +41,7 @@ namespace RenzoAgostini.Client.Pages
                     var user = state.User;
                     customOrderRequest.CustomerEmail = user.Claims.FirstOrDefault(c => c.Type == "email")?.Value ?? "";
                     accessRequest.CustomerEmail = user.Claims.FirstOrDefault(c => c.Type == "email")?.Value ?? "";
-                }               
+                }
             }
             catch (Exception ex)
             {
@@ -67,7 +67,7 @@ namespace RenzoAgostini.Client.Pages
                 StateHasChanged();
 
                 var filePath = string.Empty;
-                if(selectedFile != null)
+                if (selectedFile != null)
                 {
                     using var stream = selectedFile.OpenReadStream(maxFileSize);
                     filePath = await ImageUploadService.UploadImageAsync(stream, selectedFile.Name);
@@ -153,6 +153,9 @@ namespace RenzoAgostini.Client.Pages
             [MinLength(10, ErrorMessage = "La descrizione deve essere di almeno 10 caratteri")]
             [MaxLength(2000, ErrorMessage = "La descrizione non può superare i 2000 caratteri")]
             public string Description { get; set; } = string.Empty;
+
+            [Range(typeof(bool), "true", "true", ErrorMessage = "Devi accettare l'informativa sulla privacy.")]
+            public bool PrivacyAccepted { get; set; }
         }
 
         public class AccessCustomOrderModel

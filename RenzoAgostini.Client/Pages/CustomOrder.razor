@@ -14,7 +14,8 @@
 			<h3>✅ Richiesta Inviata!</h3>
 			<p>@successMessage</p>
 			<p><strong>Il tuo codice di riferimento è: @accessCode</strong></p>
-			<p class="small">Conserva questo codice, ti servirà per accedere al tuo quadro una volta accettata la richiesta.</p>
+			<p class="small">Conserva questo codice, ti servirà per accedere al tuo quadro una volta accettata la richiesta.
+			</p>
 		</div>
 	}
 
@@ -32,26 +33,36 @@
 
 			<div class="form-group">
 				<label for="email">Email *</label>
-				<InputText @bind-Value="customOrderRequest.CustomerEmail" class="form-control" id="email" placeholder="La tua email per essere contattato" />
+				<InputText @bind-Value="customOrderRequest.CustomerEmail" class="form-control" id="email"
+					placeholder="La tua email per essere contattato" />
 				<ValidationMessage For="@(() => customOrderRequest.CustomerEmail)" />
 			</div>
 
 			<div class="form-group">
 				<label for="description">Descrizione del quadro desiderato *</label>
 				<InputTextArea @bind-Value="customOrderRequest.Description" class="form-control" id="description"
-							   placeholder="Descrivi il quadro che vorresti: soggetto, stile, dimensioni preferite, colori, etc..."
-							   rows="6" />
+					placeholder="Descrivi il quadro che vorresti: soggetto, stile, dimensioni preferite, colori, etc..."
+					rows="6" />
 				<ValidationMessage For="@(() => customOrderRequest.Description)" />
 			</div>
 
 			<div class="form-group">
 				<label for="attachment">Allegato (opzionale)</label>
 				<InputFile OnChange="@HandleFileChange" class="form-control" id="attachment" accept="image/*" />
-				<small class="help-text">Se hai una foto di riferimento o un'immagine da copiare, caricala qui (max 5MB)</small>
+				<small class="help-text">Se hai una foto di riferimento o un'immagine da copiare, caricala qui (max
+					5MB)</small>
 				@if (selectedFileName != null)
 				{
 					<p class="selected-file">📎 @selectedFileName</p>
 				}
+			</div>
+
+			<div class="form-group checkbox-group">
+				<label class="checkbox-label">
+					<InputCheckbox @bind-Value="customOrderRequest.PrivacyAccepted" />
+					<span>Ho letto e accetto l'<a href="/privacy" target="_blank">Informativa sulla Privacy</a></span>
+				</label>
+				<ValidationMessage For="@(() => customOrderRequest.PrivacyAccepted)" />
 			</div>
 
 			<div class="form-actions">
@@ -86,12 +97,14 @@
 
 			<div class="access-form">
 				<div class="form-group inline">
-					<InputText @bind-Value="accessRequest.AccessCode" class="form-control" placeholder="Codice accesso (es: CO20241215001)" />
+					<InputText @bind-Value="accessRequest.AccessCode" class="form-control"
+						placeholder="Codice accesso (es: CO20241215001)" />
 					<ValidationMessage For="@(() => accessRequest.AccessCode)" />
 				</div>
 
 				<div class="form-group inline">
-					<InputText @bind-Value="accessRequest.CustomerEmail" class="form-control" placeholder="La tua email" />
+					<InputText @bind-Value="accessRequest.CustomerEmail" class="form-control"
+						placeholder="La tua email" />
 					<ValidationMessage For="@(() => accessRequest.CustomerEmail)" />
 				</div>
 

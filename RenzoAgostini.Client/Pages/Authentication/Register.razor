@@ -42,6 +42,17 @@
         <ValidationMessage For="@(() => registerModel.Password)" class="kc-field-error" />
     </div>
 
+    <div class="kc-field-checkbox">
+        <label class="checkbox-container">
+            <InputCheckbox @bind-Value="registerModel.PrivacyAccepted" />
+            <span class="checkmark"></span>
+            <span class="label-text">
+                Accetto la <a href="/privacy" target="_blank">Privacy Policy</a> e i Termini di servizio
+            </span>
+        </label>
+        <ValidationMessage For="@(() => registerModel.PrivacyAccepted)" class="kc-field-error" />
+    </div>
+
     <div class="kc-actions">
         <div class="kc-buttons">
             <button type="submit" class="kc-btn primary">

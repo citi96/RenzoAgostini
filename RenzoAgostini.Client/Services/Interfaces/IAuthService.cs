@@ -13,4 +13,5 @@ public interface IAuthService
     Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
     Task<UserProfileDto?> GetProfileAsync();
     Task<AuthResponseDto> UpdateProfileAsync(UserProfileDto dto);
+    Task<bool> DeleteAccountAsync();
 }

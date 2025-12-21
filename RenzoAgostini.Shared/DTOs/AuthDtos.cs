@@ -18,6 +18,9 @@ public class RegisterDto
     public string Password { get; set; } = string.Empty;
     public string Firstname { get; set; } = string.Empty;
     public string Lastname { get; set; } = string.Empty;
+
+    [Range(typeof(bool), "true", "true", ErrorMessage = "Devi accettare la Privacy Policy e i Termini di servizio.")]
+    public bool PrivacyAccepted { get; set; }
 }
 
 public class TokenDto

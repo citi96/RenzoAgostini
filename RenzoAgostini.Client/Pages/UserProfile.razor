@@ -4,10 +4,9 @@
 @using RenzoAgostini.Shared.DTOs
 @using RenzoAgostini.Client.Services
 @attribute [Authorize]
-@inject IAuthService AuthService
-@inject NavigationManager Navigation
 
 <div class="page-header">
+
     <h1 class="page-title">Il Mio Profilo</h1>
     <p class="page-subtitle">Gestisci le tue informazioni personali e la sicurezza del tuo account.</p>
 </div>
@@ -79,56 +78,19 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3">
-                    <button type="button" class="btn btn-outline" @onclick="@(() => Navigation.NavigateTo("/"))">Annulla</button>
-                    <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                 <div class="flex justify-between items-center gap-3">
+                    <button type="button" class="btn btn-danger-outline" @onclick="DeleteAccount">
+                        ⚠️ Elimina Account
+                    </button>
+                    
+                    <div class="flex gap-3">
+                        <button type="button" class="btn btn-outline" @onclick="@(() => Navigation.NavigateTo("/"))">Annulla</button>
+                        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                    </div>
                 </div>
             </EditForm>
         }
     </div>
 </div>
 
-@code {
-    private UserProfileDto? profile;
-    private bool isLoading = true;
-    private string? errorMessage;
-    private string? successMessage;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try 
-        {
-            profile = await AuthService.GetProfileAsync();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = "Errore di connessione.";
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    private async Task HandleSubmit()
-    {
-        errorMessage = null;
-        successMessage = null;
-
-        if (profile == null) return;
-
-        var result = await AuthService.UpdateProfileAsync(profile);
-        if (result.IsSuccess)
-        {
-            successMessage = "Profilo aggiornato con successo!";
-            // Clear passwords fields
-            profile.CurrentPassword = string.Empty;
-            profile.NewPassword = string.Empty;
-            profile.ConfirmNewPassword = string.Empty;
-        }
-        else
-        {
-            errorMessage = result.ErrorMessage ?? "Errore durante l'aggiornamento.";
-        }
-    }
-}
