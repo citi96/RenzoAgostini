@@ -83,6 +83,7 @@ namespace RenzoAgostini.Client.Pages
 
                 accessCode = result.AccessCode;
                 successMessage = "La tua richiesta è stata inviata con successo! Ti contatteremo presto via email.";
+                await JSRuntime.InvokeVoidAsync("window.scrollTo", 0, 0);
 
                 // Reset form
                 ResetForm();
