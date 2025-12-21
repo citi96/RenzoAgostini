@@ -3,6 +3,7 @@
     public record CreateCustomOrderDto(
         string CustomerEmail,
         string Description,
-        string? AttachmentPath
+        string? AttachmentPath,
+        string? AttachmentOriginalName
     );
 }

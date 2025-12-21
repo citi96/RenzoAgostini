@@ -23,6 +23,7 @@ namespace RenzoAgostini.Client.Pages
         protected bool showDetailsModal = false;
         protected bool showAcceptModal = false;
         protected bool showRejectModal = false;
+        protected bool showAttachmentLightbox = false;
 
         // Forms
         protected AcceptOrderForm acceptForm = new();
@@ -195,6 +196,18 @@ namespace RenzoAgostini.Client.Pages
             StateHasChanged();
         }
 
+        protected void OpenAttachmentLightbox()
+        {
+            showAttachmentLightbox = true;
+            StateHasChanged();
+        }
+
+        protected void CloseAttachmentLightbox()
+        {
+            showAttachmentLightbox = false;
+            StateHasChanged();
+        }
+
         protected async Task DownloadAttachment(int orderId)
         {
             try
@@ -293,6 +306,12 @@ namespace RenzoAgostini.Client.Pages
                 string.Empty,
                 []
             );
+        }
+        private static bool IsImage(string? fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName)) return false;
+            var ext = Path.GetExtension(fileName).ToLowerInvariant();
+            return ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif" || ext == ".webp" || ext == ".bmp";
         }
     }
 }

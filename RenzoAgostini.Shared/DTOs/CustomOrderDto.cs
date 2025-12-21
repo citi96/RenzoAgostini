@@ -13,6 +13,7 @@ namespace RenzoAgostini.Shared.DTOs
         decimal? QuotedPrice,
         string? ArtistNotes,
         int? PaintingId,
-        string AccessCode
+        string AccessCode,
+        string? AttachmentUrl
     );
 }

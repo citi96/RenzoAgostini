@@ -18,7 +18,8 @@ namespace RenzoAgostini.Server.Mappings
                 customOrder.QuotedPrice,
                 customOrder.ArtistNotes,
                 customOrder.PaintingId,
-                customOrder.AccessCode
+                customOrder.AccessCode,
+                customOrder.AttachmentPath
             );
         }
     }

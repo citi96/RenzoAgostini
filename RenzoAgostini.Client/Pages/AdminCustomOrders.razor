@@ -56,10 +56,14 @@
             <span class="filter-label">Filtra per stato:</span>
             <select class="filter-select" @onchange="FilterOrders">
                 <option value="">Tutti gli stati (@customOrders.Count)</option>
-                <option value="@CustomOrderStatus.Pending">In Attesa (@customOrders.Count(o => o.Status == CustomOrderStatus.Pending))</option>
-                <option value="@CustomOrderStatus.Accepted">Accettate (@customOrders.Count(o => o.Status == CustomOrderStatus.Accepted))</option>
-                <option value="@CustomOrderStatus.Completed">Completate (@customOrders.Count(o => o.Status == CustomOrderStatus.Completed))</option>
-                <option value="@CustomOrderStatus.Rejected">Rifiutate (@customOrders.Count(o => o.Status == CustomOrderStatus.Rejected))</option>
+                <option value="@CustomOrderStatus.Pending">In Attesa (@customOrders.Count(o => o.Status ==
+                CustomOrderStatus.Pending))</option>
+                <option value="@CustomOrderStatus.Accepted">Accettate (@customOrders.Count(o => o.Status ==
+                CustomOrderStatus.Accepted))</option>
+                <option value="@CustomOrderStatus.Completed">Completate (@customOrders.Count(o => o.Status ==
+                CustomOrderStatus.Completed))</option>
+                <option value="@CustomOrderStatus.Rejected">Rifiutate (@customOrders.Count(o => o.Status ==
+                CustomOrderStatus.Rejected))</option>
             </select>
         </div>
 
@@ -120,7 +124,8 @@
                                     }
                                     @if (order.PaintingId.HasValue)
                                     {
-                                        <button class="btn btn-small secondary" @onclick="() => ViewPainting(order.PaintingId.Value)">
+                                        <button class="btn btn-small secondary"
+                                        @onclick="() => ViewPainting(order.PaintingId.Value)">
                                             🎨 Vedi Quadro
                                         </button>
                                     }
@@ -146,9 +151,12 @@
                     <div class="details-grid">
                         <div class="detail-section">
                             <h3>Informazioni Cliente</h3>
-                            <p><strong>Email:</strong> <a href="mailto:@selectedOrder.CustomerEmail">@selectedOrder.CustomerEmail</a></p>
-                            <p><strong>Data richiesta:</strong> @selectedOrder.CreatedAt.ToString("dd/MM/yyyy HH:mm", CultureInfo.GetCultureInfo("it-IT"))</p>
-                            <p><strong>Codice accesso:</strong> <code class="access-code">@selectedOrder.AccessCode</code></p>
+                            <p><strong>Email:</strong> <a
+                                    href="mailto:@selectedOrder.CustomerEmail">@selectedOrder.CustomerEmail</a></p>
+                            <p><strong>Data richiesta:</strong> @selectedOrder.CreatedAt.ToString("dd/MM/yyyy HH:mm",
+                            CultureInfo.GetCultureInfo("it-IT"))</p>
+                            <p><strong>Codice accesso:</strong> <code class="access-code">@selectedOrder.AccessCode</code>
+                            </p>
                             <p>
                                 <strong>Stato:</strong>
                                 <span class="status-badge @GetStatusClass(selectedOrder.Status)">
@@ -161,7 +169,8 @@
                             <h3>Dettagli Commerciali</h3>
                             @if (selectedOrder.QuotedPrice.HasValue)
                             {
-                                <p><strong>Prezzo quotato:</strong> @selectedOrder.QuotedPrice.Value.ToString("C", CultureInfo.GetCultureInfo("it-IT"))</p>
+                                <p><strong>Prezzo quotato:</strong> @selectedOrder.QuotedPrice.Value.ToString("C",
+                            CultureInfo.GetCultureInfo("it-IT"))</p>
                             }
                             @if (selectedOrder.PaintingId.HasValue)
                             {
@@ -182,6 +191,15 @@
                         <div class="detail-section">
                             <h3>Allegato</h3>
                             <p>📎 <strong>@selectedOrder.AttachmentOriginalName</strong></p>
+
+                            @if (!string.IsNullOrEmpty(selectedOrder.AttachmentUrl) &&
+                           IsImage(selectedOrder.AttachmentOriginalName))
+                            {
+                                <div class="attachment-preview-container">
+                                    <img src="@selectedOrder.AttachmentUrl" alt="Allegato Cliente" class="attachment-preview" />
+                                </div>
+                            }
+
                             <button class="btn secondary" @onclick="() => DownloadAttachment(selectedOrder.Id)">
                                 ⬇️ Scarica Allegato
                             </button>
@@ -227,7 +245,8 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Prezzo Quotato (€) *</label>
-                                <InputNumber @bind-Value="acceptForm.QuotedPrice" class="form-control" step="0.01" placeholder="0.00" />
+                                <InputNumber @bind-Value="acceptForm.QuotedPrice" class="form-control" step="0.01"
+                                    placeholder="0.00" />
                                 <ValidationMessage For="@(() => acceptForm.QuotedPrice)" />
                             </div>
                             <div></div>
@@ -236,23 +255,25 @@
                         <div class="form-group">
                             <label>Note per il Cliente</label>
                             <InputTextArea @bind-Value="acceptForm.ArtistNotes" class="form-control" rows="3"
-                                           placeholder="Eventuali note o dettagli aggiuntivi..." />
+                                placeholder="Eventuali note o dettagli aggiuntivi..." />
                         </div>
 
-                        <h3 style="margin: var(--spacing-6) 0 var(--spacing-4) 0; padding-bottom: var(--spacing-2); border-bottom: 1px solid var(--neutral-200);">
+                        <h3
+                            style="margin: var(--spacing-6) 0 var(--spacing-4) 0; padding-bottom: var(--spacing-2); border-bottom: 1px solid var(--neutral-200);">
                             Dati del Quadro da Creare
                         </h3>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Titolo *</label>
-                                <InputText @bind-Value="acceptForm.PaintingData.Title" class="form-control" placeholder="Titolo del quadro" />
+                                <InputText @bind-Value="acceptForm.PaintingData.Title" class="form-control"
+                                    placeholder="Titolo del quadro" />
                                 <ValidationMessage For="@(() => acceptForm.PaintingData.Title)" />
                             </div>
                             <div class="form-group">
                                 <label>Slug *</label>
                                 <InputText @bind-Value="acceptForm.PaintingData.Slug" class="form-control"
-                                           placeholder="quadro-personalizzato-cliente" />
+                                    placeholder="quadro-personalizzato-cliente" />
                                 <ValidationMessage For="@(() => acceptForm.PaintingData.Slug)" />
                             </div>
                         </div>
@@ -260,24 +281,26 @@
                         <div class="form-group">
                             <label>Descrizione</label>
                             <InputTextArea @bind-Value="acceptForm.PaintingData.Description" class="form-control" rows="3"
-                                           placeholder="Descrizione del quadro personalizzato" />
+                                placeholder="Descrizione del quadro personalizzato" />
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Anno</label>
-                                <InputNumber @bind-Value="acceptForm.PaintingData.Year" class="form-control" placeholder="2024" />
+                                <InputNumber @bind-Value="acceptForm.PaintingData.Year" class="form-control"
+                                    placeholder="2024" />
                             </div>
                             <div class="form-group">
                                 <label>Tecnica</label>
-                                <InputText @bind-Value="acceptForm.PaintingData.Medium" class="form-control" placeholder="Olio su tela" />
+                                <InputText @bind-Value="acceptForm.PaintingData.Medium" class="form-control"
+                                    placeholder="Olio su tela" />
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label>Dimensioni</label>
                             <InputText @bind-Value="acceptForm.PaintingData.Dimensions" class="form-control"
-                                       placeholder="50x70 cm" />
+                                placeholder="50x70 cm" />
                         </div>
 
                         <div class="modal-footer">
@@ -311,15 +334,17 @@
                     <button class="btn-close" @onclick="CloseRejectModal">✕</button>
                 </div>
                 <div class="modal-body">
-                    <div style="margin-bottom: var(--spacing-4); padding: var(--spacing-4); background: var(--neutral-50); border-radius: var(--radius-lg);">
+                    <div
+                        style="margin-bottom: var(--spacing-4); padding: var(--spacing-4); background: var(--neutral-50); border-radius: var(--radius-lg);">
                         <strong>Cliente:</strong> @selectedOrder.CustomerEmail<br>
-                        <strong>Richiesta:</strong> @selectedOrder.Description.Substring(0, Math.Min(100, selectedOrder.Description.Length))@(selectedOrder.Description.Length > 100 ? "..." : "")
+                        <strong>Richiesta:</strong> @selectedOrder.Description.Substring(0, Math.Min(100,
+                    selectedOrder.Description.Length))@(selectedOrder.Description.Length > 100 ? "..." : "")
                     </div>
 
                     <div class="form-group">
                         <label>Motivo del Rifiuto (opzionale)</label>
                         <textarea @bind="rejectReason" class="form-control" rows="4"
-                                  placeholder="Spiega al cliente il motivo del rifiuto (es: richiesta non fattibile, fuori budget, etc.)..."></textarea>
+                            placeholder="Spiega al cliente il motivo del rifiuto (es: richiesta non fattibile, fuori budget, etc.)..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -339,5 +364,13 @@
                 </div>
             </div>
         </div>
+    }
+    }
+
+    <!-- Lightbox for Attachment -->
+    @if (showAttachmentLightbox && selectedOrder != null && !string.IsNullOrEmpty(selectedOrder.AttachmentUrl))
+    {
+        <ImageLightbox IsVisible="showAttachmentLightbox" Images="@(new List<string> { selectedOrder.AttachmentUrl })"
+            Title="@selectedOrder.AttachmentOriginalName" OnClose="CloseAttachmentLightbox" />
     }
 </div>

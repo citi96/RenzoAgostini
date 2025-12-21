@@ -8,6 +8,7 @@ using RenzoAgostini.Client.Authentication;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
+using RenzoAgostini.Shared.Data;
 
 namespace RenzoAgostini.Client.Pages
 {
@@ -27,6 +28,7 @@ namespace RenzoAgostini.Client.Pages
         protected string? successMessage;
         protected string? errorMessage;
         protected string? accessErrorMessage;
+        protected string? accessStatusMessage;
         protected string? accessCode;
         protected bool isSubmitting = false;
         protected bool isAccessingOrder = false;
@@ -76,7 +78,8 @@ namespace RenzoAgostini.Client.Pages
                 var dto = new CreateCustomOrderDto(
                     customOrderRequest.CustomerEmail,
                     customOrderRequest.Description,
-                    filePath
+                    filePath,
+                    selectedFileName
                 );
 
                 var result = await CustomOrderService.CreateCustomOrderAsync(dto);
@@ -106,6 +109,7 @@ namespace RenzoAgostini.Client.Pages
             {
                 isAccessingOrder = true;
                 accessErrorMessage = null;
+                accessStatusMessage = null;
                 StateHasChanged();
 
                 var result = await CustomOrderService.GetByAccessCodeAsync(
@@ -121,7 +125,18 @@ namespace RenzoAgostini.Client.Pages
                 }
                 else
                 {
-                    accessErrorMessage = "Il quadro non è ancora disponibile.";
+                    if (result.Status == CustomOrderStatus.Pending)
+                    {
+                        accessStatusMessage = "La tua richiesta è stata ricevuta ed è in fase di valutazione. Ti notificheremo via email quando sarà accettata.";
+                    }
+                    else if (result.Status == CustomOrderStatus.Rejected)
+                    {
+                        accessErrorMessage = "Ci dispiace, ma la tua richiesta è stata rifiutata dall'artista. Controlla la tua email per maggiori dettagli.";
+                    }
+                    else
+                    {
+                        accessStatusMessage = "La tua richiesta è stata accettata! Stiamo preparando il tuo quadro personalizzato. Riprova tra poco.";
+                    }
                 }
             }
             catch (Exception ex)
