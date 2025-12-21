@@ -16,26 +16,35 @@
         <div class="nav-links">
             <AuthorizeView Roles="@RoleNames.Admin">
                 <Authorized>
-                    <a class="nav-link" href="/admin/paintings">
-                        <Icon Name="gallery" />
-                        <span>Gestisci Quadri</span>
-                    </a>
-                    <a class="nav-link" href="/admin/orders">
-                        <Icon Name="orders" />
-                        <span>Ordini</span>
-                    </a>
-                    <a class="nav-link" href="/admin/shipping">
-                        <Icon Name="shipping" />
-                        <span>Spedizioni</span>
-                    </a>
-                    <a class="nav-link" href="/admin/custom-orders">
-                        <Icon Name="requests" />
-                        <span>Richieste</span>
-                    </a>
-                    <a class="nav-link" href="/admin/users">
-                        <Icon Name="user" />
-                        <span>Utenti</span>
-                    </a>
+                    <div class="nav-dropdown-container">
+                        <button class="nav-link dropdown-toggle" @onclick="ToggleAdminMenu">
+                            <Icon Name="settings" />
+                            <span>Amministrazione</span>
+                            <Icon Name="chevron-down" Class="dropdown-arrow" />
+                        </button>
+                        <div class="nav-dropdown-menu @(isAdminMenuOpen ? "show" : "")">
+                            <a class="dropdown-item" href="/admin/paintings" @onclick="CloseAdminMenu">
+                                <Icon Name="gallery" />
+                                <span>Gestisci Quadri</span>
+                            </a>
+                            <a class="dropdown-item" href="/admin/orders" @onclick="CloseAdminMenu">
+                                <Icon Name="orders" />
+                                <span>Ordini</span>
+                            </a>
+                            <a class="dropdown-item" href="/admin/shipping" @onclick="CloseAdminMenu">
+                                <Icon Name="shipping" />
+                                <span>Spedizioni</span>
+                            </a>
+                            <a class="dropdown-item" href="/admin/custom-orders" @onclick="CloseAdminMenu">
+                                <Icon Name="requests" />
+                                <span>Richieste</span>
+                            </a>
+                            <a class="dropdown-item" href="/admin/users" @onclick="CloseAdminMenu">
+                                <Icon Name="user" />
+                                <span>Utenti</span>
+                            </a>
+                        </div>
+                    </div>
                 </Authorized>
             </AuthorizeView>
             <a class="nav-link" href="/chi-sono">

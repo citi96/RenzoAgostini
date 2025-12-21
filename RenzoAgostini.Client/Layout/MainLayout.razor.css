@@ -43,7 +43,7 @@
     object-fit: contain;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .nav-brand-logo {
         height: 2rem;
     }
@@ -469,7 +469,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
 
     .nav-links,
     .nav-user-info {
@@ -524,4 +524,83 @@
     .main-content {
         padding: var(--spacing-4) var(--spacing-4);
     }
+}
+
+/* Dropdown Menu */
+.nav-dropdown-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    /* Ensure arrow rotates when open */
+    padding-right: var(--spacing-4);
+}
+
+.dropdown-arrow {
+    margin-left: var(--spacing-2);
+    width: 0.8rem;
+    height: 0.8rem;
+    transition: transform var(--transition-fast);
+}
+
+.dropdown-toggle[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background: white;
+    border: 1px solid var(--neutral-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    padding: var(--spacing-2);
+    display: none;
+    flex-direction: column;
+    gap: var(--spacing-1);
+    opacity: 0;
+    transition: all var(--transition-base);
+    z-index: 1000;
+}
+
+.nav-dropdown-menu.show {
+    display: flex;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-2) var(--spacing-3);
+    color: var(--neutral-700);
+    text-decoration: none;
+    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.dropdown-item:hover {
+    background: var(--neutral-100);
+    color: var(--primary-700);
+}
+
+.dropdown-item .icon svg {
+    width: 1rem;
+    height: 1rem;
+    color: var(--neutral-500);
+}
+
+.dropdown-item:hover .icon svg {
+    color: var(--primary-600);
 }

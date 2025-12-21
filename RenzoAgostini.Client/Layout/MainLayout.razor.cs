@@ -15,6 +15,19 @@ namespace RenzoAgostini.Client.Layout
 
         private int cartCount = 0;
         private bool showMobileMenu = false;
+        private bool isAdminMenuOpen = false;
+
+        private void ToggleAdminMenu()
+        {
+            isAdminMenuOpen = !isAdminMenuOpen;
+            StateHasChanged();
+        }
+
+        private void CloseAdminMenu()
+        {
+            isAdminMenuOpen = false;
+            StateHasChanged();
+        }
 
         protected override async Task OnInitializedAsync()
         {
