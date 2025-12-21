@@ -18,11 +18,12 @@ namespace RenzoAgostini.Server.Services
         IPaintingRepository paintingRepository,
         ICustomEmailSender emailSender,
         IWebHostEnvironment env,
-        IConfiguration configuration,
         IOptions<StorageOptions> storageOptions,
+        IOptions<EmailOptions> emailOptions,
         ILogger<CustomOrderService> logger) : ICustomOrderService
     {
         private readonly string _customOrdersPath = ResolveCustomOrdersPath(env, storageOptions.Value);
+        private readonly EmailOptions _emailOptions = emailOptions.Value;
 
         public async Task<CustomOrderDto> CreateCustomOrderAsync(CreateCustomOrderDto dto)
         {
@@ -175,7 +176,7 @@ namespace RenzoAgostini.Server.Services
 
         private async Task SendCustomerConfirmationEmail(CustomOrder customOrder)
         {
-            var message = new EmailMessage(null, null, null, $@"
+            var message = new EmailMessage(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null, $@"
                 <h2>Richiesta Ricevuta</h2>
                 <p>Ciao,</p>
                 <p>Abbiamo ricevuto la tua richiesta per un quadro personalizzato.</p>
@@ -194,13 +195,14 @@ namespace RenzoAgostini.Server.Services
         private async Task SendArtistNotificationEmail(CustomOrder customOrder)
         {
             // Email per l'artista - configurabile
-            var artistEmail = configuration["ArtistNotificationEmail"];
+            var artistEmail = _emailOptions.ArtistNotificationRecipient;
+            var senderEmail = _emailOptions.NoReplySender;
 
             var attachmentInfo = customOrder.AttachmentPath != null
                 ? $"<p><strong>Allegato:</strong> {customOrder.AttachmentOriginalName}</p>"
                 : "<p>Nessun allegato</p>";
 
-            var message = new EmailMessage(null, null, null, $@"
+            var message = new EmailMessage(new EmailAddress(senderEmail, "Renzo Agostini System"), null, null, $@"
                 <h2>Nuova Richiesta Quadro Personalizzato</h2>
                 <p><strong>Cliente:</strong> {customOrder.CustomerEmail}</p>
                 <p><strong>Descrizione:</strong> {customOrder.Description}</p>
@@ -218,7 +220,7 @@ namespace RenzoAgostini.Server.Services
 
         private async Task SendAcceptanceEmailToCustomer(CustomOrder customOrder)
         {
-            var message = new EmailMessage(null, null, null, $@"
+            var message = new EmailMessage(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null, $@"
                 <h2>Richiesta Accettata!</h2>
                 <p>Ciao,</p>
                 <p>La tua richiesta è stata accettata dall'artista!</p>
@@ -242,7 +244,7 @@ namespace RenzoAgostini.Server.Services
                 ? ""
                 : $"<p><strong>Motivo:</strong> {customOrder.ArtistNotes}</p>";
 
-            var message = new EmailMessage(null, null, null, $@"
+            var message = new EmailMessage(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null, $@"
                 <h2>Richiesta Non Accettata</h2>
                 <p>Ciao,</p>
                 <p>Purtroppo non possiamo procedere con la tua richiesta di quadro personalizzato.</p>

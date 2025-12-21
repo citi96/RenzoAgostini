@@ -38,7 +38,9 @@ var configuredOrigins = builder.Configuration
     .ToArray() ?? Array.Empty<string>();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection("Storage"));
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 
 // Services
 builder.Services.AddControllers();

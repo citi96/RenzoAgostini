@@ -1,4 +1,5 @@
 @page "/privacy"
+@inject IConfiguration Configuration
 
 <PageTitle>Privacy Policy · Renzo Agostini</PageTitle>
 
@@ -13,7 +14,7 @@
                 Il titolare del trattamento dei dati è <strong>Renzo Agostini</strong>.<br />
                 Per qualsiasi informazione o richiesta relativa ai tuoi dati personali, puoi contattarci all'indirizzo
                 email:
-                <a href="mailto:info@renzoagostini.it">info@renzoagostini.it</a>.
+                <a href="mailto:@Configuration["PublicContactEmail"]">@Configuration["PublicContactEmail"]</a>.
             </p>
         </section>
 
@@ -66,7 +67,7 @@
                 <li>Richiedere la portabilità dei dati.</li>
             </ul>
             <p>Per esercitare questi diritti, contattaci a <a
-                    href="mailto:info@renzoagostini.it">info@renzoagostini.it</a>.</p>
+                    href="mailto:@Configuration["PublicContactEmail"]">@Configuration["PublicContactEmail"]</a>.</p>
         </section>
     </div>
 </div>

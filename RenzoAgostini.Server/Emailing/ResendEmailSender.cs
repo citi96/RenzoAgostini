@@ -1,10 +1,12 @@
+using RenzoAgostini.Server.Config;
 using RenzoAgostini.Server.Emailing.Interfaces;
 using RenzoAgostini.Server.Emailing.Models;
+using Microsoft.Extensions.Options;
 using Resend;
 
 namespace RenzoAgostini.Server.Emailing
 {
-    public class ResendEmailSender(IResend resend, IConfiguration config, ILogger<ResendEmailSender> logger) : ICustomEmailSender
+    public class ResendEmailSender(IResend resend, IOptions<EmailOptions> emailOptions, ILogger<ResendEmailSender> logger) : ICustomEmailSender
     {
         public async Task<EmailResult> SendAsync(RenzoAgostini.Server.Emailing.Models.EmailMessage message, CancellationToken ct = default)
         {
@@ -13,10 +15,10 @@ namespace RenzoAgostini.Server.Emailing
             // Handle From
             if (message.From is null)
             {
-                var defaultFrom = config["Email:From"];
+                var defaultFrom = emailOptions.Value.NoReplySender;
                 if (string.IsNullOrWhiteSpace(defaultFrom))
                 {
-                    return EmailResult.Fail("From address is missing and no default is configured.");
+                    return EmailResult.Fail("NoReplySender address is missing configuration.");
                 }
                 resendMessage.From = defaultFrom;
             }

@@ -23,9 +23,11 @@ namespace RenzoAgostini.Server.Services
         IOptions<StripeOptions> stripeOptions,
         ICustomEmailSender emailSender,
         IWebHostEnvironment env,
+        IOptions<EmailOptions> emailOptions,
         ILogger<OrderService> logger) : IOrderService
     {
         private readonly StripeOptions _stripeOptions = stripeOptions.Value;
+        private readonly EmailOptions _emailOptions = emailOptions.Value;
 
         public async Task<Result<string>> CreateOrderAndStartPaymentAsync(CheckoutDto checkout)
         {
@@ -206,7 +208,7 @@ namespace RenzoAgostini.Server.Services
                 order.Status = OrderStatus.Paid;
                 await orderRepository.UpdateAsync(order);
 
-                await emailSender.SendAsync(new(null, null, null, GetHtmlMessage($"{env.WebRootPath}/mailTemplates/order_paid.html"))
+                await emailSender.SendAsync(new(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null, GetHtmlMessage($"{env.WebRootPath}/mailTemplates/order_paid.html"))
                 {
                     To = [new EmailAddress(order.CustomerEmail, $"{order.CustomerLastName}, {order.CustomerFirstName}")],
                     Subject = "Conferma di pagamento - Ordine #" + order.Id
