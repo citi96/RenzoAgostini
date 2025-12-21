@@ -35,7 +35,7 @@
                     @if (!string.IsNullOrEmpty(editForm.ImageUrl))
                     {
                         <div class="current-image">
-                            <img src="@editForm.ImageUrl" alt="Anteprima" class="bio-image-preview" />
+                            <img src="@GetImageUrl(editForm.ImageUrl)" alt="Anteprima" class="bio-image-preview" />
                             <button class="btn danger small" @onclick="RemoveImage">Rimuovi Immagine</button>
                         </div>
                     }
@@ -60,7 +60,7 @@
                 @if (!string.IsNullOrEmpty(displayDto.ImageUrl))
                 {
                     <div class="bio-image-wrapper">
-                        <img src="@displayDto.ImageUrl" alt="Renzo Agostini" class="bio-image" />
+                        <img src="@GetImageUrl(displayDto.ImageUrl)" alt="Renzo Agostini" class="bio-image" />
                     </div>
                 }
 

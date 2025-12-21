@@ -5,11 +5,13 @@ using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
 using RenzoAgostini.Shared.Constants;
 using RenzoAgostini.Client.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace RenzoAgostini.Client.Pages
 {
     public partial class Biography : ComponentBase
     {
+        [Inject] protected IConfiguration Configuration { get; set; } = default!;
         [Inject] protected IBiographyService BioService { get; set; } = default!;
         [Inject] protected IImageUploadService ImageService { get; set; } = default!;
         [Inject] protected AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
@@ -98,6 +100,16 @@ namespace RenzoAgostini.Client.Pages
             }
         }
 
+        protected string GetImageUrl(string? url)
+        {
+            if (string.IsNullOrEmpty(url)) return "";
+            if (url.StartsWith("http") || url.StartsWith("data:")) return url;
+
+            var baseUrl = Configuration["BaseUrl"]?.TrimEnd('/');
+            var cleanUrl = url.TrimStart('/');
+
+            return $"{baseUrl}/{cleanUrl}";
+        }
         protected class BiographyForm
         {
             public string Content { get; set; } = string.Empty;
