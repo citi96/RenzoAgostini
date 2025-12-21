@@ -25,7 +25,6 @@ namespace RenzoAgostini.Client.Components
 
         protected bool IsEditing => Painting != null;
         protected bool CanSave => !string.IsNullOrWhiteSpace(form.Title) &&
-                                 !string.IsNullOrWhiteSpace(form.Slug) &&
                                  (IsEditing || form.Images.Any()) &&
                                  !isSaving;
 
@@ -78,6 +77,11 @@ namespace RenzoAgostini.Client.Components
             {
                 isSaving = true;
                 StateHasChanged();
+
+                if (string.IsNullOrWhiteSpace(form.Slug))
+                {
+                    form.Slug = GenerateSlug(form.Title);
+                }
 
                 var dto = form.ToCreateDto();
 
@@ -267,6 +271,17 @@ namespace RenzoAgostini.Client.Components
                 Logger.LogError(ex, "Error showing error toast");
             }
         }
+        private static string GenerateSlug(string title)
+        {
+            if (string.IsNullOrWhiteSpace(title)) return string.Empty;
+
+            var slug = title.ToLowerInvariant();
+            // Remove diacritics/accents could be added here if needed, keeping it simple for now
+            slug = System.Text.RegularExpressions.Regex.Replace(slug, @"[^a-z0-9\s-]", "");
+            slug = System.Text.RegularExpressions.Regex.Replace(slug, @"\s+", "-").Trim('-');
+
+            return slug;
+        }
     }
 
     public class PaintingForm
@@ -274,7 +289,7 @@ namespace RenzoAgostini.Client.Components
         [Required(ErrorMessage = "Il titolo è obbligatorio")]
         public string Title { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Lo slug è obbligatorio")]
+        //[Required(ErrorMessage = "Lo slug è obbligatorio")]
         public string Slug { get; set; } = string.Empty;
 
         public string? Description { get; set; }
