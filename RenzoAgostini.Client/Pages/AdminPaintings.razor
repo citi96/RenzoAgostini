@@ -13,7 +13,9 @@
 			<p class="admin-subtitle">Crea, modifica ed elimina i quadri della galleria</p>
 		</div>
 		<button class="add-painting-btn" @onclick="() => ShowEditor(null)">
-			<span>➕</span>
+			<span>
+				<Icon Name="plus" />
+			</span>
 			<span>Nuovo Quadro</span>
 		</button>
 	</div>
@@ -22,7 +24,9 @@
 	@if (!string.IsNullOrEmpty(errorMessage))
 	{
 		<div class="admin-alert error">
-			<span>❌</span>
+			<span>
+				<Icon Name="error" />
+			</span>
 			<span>@errorMessage</span>
 			<button class="alert-close" @onclick="() => errorMessage = null">×</button>
 		</div>
@@ -31,7 +35,9 @@
 	@if (!string.IsNullOrEmpty(successMessage))
 	{
 		<div class="admin-alert success">
-			<span>✅</span>
+			<span>
+				<Icon Name="check" />
+			</span>
 			<span>@successMessage</span>
 			<button class="alert-close" @onclick="() => successMessage = null">×</button>
 		</div>
@@ -71,13 +77,17 @@
 	else if (!paintings.Any()) //Empty State
 	{
 		<div class="admin-empty">
-			<div class="admin-empty-icon">🎨</div>
+			<div class="admin-empty-icon">
+				<Icon Name="palette" />
+			</div>
 			<h3 class="admin-empty-title">Nessun Quadro Trovato</h3>
 			<p class="admin-empty-description">
 				Inizia creando il tuo primo quadro per la galleria.
 			</p>
 			<button class="add-painting-btn" @onclick="() => ShowEditor(null)">
-				<span>➕</span>
+				<span>
+					<Icon Name="plus" />
+				</span>
 				<span>Crea Primo Quadro</span>
 			</button>
 		</div>
@@ -87,17 +97,10 @@
 		<div class="admin-paintings-grid">
 			@foreach (var painting in paintings)
 			{
-				<PaintingCard Title="@painting.Title"
-							  Description="@painting.Description"
-							  Year="@painting.Year"
-							  Medium="@painting.Medium"
-							  IsForSale="@painting.IsForSale"
-							  Price="@painting.Price"
-							  ImageUrls="@painting.ImageUrls"
-							  IsAdminMode="true"
-							  PaintingDto="painting"
-							  OnEdit="ShowEditor"
-							  OnDelete="ConfirmDelete" />
+				<PaintingCard Title="@painting.Title" Description="@painting.Description" Year="@painting.Year"
+					Medium="@painting.Medium" IsForSale="@painting.IsForSale" Price="@painting.Price"
+					ImageUrls="@painting.ImageUrls" IsAdminMode="true" PaintingDto="painting" OnEdit="ShowEditor"
+					OnDelete="ConfirmDelete" />
 			}
 		</div>
 	}
@@ -105,9 +108,7 @@
 	<!-- Editor Modal -->
 	@if (showEditor)
 	{
-		<PaintingEditor Painting="editingPainting"
-						OnSave="HandleSave"
-						OnCancel="HideEditor" />
+		<PaintingEditor Painting="editingPainting" OnSave="HandleSave" OnCancel="HideEditor" />
 	}
 
 	<!-- Delete Confirmation Modal -->
@@ -115,7 +116,9 @@
 	{
 		<div class="delete-modal-overlay" @onclick="CancelDelete">
 			<div class="delete-modal" @onclick:stopPropagation="true">
-				<div class="delete-modal-icon">🗑️</div>
+				<div class="delete-modal-icon">
+					<Icon Name="trash" />
+				</div>
 				<h3 class="delete-modal-title">Conferma Eliminazione</h3>
 				<p class="delete-modal-text">
 					Sei sicuro di voler eliminare il quadro<br />

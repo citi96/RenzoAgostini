@@ -11,7 +11,9 @@
 	@if (!string.IsNullOrEmpty(successMessage))
 	{
 		<div class="alert alert-success">
-			<h3>✅ Richiesta Inviata!</h3>
+			<h3>
+				<Icon Name="check" /> Richiesta Inviata!
+			</h3>
 			<p>@successMessage</p>
 			<p><strong>Il tuo codice di riferimento è: @accessCode</strong></p>
 			<p class="small">Conserva questo codice, ti servirà per accedere al tuo quadro una volta accettata la richiesta.
@@ -22,7 +24,9 @@
 	@if (!string.IsNullOrEmpty(errorMessage))
 	{
 		<div class="alert alert-danger">
-			<p>❌ @errorMessage</p>
+			<p>
+				<Icon Name="error" /> @errorMessage
+			</p>
 		</div>
 	}
 
@@ -53,7 +57,9 @@
 					5MB)</small>
 				@if (selectedFileName != null)
 				{
-					<p class="selected-file">📎 @selectedFileName</p>
+					<p class="selected-file">
+						<Icon Name="paperclip" /> @selectedFileName
+					</p>
 				}
 			</div>
 
@@ -88,7 +94,9 @@
 		@if (!string.IsNullOrEmpty(accessErrorMessage))
 		{
 			<div class="alert error">
-				<p>❌ @accessErrorMessage</p>
+				<p>
+					<Icon Name="error" /> @accessErrorMessage
+				</p>
 			</div>
 		}
 

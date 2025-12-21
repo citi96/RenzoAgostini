@@ -37,7 +37,7 @@
 
             <EditForm Model="@profile" OnValidSubmit="HandleSubmit">
                 <DataAnnotationsValidator />
-                
+
                 <div class="grid grid-2 gap-4 mb-4">
                     <div class="form-group">
                         <label class="form-label">Nome</label>
@@ -71,20 +71,23 @@
 
                 <div class="bg-neutral-50 p-4 rounded-lg mb-6 border border-neutral-200">
                     <div class="form-group">
-                        <label class="form-label font-bold text-neutral-800">Password Attuale (Richiesta per salvare)</label>
+                        <label class="form-label font-bold text-neutral-800">Password Attuale (Richiesta per
+                            salvare)</label>
                         <InputText @bind-Value="profile.CurrentPassword" type="password" class="form-control" />
                         <ValidationMessage For="@(() => profile.CurrentPassword)" />
-                        <small class="text-neutral-500">Per la tua sicurezza, inserisci la password attuale per confermare le modifiche.</small>
+                        <small class="text-neutral-500">Per la tua sicurezza, inserisci la password attuale per confermare
+                            le modifiche.</small>
                     </div>
                 </div>
 
-                 <div class="flex justify-between items-center gap-3">
+                <div class="flex justify-between items-center gap-3">
                     <button type="button" class="btn btn-danger-outline" @onclick="DeleteAccount">
-                        ⚠️ Elimina Account
+                        <Icon Name="trash" /> Elimina Account
                     </button>
-                    
+
                     <div class="flex gap-3">
-                        <button type="button" class="btn btn-outline" @onclick="@(() => Navigation.NavigateTo("/"))">Annulla</button>
+                        <button type="button" class="btn btn-outline"
+                        @onclick="@(() => Navigation.NavigateTo("/"))">Annulla</button>
                         <button type="submit" class="btn btn-primary">Salva Modifiche</button>
                     </div>
                 </div>
