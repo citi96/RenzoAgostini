@@ -20,7 +20,7 @@
                         <button class="nav-link dropdown-toggle" @onclick="ToggleAdminMenu">
                             <Icon Name="settings" />
                             <span>Amministrazione</span>
-                            <Icon Name="chevron-down" Class="dropdown-arrow" />
+                            <Icon Name="chevron-down" CssClass="dropdown-arrow" />
                         </button>
                         <div class="nav-dropdown-menu @(isAdminMenuOpen ? "show" : "")">
                             <a class="dropdown-item" href="/admin/paintings" @onclick="CloseAdminMenu">
