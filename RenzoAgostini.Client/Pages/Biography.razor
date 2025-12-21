@@ -17,68 +17,116 @@
         <div class="bio-header">
             <h1>Chi Sono</h1>
             <AuthorizeView Roles="@RoleNames.Admin">
-                @if (!isEditing)
-                {
-                    <button class="btn primary" @onclick="EnableEditing">
-                        Modifica Biografia
-                    </button>
-                }
+                <button class="btn btn-primary" @onclick="EnableEditing">
+                    <Icon Name="edit" /> Modifica Biografia
+                </button>
             </AuthorizeView>
         </div>
 
-        @if (isEditing)
-        {
-            <div class="bio-editor">
-                <div class="form-group">
-                    <label>Immagine Profilo</label>
-                    <InputFile OnChange="HandleImageUpload" accept="image/*" class="form-control" />
-                    @if (!string.IsNullOrEmpty(editForm.ImageUrl))
-                    {
-                        <div class="current-image">
-                            <img src="@GetImageUrl(editForm.ImageUrl)" alt="Anteprima" class="bio-image-preview" />
-                            <button class="btn danger small" @onclick="RemoveImage">Rimuovi Immagine</button>
-                        </div>
-                    }
+        <div class="bio-content">
+            @if (!string.IsNullOrEmpty(displayDto.ImageUrl))
+            {
+                <div class="bio-image-wrapper">
+                    <img src="@GetImageUrl(displayDto.ImageUrl)" alt="Renzo Agostini" class="bio-image" />
                 </div>
+            }
 
-                <div class="form-group">
-                    <label>Descrizione</label>
-                    <textarea @bind="editForm.Content" class="bio-textarea" rows="15"></textarea>
-                </div>
-
-                <div class="editor-actions">
-                    <button class="btn secondary" @onclick="CancelEditing" disabled="@isSaving">Annulla</button>
-                    <button class="btn primary" @onclick="SaveBio" disabled="@isSaving">
-                        @(isSaving ? "Salvataggio..." : "Salva")
-                    </button>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="bio-content">
-                @if (!string.IsNullOrEmpty(displayDto.ImageUrl))
+            <div class="bio-text">
+                @if (string.IsNullOrWhiteSpace(displayDto.Content))
                 {
-                    <div class="bio-image-wrapper">
-                        <img src="@GetImageUrl(displayDto.ImageUrl)" alt="Renzo Agostini" class="bio-image" />
-                    </div>
+                    <p class="placeholder">Nessuna biografia inserita.</p>
                 }
-
-                <div class="bio-text">
-                    @if (string.IsNullOrWhiteSpace(displayDto.Content))
+                else
+                {
+                    @foreach (var paragraph in displayDto.Content.Split(new[] { '\n', '\r' },
+                   StringSplitOptions.RemoveEmptyEntries))
                     {
-                        <p class="placeholder">Nessuna biografia inserita.</p>
+                        <p>@paragraph</p>
                     }
-                    else
-                    {
-                        @foreach (var paragraph in displayDto.Content.Split(new[] { '\n', '\r' },
-                       StringSplitOptions.RemoveEmptyEntries))
-                        {
-                            <p>@paragraph</p>
-                        }
-                    }
-                </div>
+                }
             </div>
-        }
+        </div>
     }
 </div>
+
+@if (isEditing)
+{
+    <div class="editor-overlay" @onclick="CancelEditing">
+        <div class="editor-modal" @onclick:stopPropagation="true">
+            <!-- Header -->
+            <div class="editor-header">
+                <h2 class="editor-title">Modifica Biografia</h2>
+                <button class="editor-close" @onclick="CancelEditing" type="button">✕</button>
+            </div>
+
+            <!-- Body -->
+            <div class="editor-body">
+                <EditForm Model="editForm" OnValidSubmit="SaveBio">
+                    <DataAnnotationsValidator />
+
+                    <!-- Image Upload Section -->
+                    <div class="editor-images-section" style="margin-top: 0; border-top: none; padding-top: 0;">
+                        <h3 class="editor-images-title">Immagine Profilo</h3>
+
+                        <div class="editor-file-upload">
+                            <InputFile OnChange="HandleImageUpload" accept="image/*" class="editor-file-input" />
+                            <label class="editor-file-label">
+                                <div class="editor-file-icon">
+                                    <Icon Name="upload" />
+                                </div>
+                                <div class="editor-file-text">
+                                    Clicca per selezionare un'immagine
+                                </div>
+                                <div class="editor-file-hint">
+                                    Opzionale (Max 5MB)
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Image Preview -->
+                        @if (!string.IsNullOrEmpty(editForm.ImageUrl))
+                        {
+                            <div class="editor-images-grid">
+                                <div class="editor-image-item">
+                                    <img src="@GetImageUrl(editForm.ImageUrl)" alt="Anteprima" class="editor-image" />
+                                    <div class="editor-image-overlay">
+                                        <button type="button" class="editor-image-btn danger" @onclick="RemoveImage">
+                                            <Icon Name="trash" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Description -->
+                    <div class="editor-form-group full-width mt-6">
+                        <label class="editor-label">Descrizione</label>
+                        <textarea @bind="editForm.Content" class="editor-textarea" rows="15"
+                            placeholder="Inserisci qui la biografia..."></textarea>
+                    </div>
+
+                    <!-- Footer inside Form to submit -->
+                    <div class="editor-footer">
+                        <button type="button" class="editor-btn-cancel" @onclick="CancelEditing">
+                            Annulla
+                        </button>
+                        <button type="submit" class="editor-btn-save @(isSaving ? "editor-loading" : "")"
+                            disabled="@isSaving">
+                            @if (isSaving)
+                            {
+                                <span class="editor-spinner"></span>
+                                <span>Salvataggio...</span>
+                            }
+                            else
+                            {
+                                <Icon Name="save" />
+                                <span>Salva Modifiche</span>
+                            }
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
