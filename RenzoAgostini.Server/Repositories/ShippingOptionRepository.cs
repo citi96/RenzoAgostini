@@ -1,4 +1,3 @@
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using RenzoAgostini.Server.Data;
 using RenzoAgostini.Server.Entities;

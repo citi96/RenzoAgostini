@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RenzoAgostini.Server.Auth;
@@ -19,7 +18,6 @@ using RenzoAgostini.Server.Services.Interfaces;
 using RenzoAgostini.Shared.Constants;
 using RenzoAgostini.Shared.Contracts;
 using Stripe;
-using System.Security.Claims;
 using System.Text;
 using IOrderService = RenzoAgostini.Server.Services.Interfaces.IOrderService;
 

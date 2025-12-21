@@ -1,6 +1,4 @@
-﻿using RenzoAgostini.Shared.DTOs;
-
-namespace RenzoAgostini.Client.Services.Interfaces
+﻿namespace RenzoAgostini.Client.Services.Interfaces
 {
     public interface IKeycloakService
     {

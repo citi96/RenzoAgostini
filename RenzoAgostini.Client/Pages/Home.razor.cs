@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Configuration;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
-using System.Linq;
 
 namespace RenzoAgostini.Client.Pages;
 

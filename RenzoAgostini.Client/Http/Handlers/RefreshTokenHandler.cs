@@ -3,7 +3,6 @@ using System.Net.Http.Headers;
 using Blazored.LocalStorage;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.DTOs;
-using RenzoAgostini.Client.Services;
 
 namespace RenzoAgostini.Client.Http.Handlers;
 

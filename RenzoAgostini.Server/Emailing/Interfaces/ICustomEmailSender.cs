@@ -1,5 +1,4 @@
-﻿using System.Net.Mail;
-using RenzoAgostini.Server.Emailing.Models;
+﻿using RenzoAgostini.Server.Emailing.Models;
 
 namespace RenzoAgostini.Server.Emailing.Interfaces
 {

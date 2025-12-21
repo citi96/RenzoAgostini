@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Components;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Pages;

@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
-using RenzoAgostini.Client.Services;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;

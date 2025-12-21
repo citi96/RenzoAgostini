@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using RenzoAgostini.Client.Services;
 using RenzoAgostini.Client.Services.Interfaces;
 
 namespace RenzoAgostini.Client.Pages

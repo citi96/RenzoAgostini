@@ -7,7 +7,6 @@ using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Server.Exceptions;
 using RenzoAgostini.Server.Mappings;
 using RenzoAgostini.Server.Repositories.Interfaces;
-using RenzoAgostini.Shared.Common;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.Data;
 using RenzoAgostini.Shared.DTOs;

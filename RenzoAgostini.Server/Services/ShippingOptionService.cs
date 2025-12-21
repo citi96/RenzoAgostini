@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Net;
 using RenzoAgostini.Server.Entities;
 using RenzoAgostini.Server.Exceptions;

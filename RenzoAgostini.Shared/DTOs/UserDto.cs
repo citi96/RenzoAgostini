@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RenzoAgostini.Shared.DTOs
+﻿namespace RenzoAgostini.Shared.DTOs
 {
     public class UserDto
     {

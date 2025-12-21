@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
-using System.Linq;
 
 namespace RenzoAgostini.Server.Auth;
 

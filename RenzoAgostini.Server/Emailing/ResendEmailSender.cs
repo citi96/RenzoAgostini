@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Options;
 using RenzoAgostini.Server.Emailing.Interfaces;
 using RenzoAgostini.Server.Emailing.Models;
 using Resend;

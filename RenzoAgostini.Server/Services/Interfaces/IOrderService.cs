@@ -1,5 +1,4 @@
-﻿using RenzoAgostini.Server.Entities;
-using RenzoAgostini.Shared.Common;
+﻿using RenzoAgostini.Shared.Common;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Server.Services.Interfaces

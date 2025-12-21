@@ -1,7 +1,6 @@
 // RenzoAgostini.Server/Controllers/CustomOrdersController.cs
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RenzoAgostini.Server.Services.Interfaces;
 using RenzoAgostini.Shared.Constants;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;

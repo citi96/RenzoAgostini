@@ -9,7 +9,6 @@ using RenzoAgostini.Client.Services;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.Contracts;
 using Blazored.LocalStorage;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

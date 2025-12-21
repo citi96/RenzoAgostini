@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
-using RenzoAgostini.Client.Services;
 using RenzoAgostini.Client.Services.Interfaces;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Metrics;
-using System.Linq;
 
 namespace RenzoAgostini.Client.Pages
 {

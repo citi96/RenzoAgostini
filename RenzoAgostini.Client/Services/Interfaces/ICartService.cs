@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using RenzoAgostini.Shared.DTOs;
 
 namespace RenzoAgostini.Client.Services.Interfaces

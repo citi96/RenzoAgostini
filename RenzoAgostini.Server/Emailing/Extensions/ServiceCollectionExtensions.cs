@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using RenzoAgostini.Server.Config;
-using RenzoAgostini.Server.Emailing.Interfaces;
+﻿using RenzoAgostini.Server.Emailing.Interfaces;
 using Resend;
 
 namespace RenzoAgostini.Server.Emailing.Extensions

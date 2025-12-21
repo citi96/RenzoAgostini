@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using RenzoAgostini.Shared.Contracts;
 using RenzoAgostini.Shared.DTOs;
-using RenzoAgostini.Shared.Constants;
 using RenzoAgostini.Client.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
 
 namespace RenzoAgostini.Client.Pages
 {

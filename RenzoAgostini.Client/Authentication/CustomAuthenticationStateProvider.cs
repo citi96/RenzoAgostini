@@ -1,6 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Linq;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using RenzoAgostini.Shared.DTOs;
