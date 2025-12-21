@@ -5,7 +5,7 @@ using System.Timers;
 
 namespace RenzoAgostini.Client.Components
 {
-    public partial class ImageLightbox : ComponentBase, IDisposable
+    public partial class ImageLightbox : ComponentBase, IAsyncDisposable
     {
         [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
         [Inject] private ILogger<ImageLightbox> Logger { get; set; } = default!;
@@ -63,7 +63,7 @@ namespace RenzoAgostini.Client.Components
             }
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             StopSlideshow();
             dotNetRef?.Dispose();
@@ -71,7 +71,11 @@ namespace RenzoAgostini.Client.Components
             // Restore body scrolling
             try
             {
-                JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = ''").GetAwaiter().GetResult();
+                await JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = ''");
+            }
+            catch (JSDisconnectedException)
+            {
+                // Ignored - JS runtime is gone
             }
             catch (Exception ex)
             {
