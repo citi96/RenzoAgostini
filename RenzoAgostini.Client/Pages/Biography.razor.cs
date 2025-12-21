@@ -60,6 +60,12 @@ namespace RenzoAgostini.Client.Pages
                 var file = e.File;
                 if (file != null)
                 {
+                    // Se c'è già un'immagine (e non è un data URI), cancellala dal server prima di caricarne una nuova
+                    if (!string.IsNullOrEmpty(editForm.ImageUrl) && !editForm.ImageUrl.StartsWith("data:"))
+                    {
+                        await ImageService.DeleteImageAsync(editForm.ImageUrl);
+                    }
+
                     // Max 5MB
                     var maxFileSize = 5L * 1024 * 1024;
                     using var stream = file.OpenReadStream(maxFileSize);
@@ -73,8 +79,19 @@ namespace RenzoAgostini.Client.Pages
             }
         }
 
-        protected void RemoveImage()
+        protected async Task RemoveImage()
         {
+            if (!string.IsNullOrEmpty(editForm.ImageUrl) && !editForm.ImageUrl.StartsWith("data:"))
+            {
+                try
+                {
+                    await ImageService.DeleteImageAsync(editForm.ImageUrl);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error deleting image: {ex.Message}");
+                }
+            }
             editForm.ImageUrl = null;
         }
 
