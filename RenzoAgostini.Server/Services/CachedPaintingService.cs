@@ -13,7 +13,7 @@ namespace RenzoAgostini.Server.Services
 
         public async Task<IEnumerable<PaintingDto>> GetAllPaintingsAsync()
         {
-            const string cacheKey = "all_paintings";
+            const string cacheKey = "all_paintings_v2";
 
             if (cache.TryGetValue(cacheKey, out IEnumerable<PaintingDto>? cachedPaintings))
             {
@@ -31,7 +31,7 @@ namespace RenzoAgostini.Server.Services
 
         public async Task<PaintingDto?> GetPaintingByIdAsync(int id)
         {
-            var cacheKey = $"painting_id_{id}";
+            var cacheKey = $"painting_id_{id}_v2";
 
             if (cache.TryGetValue(cacheKey, out PaintingDto? cachedPainting))
             {
@@ -50,7 +50,7 @@ namespace RenzoAgostini.Server.Services
 
         public async Task<PaintingDto?> GetPaintingBySlugAsync(string slug)
         {
-            var cacheKey = $"painting_slug_{slug}";
+            var cacheKey = $"painting_slug_{slug}_v2";
 
             if (cache.TryGetValue(cacheKey, out PaintingDto? cachedPainting))
             {
@@ -72,8 +72,8 @@ namespace RenzoAgostini.Server.Services
             var result = await innerService.CreatePaintingAsync(painting);
 
             // Invalida cache
-            cache.Remove("all_paintings");
-            cache.Remove("paintings_for_sale");
+            cache.Remove("all_paintings_v2");
+            cache.Remove("paintings_for_sale_v2");
 
             return result;
         }
@@ -83,9 +83,9 @@ namespace RenzoAgostini.Server.Services
             var result = await innerService.UpdatePaintingAsync(id, painting);
 
             // Invalida cache specifiche
-            cache.Remove($"painting_id_{id}");
-            cache.Remove("all_paintings");
-            cache.Remove("paintings_for_sale");
+            cache.Remove($"painting_id_{id}_v2");
+            cache.Remove("all_paintings_v2");
+            cache.Remove("paintings_for_sale_v2");
 
             return result;
         }
@@ -95,14 +95,14 @@ namespace RenzoAgostini.Server.Services
             await innerService.DeletePaintingAsync(id);
 
             // Invalida cache
-            cache.Remove($"painting_id_{id}");
-            cache.Remove("all_paintings");
-            cache.Remove("paintings_for_sale");
+            cache.Remove($"painting_id_{id}_v2");
+            cache.Remove("all_paintings_v2");
+            cache.Remove("paintings_for_sale_v2");
         }
 
         public async Task<IEnumerable<PaintingDto>> GetPaintingsForSaleAsync()
         {
-            const string cacheKey = "paintings_for_sale";
+            const string cacheKey = "paintings_for_sale_v2";
 
             if (cache.TryGetValue(cacheKey, out IEnumerable<PaintingDto>? cachedPaintings))
             {

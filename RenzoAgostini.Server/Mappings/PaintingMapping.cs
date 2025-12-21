@@ -17,20 +17,21 @@ namespace RenzoAgostini.Server.Mappings
                 painting.Price,
                 painting.IsForSale,
                 painting.Dimensions,
-                [.. painting.Images.OrderByDescending(i => i.IsPrimary).Select(img => img.Url)]
+                [.. painting.Images.OrderByDescending(i => i.IsPrimary).Select(img => img.Url.TrimStart('/'))]
             );
         }
 
         public static Painting ToEntity(this CreatePaintingDto dto)
         {
-            return new Painting {
+            return new Painting
+            {
                 Id = 0, // ID sarà assegnato dal database
                 Slug = dto.Slug,
                 Title = dto.Title,
                 Description = dto.Description,
                 Year = dto.Year,
                 Medium = dto.Medium,
-                Price =dto.Price,
+                Price = dto.Price,
                 IsForSale = dto.IsForSale,
                 Dimensions = dto.Dimensions,
                 Images = [.. dto.Images.Select(img => new PaintingImage {
@@ -54,12 +55,13 @@ namespace RenzoAgostini.Server.Mappings
             target.Dimensions = dto.Dimensions;
 
             target.Images.Clear();
-            target.Images.AddRange(dto.Images.Select(i => new PaintingImage {
-                    Url = i.Url,
-                    Width = i.Width,
-                    Height = i.Height,
-                    IsPrimary = i.IsPrimary
-                }));
+            target.Images.AddRange(dto.Images.Select(i => new PaintingImage
+            {
+                Url = i.Url,
+                Width = i.Width,
+                Height = i.Height,
+                IsPrimary = i.IsPrimary
+            }));
             return target;
         }
     }

@@ -23,7 +23,7 @@ else
                     <div class="main-image">
                         <img src="@currentImage" alt="@painting.Title" />
                     </div>
-                    
+
                     @if (painting.ImageUrls.Count > 1)
                     {
                         <div class="thumbnail-gallery">
@@ -31,8 +31,8 @@ else
                             {
                                 var index = i; // Capture for closure
                                 var imageUrl = painting.ImageUrls[i];
-                                <button class="thumbnail @(imageUrl == currentImage ? "active" : "")" 
-                                        @onclick="() => SetCurrentImage(imageUrl)">
+                                <button class="thumbnail @(imageUrl == currentImage ? "active" : "")"
+                                @onclick="() => SetCurrentImage(imageUrl)">
                                     <img src="@imageUrl" alt="@painting.Title" />
                                 </button>
                             }
@@ -65,7 +65,7 @@ else
                                 <span class="value">@painting.Year</span>
                             </div>
                         }
-                        
+
                         @if (!string.IsNullOrEmpty(painting.Medium))
                         {
                             <div class="detail-item">
@@ -73,7 +73,7 @@ else
                                 <span class="value">@painting.Medium</span>
                             </div>
                         }
-                        
+
                         @if (!string.IsNullOrEmpty(painting.Dimensions))
                         {
                             <div class="detail-item">
@@ -91,11 +91,11 @@ else
                             <span class="currency">€</span>
                             <span class="amount">@painting.Price.Value.ToString("N2")</span>
                         </div>
-                        
+
                         <p class="exclusive-note">
                             🌟 Questo quadro è stato creato esclusivamente per te e sarà disponibile solo per un tempo limitato.
                         </p>
-                        
+
                         <button class="btn primary large" @onclick="AddToCart" disabled="@isAddingToCart">
                             @if (isAddingToCart)
                             {
@@ -106,11 +106,11 @@ else
                                 <span>🛒 Aggiungi al Carrello</span>
                             }
                         </button>
-                        
+
                         @if (addedToCart)
                         {
                             <div class="success-message">
-                                ✅ Aggiunto al carrello! 
+                                ✅ Aggiunto al carrello!
                                 <a href="/cart" class="link">Vai al carrello</a>
                             </div>
                         }
@@ -129,8 +129,8 @@ else
         <div class="contact-section">
             <h3>Hai domande sul tuo quadro?</h3>
             <p>L'artista è a tua disposizione per qualsiasi chiarimento o modifica.</p>
-            <a href="mailto:renzo.agostini@example.com?subject=Domanda su quadro personalizzato - ID @painting.Id" 
-               class="btn secondary">
+            <a href="mailto:renzo.agostini@example.com?subject=Domanda su quadro personalizzato - ID @painting.Id"
+                class="btn secondary">
                 📧 Contatta l'Artista
             </a>
         </div>

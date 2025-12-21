@@ -6,8 +6,8 @@
 	<div class="painting-card-image-container">
 		@if (!string.IsNullOrEmpty(PrimaryImageUrl))
 		{
-			<img src="@($"{Configuration["BaseUrl"]}{PrimaryImageUrl}")" alt="@Title" class="painting-card-image"
-				loading="lazy" />
+			<img src="@(PrimaryImageUrl.StartsWith("http") ? PrimaryImageUrl : $"{Configuration["BaseUrl"]}/{PrimaryImageUrl}")"
+				alt="@Title" class="painting-card-image" loading="lazy" />
 		}
 		else
 		{

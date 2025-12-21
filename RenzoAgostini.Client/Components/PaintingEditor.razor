@@ -1,5 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
 @using RenzoAgostini.Shared.DTOs
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 
 <div class="editor-overlay" @onclick="OnCancel">
     <div class="editor-modal" @onclick:stopPropagation="true">
@@ -18,55 +20,42 @@
                 <div class="editor-form-grid">
                     <div class="editor-form-group">
                         <label class="editor-label required">Titolo</label>
-                        <InputText @bind-Value="form.Title"
-                                   class="editor-input"
-                                   placeholder="Inserisci il titolo del quadro" />
+                        <InputText @bind-Value="form.Title" class="editor-input"
+                            placeholder="Inserisci il titolo del quadro" />
                         <ValidationMessage For="() => form.Title" class="editor-validation" />
                     </div>
 
                     <div class="editor-form-group">
                         <label class="editor-label required">Slug</label>
-                        <InputText @bind-Value="form.Slug"
-                                   class="editor-input"
-                                   placeholder="titolo-del-quadro" />
+                        <InputText @bind-Value="form.Slug" class="editor-input" placeholder="titolo-del-quadro" />
                         <ValidationMessage For="() => form.Slug" class="editor-validation" />
                     </div>
 
                     <div class="editor-form-group full-width">
                         <label class="editor-label">Descrizione</label>
-                        <InputTextArea @bind-Value="form.Description"
-                                       class="editor-textarea"
-                                       rows="3"
-                                       placeholder="Descrivi il quadro, il soggetto, lo stile..." />
+                        <InputTextArea @bind-Value="form.Description" class="editor-textarea" rows="3"
+                            placeholder="Descrivi il quadro, il soggetto, lo stile..." />
                     </div>
 
                     <div class="editor-form-group">
                         <label class="editor-label">Anno</label>
-                        <InputNumber @bind-Value="form.Year"
-                                     class="editor-input"
-                                     placeholder="2024" />
+                        <InputNumber @bind-Value="form.Year" class="editor-input" placeholder="2024" />
                     </div>
 
                     <div class="editor-form-group">
                         <label class="editor-label">Tecnica</label>
-                        <InputText @bind-Value="form.Medium"
-                                   class="editor-input"
-                                   placeholder="Olio su tela, Acrilico su cartone..." />
+                        <InputText @bind-Value="form.Medium" class="editor-input"
+                            placeholder="Olio su tela, Acrilico su cartone..." />
                     </div>
 
                     <div class="editor-form-group">
                         <label class="editor-label">Dimensioni</label>
-                        <InputText @bind-Value="form.Dimensions"
-                                   class="editor-input"
-                                   placeholder="50x70 cm" />
+                        <InputText @bind-Value="form.Dimensions" class="editor-input" placeholder="50x70 cm" />
                     </div>
 
                     <div class="editor-form-group">
                         <label class="editor-label">Prezzo (€)</label>
-                        <InputNumber @bind-Value="form.Price"
-                                     class="editor-input"
-                                     step="0.01"
-                                     placeholder="0.00" />
+                        <InputNumber @bind-Value="form.Price" class="editor-input" step="0.01" placeholder="0.00" />
                     </div>
 
                     <div class="editor-form-group checkbox-group">
@@ -81,12 +70,11 @@
 
                     <!-- File Upload -->
                     <div class="editor-file-upload">
-                        <InputFile OnChange="HandleFileSelection"
-                                   multiple
-                                   accept="image/*"
-                                   class="editor-file-input" />
+                        <InputFile OnChange="HandleFileSelection" multiple accept="image/*" class="editor-file-input" />
                         <label class="editor-file-label">
-                            <div class="editor-file-icon"><Icon Name="upload" /></div>
+                            <div class="editor-file-icon">
+                                <Icon Name="upload" />
+                            </div>
                             <div class="editor-file-text">
                                 Clicca per selezionare immagini
                             </div>
@@ -112,27 +100,26 @@
                                 var index = i;
                                 var image = form.Images[i];
                                 <div class="editor-image-item @(image.IsPrimary ? "primary" : "")">
-                                @if (image.IsPrimary)
-                                {
+                                    @if (image.IsPrimary)
+                                    {
                                         <div class="editor-primary-badge">
                                             <Icon Name="star" />
                                             <span>Principale</span>
                                         </div>
-                                }
-                                    <img src="@image.Url" alt="Anteprima" class="editor-image" />
+                                    }
+                                    <img src="@(image.Url.StartsWith("data:") || image.Url.StartsWith("http") ? image.Url : $"{Configuration["BaseUrl"]}/{image.Url}")"
+                                        alt="Anteprima" class="editor-image" />
                                     <div class="editor-image-overlay">
                                         @if (!image.IsPrimary)
                                         {
-                                            <button type="button"
-                                                    class="editor-image-btn primary"
-                                                    @onclick="() => SetPrimary(index)">
+                                            <button type="button" class="editor-image-btn primary"
+                                            @onclick="() => SetPrimary(index)">
                                                 <Icon Name="star" />
                                                 <span>Principale</span>
                                             </button>
                                         }
-                                        <button type="button"
-                                                class="editor-image-btn danger"
-                                                @onclick="() => RemoveImage(index)">
+                                        <button type="button" class="editor-image-btn danger"
+                                        @onclick="() => RemoveImage(index)">
                                             <Icon Name="trash" />
                                         </button>
                                     </div>
@@ -147,9 +134,8 @@
                     <button type="button" class="editor-btn-cancel" @onclick="OnCancel">
                         Annulla
                     </button>
-                    <button type="submit"
-                            class="editor-btn-save @(isSaving ? "editor-loading" : "")"
-                            disabled="@(!CanSave || isSaving)">
+                    <button type="submit" class="editor-btn-save @(isSaving ? "editor-loading" : "")"
+                        disabled="@(!CanSave || isSaving)">
                         @if (isSaving)
                         {
                             <span class="editor-spinner"></span>

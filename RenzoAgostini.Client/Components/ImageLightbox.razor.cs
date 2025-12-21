@@ -324,7 +324,7 @@ namespace RenzoAgostini.Client.Components
             var baseUrl = Configuration["BaseUrl"] ?? "";
             var imageUrl = Images[CurrentIndex];
 
-            return imageUrl.StartsWith("http") ? imageUrl : $"{baseUrl}{imageUrl}";
+            return imageUrl.StartsWith("http") ? imageUrl : $"{baseUrl}/{imageUrl}";
         }
 
         protected string GetThumbnailUrl(int index)
@@ -336,7 +336,7 @@ namespace RenzoAgostini.Client.Components
 
             // In a real app, you might want to generate thumbnail URLs
             // For now, we'll use the full image
-            return imageUrl.StartsWith("http") ? imageUrl : $"{baseUrl}{imageUrl}";
+            return imageUrl.StartsWith("http") ? imageUrl : $"{baseUrl}/{imageUrl}";
         }
     }
 

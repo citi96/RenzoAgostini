@@ -229,7 +229,7 @@
                                 <div>
                                     @if (item.ImageUrls.Any())
                                     {
-                                        <img src="@($"{Configuration["BaseUrl"]}{item.ImageUrls[0]}")" 
+                                        <img src="@($"{Configuration["BaseUrl"]}/{item.ImageUrls[0]}")" 
                                              alt="@item.Title" 
                                              class="order-item-image" />
                                     }
