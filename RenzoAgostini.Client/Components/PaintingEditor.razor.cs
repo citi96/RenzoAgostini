@@ -153,7 +153,7 @@ namespace RenzoAgostini.Client.Components
                     var imageIndex = form.Images.FindIndex(img => img.Url == tempUrl);
                     if (imageIndex >= 0)
                     {
-                        form.Images[imageIndex] = tempImage with { Url = imageUrl };
+                        form.Images[imageIndex] = tempImage with { Url = imageUrl.TrimStart('/') };
                     }
 
                     uploadedCount++;
