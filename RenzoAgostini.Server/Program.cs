@@ -72,20 +72,23 @@ builder.Services.AddSingleton<IClaimsTransformation, LowercaseRoleClaimsTransfor
 builder.Services.AddSingleton<ITokenService, RenzoAgostini.Server.Services.TokenService>();
 
 builder.Services.AddScoped<IPaintingRepository, PaintingRepository>();
-builder.Services.AddScoped<PaintingService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<ICustomOrderRepository, CustomOrderRepository>();
+builder.Services.AddScoped<IShippingOptionRepository, ShippingOptionRepository>();
+builder.Services.AddScoped<IBiographyRepository, BiographyRepository>();
+
+// Services
+builder.Services.AddScoped<PaintingService>(); // Concrete service for caching
 builder.Services.AddScoped<IPaintingService>(sp =>
     new CachedPaintingService(
         sp.GetRequiredService<PaintingService>(),
         sp.GetRequiredService<IMemoryCache>(),
         sp.GetRequiredService<ILogger<CachedPaintingService>>()
     ));
-
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<ICustomOrderRepository, CustomOrderRepository>();
 builder.Services.AddScoped<ICustomOrderService, CustomOrderService>();
-builder.Services.AddScoped<IShippingOptionRepository, ShippingOptionRepository>();
 builder.Services.AddScoped<IShippingOptionService, ShippingOptionService>();
+builder.Services.AddScoped<IBiographyService, BiographyService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFileStorageService, DatabaseFileStorageService>();

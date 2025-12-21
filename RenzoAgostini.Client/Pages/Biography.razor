@@ -1,0 +1,84 @@
+@page "/chi-sono"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using RenzoAgostini.Shared.Contracts
+@using RenzoAgostini.Shared.Constants
+@using RenzoAgostini.Shared.DTOs
+
+<PageTitle>Chi Sono - Renzo Agostini</PageTitle>
+
+<div class="bio-container">
+    @if (isLoading)
+    {
+        <div class="loading">Caricamento...</div>
+    }
+    else
+    {
+        <div class="bio-header">
+            <h1>Chi Sono</h1>
+            <AuthorizeView Roles="@RoleNames.Admin">
+                @if (!isEditing)
+                {
+                    <button class="btn primary" @onclick="EnableEditing">
+                        Modifica Biografia
+                    </button>
+                }
+            </AuthorizeView>
+        </div>
+
+        @if (isEditing)
+        {
+            <div class="bio-editor">
+                <div class="form-group">
+                    <label>Immagine Profilo</label>
+                    <InputFile OnChange="HandleImageUpload" accept="image/*" class="form-control" />
+                    @if (!string.IsNullOrEmpty(editForm.ImageUrl))
+                    {
+                        <div class="current-image">
+                            <img src="@editForm.ImageUrl" alt="Anteprima" class="bio-image-preview" />
+                            <button class="btn danger small" @onclick="RemoveImage">Rimuovi Immagine</button>
+                        </div>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label>Descrizione</label>
+                    <textarea @bind="editForm.Content" class="bio-textarea" rows="15"></textarea>
+                </div>
+
+                <div class="editor-actions">
+                    <button class="btn secondary" @onclick="CancelEditing" disabled="@isSaving">Annulla</button>
+                    <button class="btn primary" @onclick="SaveBio" disabled="@isSaving">
+                        @(isSaving ? "Salvataggio..." : "Salva")
+                    </button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="bio-content">
+                @if (!string.IsNullOrEmpty(displayDto.ImageUrl))
+                {
+                    <div class="bio-image-wrapper">
+                        <img src="@displayDto.ImageUrl" alt="Renzo Agostini" class="bio-image" />
+                    </div>
+                }
+
+                <div class="bio-text">
+                    @if (string.IsNullOrWhiteSpace(displayDto.Content))
+                    {
+                        <p class="placeholder">Nessuna biografia inserita.</p>
+                    }
+                    else
+                    {
+                        @foreach (var paragraph in displayDto.Content.Split(new[] { '\n', '\r' },
+                       StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            <p>@paragraph</p>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

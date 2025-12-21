@@ -1,0 +1,122 @@
+.bio-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.bio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bio-header h1 {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Content View */
+.bio-content {
+    display: grid;
+    gap: 3rem;
+    /* By default stack */
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .bio-content {
+        grid-template-columns: 350px 1fr;
+        align-items: start;
+    }
+}
+
+.bio-image-wrapper {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    aspect-ratio: 3/4;
+}
+
+.bio-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.bio-text {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+}
+
+.bio-text p {
+    margin-bottom: 1.5rem;
+}
+
+.placeholder {
+    font-style: italic;
+    color: var(--text-tertiary);
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* Editor View */
+.bio-editor {
+    background: var(--bg-surface);
+    padding: 2rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.bio-textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 300px;
+}
+
+.bio-image-preview {
+    max-width: 200px;
+    border-radius: var(--radius-sm);
+    margin: 1rem 0;
+    display: block;
+}
+
+.editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.current-image {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}

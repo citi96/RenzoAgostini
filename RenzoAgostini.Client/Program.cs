@@ -51,6 +51,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICheckoutService, CheckoutClient>();
 builder.Services.AddScoped<IShippingClient, ShippingClient>();
 builder.Services.AddScoped<ICustomOrderService, CustomOrderService>();
+builder.Services.AddScoped<IBiographyService, BiographyService>();
 
 // 5. Register AuthService
 builder.Services.AddScoped<IAuthService, AuthService>();

@@ -12,6 +12,7 @@ namespace RenzoAgostini.Server.Data
         public DbSet<CustomOrder> CustomOrders => Set<CustomOrder>();
         public DbSet<ShippingOption> ShippingOptions => Set<ShippingOption>();
         public DbSet<StoredFile> StoredFiles => Set<StoredFile>();
+        public DbSet<Biography> Bios => Set<Biography>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -158,12 +159,30 @@ namespace RenzoAgostini.Server.Data
                 entity.Property(f => f.Content).IsRequired(); // BLOB
             });
 
+            // Configurazione Biography
+            modelBuilder.Entity<Biography>(entity =>
+            {
+                entity.HasKey(b => b.Id);
+                entity.Property(b => b.Content).HasMaxLength(4000);
+                entity.Property(b => b.ImageUrl).HasMaxLength(500);
+            });
+
             // Seed data per development
             SeedData(modelBuilder);
         }
 
         private void SeedData(ModelBuilder modelBuilder)
         {
+            // Seed Biography
+            modelBuilder.Entity<Biography>().HasData(
+                new Biography
+                {
+                    Id = 1,
+                    Content = "Questa è la biografia dell'artista. Modificala dal pannello admin.",
+                    ImageUrl = null
+                }
+            );
+
             var shippingOptions = new[]
             {
                 new ShippingOption
