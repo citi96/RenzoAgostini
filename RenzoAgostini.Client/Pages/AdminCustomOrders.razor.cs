@@ -313,5 +313,26 @@ namespace RenzoAgostini.Client.Pages
             var ext = Path.GetExtension(fileName).ToLowerInvariant();
             return ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif" || ext == ".webp" || ext == ".bmp";
         }
+
+        protected void UpdateTitleAndSlug(string title)
+        {
+            acceptForm.PaintingData.Title = title;
+            acceptForm.PaintingData.Slug = GenerateSlug(title);
+        }
+
+        private static string GenerateSlug(string title)
+        {
+            if (string.IsNullOrWhiteSpace(title)) return "";
+
+            var slug = title.ToLowerInvariant().Trim();
+            // Replace spaces with dashes
+            slug = System.Text.RegularExpressions.Regex.Replace(slug, @"\s+", "-");
+            // Remove invalid chars
+            slug = System.Text.RegularExpressions.Regex.Replace(slug, @"[^a-z0-9\-]", "");
+            // Remove multiple dashes
+            slug = System.Text.RegularExpressions.Regex.Replace(slug, @"-+", "-");
+
+            return slug;
+        }
     }
 }
