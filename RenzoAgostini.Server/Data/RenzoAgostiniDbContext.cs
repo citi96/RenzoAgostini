@@ -14,6 +14,11 @@ namespace RenzoAgostini.Server.Data
         public DbSet<StoredFile> StoredFiles => Set<StoredFile>();
         public DbSet<Biography> Bios => Set<Biography>();
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

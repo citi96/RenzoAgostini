@@ -213,18 +213,29 @@ namespace RenzoAgostini.Server.Services
                 var orderUrl = $"{baseUrl}/orders/{order.Id}";
                 var supportUrl = $"mailto:{_emailOptions.NoReplySender}";
 
-                await emailSender.SendAsync(new(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null,
-                    EmailTemplates.GetOrderPaidEmail(
-                        order.Id.ToString(),
-                        $"{order.CustomerFirstName} {order.CustomerLastName}",
-                        order.CreatedAt.ToString("dd/MM/yyyy"),
-                        $"€{order.TotalAmount:F2}",
-                        "Carta di Credito / Stripe",
-                        orderUrl,
-                        supportUrl))
+                // Fire-and-forget email sending to avoid blocking response
+                _ = Task.Run(async () =>
                 {
-                    To = [new EmailAddress(order.CustomerEmail, $"{order.CustomerLastName}, {order.CustomerFirstName}")],
-                    Subject = "Conferma di pagamento - Ordine #" + order.Id
+                    try
+                    {
+                        await emailSender.SendAsync(new(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null,
+                            EmailTemplates.GetOrderPaidEmail(
+                                order.Id.ToString(),
+                                $"{order.CustomerFirstName} {order.CustomerLastName}",
+                                order.CreatedAt.ToString("dd/MM/yyyy"),
+                                $"€{order.TotalAmount:F2}",
+                                "Carta di Credito / Stripe",
+                                orderUrl,
+                                supportUrl))
+                        {
+                            To = [new EmailAddress(order.CustomerEmail, $"{order.CustomerLastName}, {order.CustomerFirstName}")],
+                            Subject = "Conferma di pagamento - Ordine #" + order.Id
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "Errore nell'invio dell'email di conferma per ordine {OrderId}", order.Id);
+                    }
                 });
 
                 // 4. Aggiorna lo stato di ogni quadro come venduto (IsForSale = false)

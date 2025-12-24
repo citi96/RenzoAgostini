@@ -24,6 +24,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -96,6 +98,12 @@ builder.Services.AddScoped<IBiographyService, BiographyService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFileStorageService, DatabaseFileStorageService>();
+
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
 
 builder.Services.Configure<StripeOptions>(builder.Configuration.GetSection("Stripe"));
 var stripeApiKey = builder.Configuration["Stripe:SecretKey"];
@@ -249,6 +257,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseResponseCompression();
 app.UseStaticFiles();
 
 app.MapControllers();
