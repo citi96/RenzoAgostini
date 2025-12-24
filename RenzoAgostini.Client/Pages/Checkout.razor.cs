@@ -13,7 +13,7 @@ namespace RenzoAgostini.Client.Pages
         [Inject] private ICartService CartService { get; set; } = default!;
         [Inject] private IOrderService OrderService { get; set; } = default!;
         [Inject] private ICheckoutService CheckoutService { get; set; } = default!;
-        [Inject] private Services.Interfaces.IAuthService AuthService { get; set; } = default!; /* Added Injection */
+        [Inject] private IAuthService AuthService { get; set; } = default!; /* Fixed Injection */
         [Inject] private IShippingClient ShippingClient { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;

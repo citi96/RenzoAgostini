@@ -2,6 +2,7 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using RenzoAgostini.Client.Components
 @attribute [Authorize]
 
 <PageTitle>Checkout - Galleria Agostini</PageTitle>
@@ -12,7 +13,7 @@
         <h1 class="checkout-title">Checkout Sicuro</h1>
         <div class="checkout-subtitle">
             <div class="security-badge">
-                <span>🔒</span>
+                <Icon Name="lock" />
                 <span>Connessione Sicura SSL</span>
             </div>
         </div>
@@ -44,7 +45,9 @@
     else if (!cartItems.Any())
     {
         <div class="empty-cart">
-            <div class="empty-cart-icon">🛒</div>
+            <div class="empty-cart-icon">
+                <Icon Name="cart" />
+            </div>
             <h2>Carrello Vuoto</h2>
             <p>Non puoi procedere al checkout con un carrello vuoto.</p>
             <a href="/cart" class="btn btn-primary">Torna al Carrello</a>
@@ -62,7 +65,9 @@
                     <!-- Personal Information -->
                     <div class="form-section">
                         <h2 class="section-title">
-                            <div class="section-icon">👤</div>
+                            <div class="section-icon">
+                                <Icon Name="user" />
+                            </div>
                             <span>Dati Personali</span>
                         </h2>
 
@@ -92,7 +97,9 @@
                     <!-- Shipping Address -->
                     <div class="form-section">
                         <h2 class="section-title">
-                            <div class="section-icon">📍</div>
+                            <div class="section-icon">
+                                <Icon Name="pin" />
+                            </div>
                             <span>Indirizzo di Spedizione</span>
                         </h2>
 
@@ -132,7 +139,9 @@
                     <!-- Shipping Method -->
                     <div class="form-section shipping-method-section">
                         <h2 class="section-title">
-                            <div class="section-icon">🚚</div>
+                            <div class="section-icon">
+                                <Icon Name="shipping" />
+                            </div>
                             <span>Metodo di Spedizione</span>
                         </h2>
 
@@ -146,14 +155,14 @@
                         else if (!string.IsNullOrEmpty(shippingError))
                         {
                             <div class="shipping-state error">
-                                <span>⚠️</span>
+                                <Icon Name="error" />
                                 <span>@shippingError</span>
                             </div>
                         }
                         else if (!shippingOptions.Any())
                         {
                             <div class="shipping-state empty">
-                                <span>😕</span>
+                                <Icon Name="empty" />
                                 <div>
                                     <p>Nessuna modalità di spedizione disponibile per il paese selezionato.</p>
                                     <p class="shipping-state-subtext">Contattaci per organizzare una consegna personalizzata.</p>
@@ -219,7 +228,10 @@
             <div class="order-summary">
                 <div class="summary-card">
                     <div class="summary-header">
-                        <h3 class="summary-title">Il Tuo Ordine</h3>
+                        <h3 class="summary-title">
+                            <Icon Name="palette" />
+                            <span>Il Tuo Ordine</span>
+                        </h3>
                     </div>
 
                     <div class="summary-body">
@@ -236,7 +248,7 @@
                                     else
                                     {
                                         <div class="order-item-image" style="background: var(--neutral-200); display: flex; align-items: center; justify-content: center; color: var(--neutral-500);">
-                                            🎨
+                                            <Icon Name="palette" />
                                         </div>
                                     }
                                 </div>
@@ -289,18 +301,18 @@
                                 disabled="@(!IsFormValid() || isProcessing)">
                             @if (isProcessing)
                             {
-                                <span class="animate-spin">⏳</span>
+                                <span class="animate-spin checkout-loading-spinner"></span>
                                 <span>Elaborazione...</span>
                             }
                             else
                             {
-                                <span>🔒</span>
+                                <Icon Name="lock" />
                                 <span>Conferma Ordine (@GetTotal().ToString("C", CultureInfo.GetCultureInfo("it-IT")))</span>
                             }
                         </button>
                         
                         <div class="security-info">
-                            <span>🔒</span>
+                            <Icon Name="lock" />
                             <span>I tuoi dati sono protetti da crittografia SSL a 256-bit</span>
                         </div>
                     </div>
