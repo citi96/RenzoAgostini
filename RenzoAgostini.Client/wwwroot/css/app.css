@@ -46,6 +46,17 @@
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
     --shadow-colored: 0 10px 25px -5px rgb(168 85 247 / 0.2), 0 8px 10px -6px rgb(168 85 247 / 0.1);
+    /* Stati Semantici */
+    --status-success-bg: #dcfce7;
+    --status-success-text: #15803d;
+    --status-success-border: #86efac;
+    --status-error-bg: #fee2e2;
+    --status-error-text: #dc2626;
+    --status-error-border: #fca5a5;
+    --status-info-bg: #dbeafe;
+    --status-info-text: #1e40af;
+    --status-completed-bg: #f3e8ff;
+    --status-completed-text: #7c3aed;
     /* Typography */
     --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
