@@ -77,7 +77,7 @@ public class AuthController(
             await emailSender.SendAsync(new EmailMessage(
                 From: null,
                 ReplyTo: null,
-                TextBody: $"Ciao {user.Name}, grazie per esserti registrato alla Galleria Renzo Agostini!",
+                TextBody: $"Salve {user.Name}, grazie per esserti registrato alla Galleria Renzo Agostini!",
                 HtmlBody: EmailTemplates.GetWelcomeEmail(user.Name ?? user.UserName ?? "Utente")
             )
             {

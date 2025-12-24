@@ -179,10 +179,10 @@ namespace RenzoAgostini.Server.Services
         {
             var message = new EmailMessage(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null, $@"
                 <h2>Richiesta Ricevuta</h2>
-                <p>Ciao,</p>
-                <p>Abbiamo ricevuto la tua richiesta per un quadro personalizzato.</p>
+                <p>Salve,</p>
+                <p>Ho ricevuto la tua richiesta per un quadro personalizzato.</p>
                 <p><strong>Descrizione:</strong> {customOrder.Description}</p>
-                <p>Ti contatteremo presto con maggiori dettagli.</p>
+                <p>Ti contatterò presto con maggiori dettagli.</p>
                 <p>Il tuo codice di riferimento è: <strong>{customOrder.AccessCode}</strong></p>
             ")
             {
@@ -223,7 +223,7 @@ namespace RenzoAgostini.Server.Services
         {
             var message = new EmailMessage(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null, $@"
                 <h2>Richiesta Accettata!</h2>
-                <p>Ciao,</p>
+                <p>Salve,</p>
                 <p>La tua richiesta è stata accettata dall'artista!</p>
                 <p><strong>Prezzo:</strong> €{customOrder.QuotedPrice:F2}</p>
                 {(string.IsNullOrEmpty(customOrder.ArtistNotes) ? "" : $"<p><strong>Note dell'artista:</strong> {customOrder.ArtistNotes}</p>")}
@@ -247,10 +247,10 @@ namespace RenzoAgostini.Server.Services
 
             var message = new EmailMessage(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null, $@"
                 <h2>Richiesta Non Accettata</h2>
-                <p>Ciao,</p>
-                <p>Purtroppo non possiamo procedere con la tua richiesta di quadro personalizzato.</p>
+                <p>Salve,</p>
+                <p>Purtroppo non posso procedere con la tua richiesta di quadro personalizzato.</p>
                 {reasonText}
-                <p>Ti ringraziamo per l'interesse e speriamo di poterti servire in futuro.</p>
+                <p>Ti ringrazio per l'interesse.</p>
             ")
             {
                 To = [new EmailAddress(customOrder.CustomerEmail)],

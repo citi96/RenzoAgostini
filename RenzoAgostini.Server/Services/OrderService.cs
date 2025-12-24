@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.Extensions.Options;
 using RenzoAgostini.Server.Config;
+using RenzoAgostini.Server.Emailing;
 using RenzoAgostini.Server.Emailing.Interfaces;
 using RenzoAgostini.Server.Emailing.Models;
 using RenzoAgostini.Server.Entities;
@@ -22,7 +23,7 @@ namespace RenzoAgostini.Server.Services
         IShippingOptionRepository shippingOptionRepository,
         IOptions<StripeOptions> stripeOptions,
         ICustomEmailSender emailSender,
-        IWebHostEnvironment env,
+        // IWebHostEnvironment env removed as unused
         IOptions<EmailOptions> emailOptions,
         ILogger<OrderService> logger) : IOrderService
     {
@@ -208,7 +209,19 @@ namespace RenzoAgostini.Server.Services
                 order.Status = OrderStatus.Paid;
                 await orderRepository.UpdateAsync(order);
 
-                await emailSender.SendAsync(new(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null, GetHtmlMessage($"{env.WebRootPath}/mailTemplates/order_paid.html"))
+                var baseUrl = "https://www.renzoagostini.it"; // Should be in config
+                var orderUrl = $"{baseUrl}/orders/{order.Id}";
+                var supportUrl = $"mailto:{_emailOptions.NoReplySender}";
+
+                await emailSender.SendAsync(new(new EmailAddress(_emailOptions.NoReplySender, "Renzo Agostini"), null, null,
+                    EmailTemplates.GetOrderPaidEmail(
+                        order.Id.ToString(),
+                        $"{order.CustomerFirstName} {order.CustomerLastName}",
+                        order.CreatedAt.ToString("dd/MM/yyyy"),
+                        $"€{order.TotalAmount:F2}",
+                        "Carta di Credito / Stripe",
+                        orderUrl,
+                        supportUrl))
                 {
                     To = [new EmailAddress(order.CustomerEmail, $"{order.CustomerLastName}, {order.CustomerFirstName}")],
                     Subject = "Conferma di pagamento - Ordine #" + order.Id
@@ -329,11 +342,6 @@ namespace RenzoAgostini.Server.Services
                 "vatican" or "vaticano" or "città del vaticano" or "holy see" => true,
                 _ => false
             };
-        }
-
-        private static string GetHtmlMessage(string templatePath)
-        {
-            return System.IO.File.ReadAllText(templatePath);
         }
     }
 }
