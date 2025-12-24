@@ -56,7 +56,10 @@ body.kc-body,
 }
 
 .kc-shell {
-    width: min(560px, 100%);
+    width: 450px;
+    /* Fixed dimension as requested */
+    max-width: 95vw;
+    /* Mobile safety */
     background: white;
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-lg);

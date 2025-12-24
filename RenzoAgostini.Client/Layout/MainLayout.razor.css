@@ -380,7 +380,7 @@
 /* Main Content Container */
 .main-container {
     min-height: calc(100vh - 80px);
-    background: var(--neutral-50);
+    /* background: var(--neutral-50); Removed to show global body gradient */
 }
 
 .main-content {
