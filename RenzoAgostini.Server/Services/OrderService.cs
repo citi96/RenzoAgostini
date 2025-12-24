@@ -23,7 +23,7 @@ namespace RenzoAgostini.Server.Services
         IShippingOptionRepository shippingOptionRepository,
         IOptions<StripeOptions> stripeOptions,
         ICustomEmailSender emailSender,
-        // IWebHostEnvironment env removed as unused
+        IConfiguration configuration,
         IOptions<EmailOptions> emailOptions,
         ILogger<OrderService> logger) : IOrderService
     {
@@ -209,7 +209,7 @@ namespace RenzoAgostini.Server.Services
                 order.Status = OrderStatus.Paid;
                 await orderRepository.UpdateAsync(order);
 
-                var baseUrl = "https://www.renzoagostini.it"; // Should be in config
+                var baseUrl = configuration["ClientBaseUrl"] ?? "https://www.renzoagostini.it";
                 var orderUrl = $"{baseUrl}/orders/{order.Id}";
                 var supportUrl = $"mailto:{_emailOptions.NoReplySender}";
 
