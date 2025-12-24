@@ -423,5 +423,30 @@ window.GalleriaUtils = {
     initializeHomeAnimations: window.initializeHomeAnimations,
     trackEvent: window.trackEvent,
     measurePerformance: window.measurePerformance,
-    trapFocus: window.trapFocus
+    trackEvent: window.trackEvent,
+    measurePerformance: window.measurePerformance,
+    trapFocus: window.trapFocus,
+    initializeImageProtection: window.initializeImageProtection
 };
+
+// Image Protection (Right-click disable)
+window.initializeImageProtection = () => {
+    document.addEventListener('contextmenu', (e) => {
+        if (e.target.tagName === 'IMG') {
+            e.preventDefault();
+            // Optional: Show a toast? No, silent is better to not annoy legitimate users too much.
+            return false;
+        }
+    });
+
+    // Disable drag start on images globally
+    document.addEventListener('dragstart', (e) => {
+        if (e.target.tagName === 'IMG') {
+            e.preventDefault();
+            return false;
+        }
+    });
+};
+
+// Auto-run on load
+window.initializeImageProtection();

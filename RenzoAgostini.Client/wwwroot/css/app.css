@@ -99,6 +99,17 @@ html {
     scroll-behavior: smooth;
 }
 
+/* Image Copyright Protection */
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
 body {
     font-family: var(--font-body);
     font-size: 1rem;
