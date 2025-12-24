@@ -45,9 +45,6 @@
 body.kc-body,
 .kc-body {
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-    background: radial-gradient(circle at top, rgba(147, 51, 234, 0.2), transparent 45%), var(--neutral-50);
-    background-attachment: fixed;
-    /* Ensures gradient doesn't scroll away */
     color: var(--neutral-700);
     min-height: 100vh;
     margin: 0;
@@ -55,6 +52,22 @@ body.kc-body,
     align-items: center;
     justify-content: center;
     padding: var(--spacing-6) var(--spacing-3);
+    position: relative;
+    background: transparent;
+    /* Reset for pseudo-element */
+}
+
+/* Auth Page specific override */
+body.kc-body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Gradient AND Base Color combined in fixed layer */
+    background: radial-gradient(circle at top, rgba(147, 51, 234, 0.2), transparent 45%), var(--neutral-50);
+    z-index: -1;
 }
 
 .kc-shell {
