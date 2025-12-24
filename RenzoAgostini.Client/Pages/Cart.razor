@@ -31,14 +31,13 @@
     {
         <!-- Empty Cart -->
         <div class="empty-cart">
-            <div class="empty-cart-icon">🛒</div>
+            <div class="empty-cart-icon"></div>
             <h2 class="empty-cart-title">Il Tuo Carrello è Vuoto</h2>
             <p class="empty-cart-description">
                 Non hai ancora aggiunto nessun quadro al tuo carrello.
                 Esplora la nostra galleria e trova l'opera perfetta per te.
             </p>
             <a href="/" class="start-shopping-btn">
-                <span>🎨</span>
                 <span>Inizia a Comprare</span>
             </a>
         </div>
@@ -52,7 +51,6 @@
                 <div class="cart-items-header">
                     <h2 class="cart-items-title">Articoli (@cartItems.Count)</h2>
                     <button class="clear-cart-btn" @onclick="ClearCart" disabled="@isUpdating">
-                        <span>🗑️</span>
                         <span>Svuota Carrello</span>
                     </button>
                 </div>
@@ -72,7 +70,7 @@
                                 {
                                     <div class="cart-item-image"
                                         style="background: var(--neutral-200); display: flex; align-items: center; justify-content: center; color: var(--neutral-500);">
-                                        🎨
+                                        <!-- Placeholder -->
                                     </div>
                                 }
                             </div>
@@ -83,11 +81,11 @@
                                 <div class="cart-item-meta">
                                     @if (item.Year.HasValue)
                                     {
-                                        <span>📅 @item.Year</span>
+                                        <span>@item.Year</span>
                                     }
                                     @if (!string.IsNullOrEmpty(item.Medium))
                                     {
-                                        <span>🎨 @item.Medium</span>
+                                        <span>@item.Medium</span>
                                     }
                                 </div>
                                 <div class="cart-item-price">
@@ -98,7 +96,7 @@
                             <!-- Remove Button -->
                             <button class="remove-item-btn" @onclick="() => RemoveItem(item.Id)" disabled="@isUpdating"
                                 title="Rimuovi dal carrello">
-                                🗑️
+                                &times;
                             </button>
                         </div>
                     }
@@ -143,7 +141,7 @@
                         @if (ShouldShowFreeShippingBanner())
                         {
                             <div class="summary-row shipping-incentive">
-                                <span>🚚 Aggiungi @GetAmountForFreeShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT"))
+                                <span>Aggiungi @GetAmountForFreeShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT"))
                                     per ottenere la spedizione gratuita con @SelectedShippingOption!.Name.</span>
                             </div>
                         }
@@ -158,18 +156,15 @@
                         <button class="checkout-btn" @onclick="GoToCheckout" disabled="@(!cartItems.Any() || isUpdating)">
                             @if (isUpdating)
                             {
-                                <span class="animate-spin">⏳</span>
                                 <span>Aggiornamento...</span>
                             }
                             else
                             {
-                                <span>🔒</span>
                                 <span>Procedi al Checkout</span>
                             }
                         </button>
 
                         <a href="/" class="continue-shopping-btn">
-                            <span>🎨</span>
                             <span>Continua lo Shopping</span>
                         </a>
                     </div>
@@ -179,7 +174,8 @@
                 @if (ShouldShowFreeShippingBanner())
                 {
                     <div class="free-shipping-banner">
-                        <div class="free-shipping-title">🚚 Spedizione Gratuita</div>
+                    <div class="free-shipping-banner">
+                        <div class="free-shipping-title">Spedizione Gratuita</div>
                         <div class="free-shipping-text">
                             Ti mancano @GetAmountForFreeShipping().ToString("C", CultureInfo.GetCultureInfo("it-IT")) per
                             ottenere la spedizione gratuita con @SelectedShippingOption!.Name.
@@ -189,7 +185,7 @@
                 else if (SelectedShippingOption is not null && !SelectedShippingOption.IsPickup && GetShipping() == 0)
                 {
                     <div class="free-shipping-banner success">
-                        <div class="free-shipping-title">🎉 Spedizione gratuita applicata</div>
+                        <div class="free-shipping-title">Spedizione gratuita applicata</div>
                         <div class="free-shipping-text">
                             Con @SelectedShippingOption.Name la spedizione è gratuita sul tuo ordine attuale.
                         </div>

@@ -11,7 +11,7 @@ else
 {
     <div class="custom-painting-container">
         <div class="header">
-            <div class="badge">✨ Quadro Personalizzato</div>
+            <div class="badge">Quadro Personalizzato</div>
             <h1>@painting.Title</h1>
             <p class="subtitle">Creato appositamente per te dall'artista</p>
         </div>
@@ -42,7 +42,7 @@ else
                 else
                 {
                     <div class="no-image">
-                        <p>🎨 Immagine in arrivo...</p>
+                        <p>Immagine in arrivo...</p>
                     </div>
                 }
             </div>
@@ -93,7 +93,7 @@ else
                         </div>
 
                         <p class="exclusive-note">
-                            🌟 Questo quadro è stato creato esclusivamente per te e sarà disponibile solo per un tempo limitato.
+                            Questo quadro è stato creato esclusivamente per te e sarà disponibile solo per un tempo limitato.
                         </p>
 
                         <button class="btn primary large" @onclick="AddToCart" disabled="@isAddingToCart">
@@ -103,14 +103,14 @@ else
                             }
                             else
                             {
-                                <span>🛒 Aggiungi al Carrello</span>
+                                <span>Aggiungi al Carrello</span>
                             }
                         </button>
 
                         @if (addedToCart)
                         {
                             <div class="success-message">
-                                ✅ Aggiunto al carrello!
+                                Aggiunto al carrello!
                                 <a href="/cart" class="link">Vai al carrello</a>
                             </div>
                         }
@@ -131,7 +131,7 @@ else
             <p>L'artista è a tua disposizione per qualsiasi chiarimento o modifica.</p>
             <a href="mailto:renzo.agostini@example.com?subject=Domanda su quadro personalizzato - ID @painting.Id"
                 class="btn secondary">
-                📧 Contatta l'Artista
+                Contatta l'Artista
             </a>
         </div>
     </div>
