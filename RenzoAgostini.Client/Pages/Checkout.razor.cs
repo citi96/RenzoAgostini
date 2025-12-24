@@ -13,6 +13,7 @@ namespace RenzoAgostini.Client.Pages
         [Inject] private ICartService CartService { get; set; } = default!;
         [Inject] private IOrderService OrderService { get; set; } = default!;
         [Inject] private ICheckoutService CheckoutService { get; set; } = default!;
+        [Inject] private Services.Interfaces.IAuthService AuthService { get; set; } = default!; /* Added Injection */
         [Inject] private IShippingClient ShippingClient { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthProvider { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
@@ -80,17 +81,36 @@ namespace RenzoAgostini.Client.Pages
                 var authState = await AuthProvider.GetAuthenticationStateAsync();
                 if (authState.User.Identity?.IsAuthenticated == true)
                 {
+                    // 1. Try Claims first (Instant)
                     orderForm.Email = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
                         ?? authState.User.FindFirst("email")?.Value
                         ?? authState.User.Identity.Name
                         ?? "";
 
-                    // Extract first/last name from claims if available
                     var givenName = authState.User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value
                         ?? authState.User.FindFirst("given_name")?.Value;
 
                     var familyName = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value
                         ?? authState.User.FindFirst("family_name")?.Value;
+
+                    // 2. Fallback to API Profile Fetch if names are missing (Guaranteed fresh data)
+                    if (string.IsNullOrEmpty(givenName) || string.IsNullOrEmpty(familyName))
+                    {
+                        try
+                        {
+                            var profile = await AuthService.GetProfileAsync();
+                            if (profile != null)
+                            {
+                                givenName = profile.Name;
+                                familyName = profile.Surname;
+                                if (string.IsNullOrEmpty(orderForm.Email)) orderForm.Email = profile.Email;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogWarning(ex, "Failed to fetch profile fallback in checkout");
+                        }
+                    }
 
                     if (!string.IsNullOrEmpty(givenName))
                         orderForm.FirstName = givenName;
