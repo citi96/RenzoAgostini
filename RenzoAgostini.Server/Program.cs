@@ -20,6 +20,10 @@ using RenzoAgostini.Shared.Contracts;
 using Stripe;
 using System.Text;
 using IOrderService = RenzoAgostini.Server.Services.Interfaces.IOrderService;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -244,9 +248,11 @@ else if (configuredOrigins.Length > 0)
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 
 app.UseStaticFiles();
+
+app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();
 

@@ -16,8 +16,15 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 var http = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
-using var s1 = await http.GetStreamAsync("appsettings.json");
-builder.Configuration.AddJsonStream(s1);
+try
+{
+    using var s1 = await http.GetStreamAsync("appsettings.json");
+    builder.Configuration.AddJsonStream(s1);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Warning: Failed to load appsettings.json. Using default configuration. Error: {ex.Message}");
+}
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<AuthorizationMessageHandler>();
