@@ -46,6 +46,8 @@ body.kc-body,
 .kc-body {
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     background: radial-gradient(circle at top, rgba(147, 51, 234, 0.2), transparent 45%), var(--neutral-50);
+    background-attachment: fixed;
+    /* Ensures gradient doesn't scroll away */
     color: var(--neutral-700);
     min-height: 100vh;
     margin: 0;
