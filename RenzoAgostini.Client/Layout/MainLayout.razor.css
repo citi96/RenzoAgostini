@@ -5,10 +5,12 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(255, 255, 255, 0.95);
+    /* More transparent for better blending */
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--neutral-200);
+    /* Softer border that blends with the purple gradient */
+    border-bottom: 1px solid rgba(147, 51, 234, 0.1);
     padding: var(--spacing-4) 0;
     transition: all var(--transition-base);
 }
