@@ -36,6 +36,8 @@ public class TokenService(IOptions<JwtOptions> jwtOptions) : ITokenService
             new(JwtRegisteredClaimNames.Sub, user.Id),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+            new(JwtRegisteredClaimNames.GivenName, user.Name ?? ""),
+            new(JwtRegisteredClaimNames.FamilyName, user.Surname ?? ""),
             new(ClaimTypes.NameIdentifier, user.Id),
             new(ClaimTypes.Name, user.UserName ?? "")
         };

@@ -80,11 +80,17 @@ namespace RenzoAgostini.Client.Pages
                 var authState = await AuthProvider.GetAuthenticationStateAsync();
                 if (authState.User.Identity?.IsAuthenticated == true)
                 {
-                    orderForm.Email = authState.User.Identity.Name ?? "";
+                    orderForm.Email = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                        ?? authState.User.FindFirst("email")?.Value
+                        ?? authState.User.Identity.Name
+                        ?? "";
 
                     // Extract first/last name from claims if available
-                    var givenName = authState.User.FindFirst("given_name")?.Value;
-                    var familyName = authState.User.FindFirst("family_name")?.Value;
+                    var givenName = authState.User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value
+                        ?? authState.User.FindFirst("given_name")?.Value;
+
+                    var familyName = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value
+                        ?? authState.User.FindFirst("family_name")?.Value;
 
                     if (!string.IsNullOrEmpty(givenName))
                         orderForm.FirstName = givenName;
@@ -202,7 +208,7 @@ namespace RenzoAgostini.Client.Pages
                 CartService.CheckoutData = orderForm.ToCheckoutDto(cartItems.Select(p => p.Id));
 
                 var session = await CheckoutService.CreateCheckoutSessionAsync(CartService.CheckoutData!);
-                Navigation.NavigateTo(session.SessionUrl, forceLoad: true);                
+                Navigation.NavigateTo(session.SessionUrl, forceLoad: true);
             }
             catch (Exception ex)
             {
